@@ -1,0 +1,10 @@
+3,17,forward,false
+2,31,back,false
+3,30,left,false
+2,32,right,false
+3,200,lookUp,false
+2,208,lookDown,false
+3,203,lookLeft,false
+2,205,lookRight,false
+2,44,down,false
+2,16,up,false

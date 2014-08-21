@@ -1,0 +1,25 @@
+Server - The main server in which users connect to
+	* Ip = The IPv4 address to connect to
+	* Port = The port the server listens on
+	* MaxUsers = The maximum number of users can join the server
+	* Users = The array of all the NetworkUsers on the server
+	
+NetworkPlayer - The instance of a player that is connected to the server
+	* in = An input stream used to manage all of the massages sent from the user, that the NetworkPlayer represents, to the server
+	* out = An output stream used to send a packet to the user, that the NetworkPlayer represents, from the server
+	
+Client - The client used to send and receive packets from the server 
+	* in = An input stream used to manage all of the massages sent from the server to the client
+	* out = An output stream used to send a packet to the server from the client
+	
+	
+	
+	
+	
+	Client(OUT) --packet--> Server
+						       |                           Processes packet
+					     NetWork Player                           / \
+					         (IN)                                  |
+						       |                                  (IN)
+						      \ /                                  |
+					        packet --Network Player (OUT) --> Other Client's
