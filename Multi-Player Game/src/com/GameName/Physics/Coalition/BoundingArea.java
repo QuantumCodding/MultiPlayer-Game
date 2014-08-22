@@ -33,7 +33,7 @@ public class BoundingArea {
 			}
 		}
 		
-		return new CollisionEvent(false, getAvgCenter().distance(other.getAvgCenter()));
+		return new CollisionEvent(false, getAvgCenter().subtract(other.getAvgCenter()));
 	}
 	
 	public Vector3f getAvgCenter() {

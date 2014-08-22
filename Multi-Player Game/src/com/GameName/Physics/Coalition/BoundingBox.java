@@ -20,7 +20,7 @@ public class BoundingBox extends Collidable {
 //			case BoundingSphere: return intersectBoundingSphereWithBoundingBox((BoundingSphere) other, this); 
 			
 			default: System.err.println("Error: Tried to intersect a BoundingBox and an Unknown Shape"); 
-					 return new CollisionEvent(false, 0);			
+					 return new CollisionEvent(false, new Vector3f(0, 0, 0));			
 		}
 	}
 

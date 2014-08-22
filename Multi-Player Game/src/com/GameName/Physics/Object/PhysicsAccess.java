@@ -22,6 +22,10 @@ public class PhysicsAccess {
 		return object.vel;
 	}	
 
+	public Vector3f getRotVel() {
+		return object.rotVel;
+	}
+	
 	public BoundingArea getBoundingArea() {
 		return object.bounding;
 	}

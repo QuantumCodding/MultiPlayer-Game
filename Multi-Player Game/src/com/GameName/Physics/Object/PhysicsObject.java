@@ -8,7 +8,9 @@ import com.GameName.World.World;
 public abstract class PhysicsObject {
 	protected Vector3f pos;
 	protected Vector3f rot;
+	
 	protected Vector3f vel;
+	protected Vector3f rotVel;
 
 	protected BoundingArea bounding;
 	
@@ -35,6 +37,13 @@ public abstract class PhysicsObject {
 		
 		newVel = vel.getY() - PhysicsEngine.GRAVITY;		
 		if(newVel < PhysicsEngine.TERMINAL_VELOCITY) newVel = PhysicsEngine.TERMINAL_VELOCITY;
+		
+		vel.setY(newVel);
+	}
+	
+	public void intergrate(float delta) {
+		pos.addE(vel.multiply(delta));
+		rot.addE(rotVel.multiply(delta));
 	}
 	
 	public PhysicsAccess getAccess() {

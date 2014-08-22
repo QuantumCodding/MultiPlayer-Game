@@ -1,7 +1,7 @@
 package com.GameName.World;
 
 import com.GameName.Entity.Entity;
-import com.GameName.Render.RenderEngin;
+import com.GameName.Render.RenderEngine;
 import com.GameName.Util.Time;
 import com.GameName.Util.Vector3f;
 import com.GameName.World.Cube.Cube;
@@ -45,7 +45,7 @@ public class World {
 		if(!isGenerated)
 			generate();
 		
-		System.out.println("Done In " + RenderEngin.oneDecimal(((double) Time.getTime() - time) / Time.getSECONDS()) + " Seconds");
+		System.out.println("Done In " + RenderEngine.oneDecimal(((double) Time.getTime() - time) / Time.getSECONDS()) + " Seconds");
 	}
 	
 	private void generate() {

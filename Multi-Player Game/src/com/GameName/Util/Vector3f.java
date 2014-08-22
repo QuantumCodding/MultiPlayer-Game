@@ -51,6 +51,9 @@ public class Vector3f {
 				z + add
 			);
 	}
+
+	public void addE(Vector3f add) {set(add(add));}
+	public void addE(float add) {set(add(add));}
 	
 	public Vector3f subtract(Vector3f subtract) {
 		return new Vector3f(
@@ -67,6 +70,9 @@ public class Vector3f {
 				z - subtract
 			);
 	}
+
+	public void subtractE(Vector3f subtract) {set(subtract(subtract));}
+	public void subtractE(float subtract) {set(subtract(subtract));}
 	
 	public Vector3f multiply(Vector3f mult) {
 		return new Vector3f(
@@ -84,6 +90,9 @@ public class Vector3f {
 			);
 	}
 	
+	public void multiplyE(Vector3f mult) {set(multiply(mult));}
+	public void multiplyE(float mult) {set(multiply(mult));}
+	
 	public Vector3f divide(Vector3f divide) {
 		return new Vector3f(
 				x / divide.getX(),
@@ -100,6 +109,9 @@ public class Vector3f {
 			);
 	}
 	
+	public void divideE(Vector3f divide) {set(divide(divide));}
+	public void divideE(float divide) {set(divide(divide));}
+	
 	public float distance(Vector3f other) {
 		return (float) Math.sqrt(
 				Math.pow(x - other.getX(), 2) +
@@ -110,10 +122,40 @@ public class Vector3f {
 	
 	public float length() {
 		return (float) Math.sqrt(
-				Math.pow(x, 2) +
-				Math.pow(y, 2) + 
-				Math.pow(z, 2)
+				dot(this)
 			);
+	}
+	
+	public float dot(Vector3f other) {
+		return (x * other.x) +
+			   (y * other.y) +
+			   (z * other.z) ;
+	}
+	
+	public Vector3f max(Vector3f other) {
+		return new Vector3f(
+				x > other.getX() ? x : other.getX(),
+				y > other.getY() ? y : other.getY(),
+				z > other.getZ() ? z : other.getZ()
+			);
+	}
+	
+	public float max() {
+		float max = 0;
+		
+		if(x > max) max = x;
+		if(y > max) max = y;
+		if(z > max) max = z;
+		
+		return max;
+	}
+	
+	public Vector3f normalized() {
+		return divide(length());
+	}
+	
+	public Vector3f reflect(Vector3f normal) {
+		return subtract(normal.multiply(dot(normal) * 2));
 	}
 	
 	public Vector3f rotate(Vector3f center, Vector3f rot) {
@@ -140,6 +182,12 @@ public class Vector3f {
 				(float) Math.toDegrees(y),
 				(float) Math.toDegrees(z)
 			);
+	}
+	
+	public void set(Vector3f set) {
+		this.x = set.x;
+		this.y = set.y;
+		this.z = set.z;
 	}
 	
 	public Vector3f clone() {

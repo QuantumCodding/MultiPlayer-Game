@@ -1,12 +1,14 @@
 package com.GameName.Physics.Coalition;
 
+import com.GameName.Util.Vector3f;
+
 public class CollisionEvent {
 	private boolean isColliding;
-	private float distance;
+	private Vector3f direction;
 	
-	public CollisionEvent(boolean isColliding, float distance) {
+	public CollisionEvent(boolean isColliding, Vector3f direction) {
 		this.isColliding = isColliding;
-		this.distance = distance;
+		this.direction = direction;
 	}
 	
 	public boolean isColliding() {
@@ -14,7 +16,10 @@ public class CollisionEvent {
 	}
 	
 	public float getDistance() {
-		return distance;
+		return direction.length();
 	}
 	
+	public Vector3f getDirection() {
+		return direction;
+	}
 }

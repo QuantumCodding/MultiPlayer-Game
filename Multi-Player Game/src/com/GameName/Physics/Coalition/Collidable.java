@@ -18,19 +18,23 @@ public abstract class Collidable {
 	CollisionEvent intersectBoundingSphereWithBoundingSphere(BoundingSphere sphere, BoundingSphere other) {
 					
 		float radiusLength = sphere.getRadius() + other.getRadius();
-		float centerDistance = sphere.getPos().distance(other.getPos());
+		Vector3f direction = other.getCenter().subtract(getCenter());		
+		float centerDistance = direction.length();
+		
+		direction.divideE(centerDistance);
 		float distance = centerDistance - radiusLength;
 			
-		return new CollisionEvent(distance < 0, distance);	
+		return new CollisionEvent(distance < 0, direction.multiply(distance));	
 	}
 
 	CollisionEvent intersectBoundingBoxWithBoundingBox(BoundingBox box, BoundingBox other) {
-		float distance1 = Math.abs(box.getMaxPos().distance(other.getMinPos()));
-		float distance2 = Math.abs(box.getMinPos().distance(other.getMaxPos()));
+		Vector3f distances1 = box.getMaxPos().subtract(other.getMinPos());
+		Vector3f distances2 = box.getMinPos().subtract(other.getMaxPos());
 		
-		float maxDistance = Math.max(distance1, distance2);
+		Vector3f distances = distances1.max(distances2);		
+		float maxDistance = distances.max();
 		
-		return new CollisionEvent(maxDistance < 0, maxDistance);
+		return new CollisionEvent(maxDistance < 0, distances);
 	}
 	
 	CollisionEvent intersectBoundingSphereWithBoundingBox(BoundingSphere sphere, BoundingBox box) {

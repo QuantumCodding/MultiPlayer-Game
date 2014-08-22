@@ -1,6 +1,10 @@
 package com.GameName.Physics;
 
+import java.util.ArrayList;
+
 import com.GameName.Main.GameName;
+import com.GameName.Physics.Coalition.CollisionEvent;
+import com.GameName.Physics.Object.PhysicsObject;
 import com.GameName.Util.Vector3f;
 import com.GameName.World.World;
 
@@ -36,8 +40,7 @@ public class PhysicsEngine {
 		return true;
 	}
 	
-	public static Vector3f getLookPosition(float x, float y, float z, float rotX, float rotY, float rotZ, World w, int maxDistance) {
-		Vector3f pos = new Vector3f(x, y, z);		
+	public static Vector3f getLookPosition(Vector3f pos, float rotX, float rotY, float rotZ, World w, int maxDistance) {	
 		Vector3f change = new Vector3f(
 				(float) Math.cos(Math.toRadians(rotY + 90)),
 				(float) 5,
@@ -51,5 +54,54 @@ public class PhysicsEngine {
 		if(checkDistance >= maxDistance) return null;
 		
 		return pos;
+	}
+	
+	public void simulate(ArrayList<PhysicsObject> objects, float delta) {
+		for(PhysicsObject obj : objects) {
+			obj.intergrate(delta);
+		}
+	}
+	
+	public ArrayList<Collision> detectCollisions(ArrayList<PhysicsObject> objects) {		
+		ArrayList<Collision> collisions = new ArrayList<Collision>();
+		
+		for(int i = 0; i < objects.size(); i ++) {
+			for(int j = i + 1; j < objects.size(); j ++) {
+				
+				CollisionEvent event = objects.get(i).getAccess().getBoundingArea().intersect(
+									   objects.get(j).getAccess().getBoundingArea());
+				
+				if(event.isColliding()) {
+					collisions.add(new Collision(event, i, j));
+				}
+			}	
+		}
+		
+		return collisions;
+	}
+	
+	public void handelCollisions(ArrayList<PhysicsObject> objects, ArrayList<Collision> collisions) {
+		for(Collision collision : collisions) {
+			if(!collision.event.isColliding()) continue;
+			
+			Vector3f direction = collision.event.getDirection().normalized();
+			Vector3f otherDirection = direction.reflect(objects.get(collision.object1).getAccess().getVel().normalized());
+			
+			objects.get(collision.object1).getAccess().getVel().multiplyE(otherDirection);
+			objects.get(collision.object2).getAccess().getVel().multiplyE(direction);
+		}
+	}
+	
+	private class Collision {
+		private CollisionEvent event;
+		
+		private int object1;
+		private int object2;
+		
+		public Collision(CollisionEvent event, int object1, int object2) {
+			this.event = event;
+			this.object1 = object1;
+			this.object2 = object2;
+		}		
 	}
 }
