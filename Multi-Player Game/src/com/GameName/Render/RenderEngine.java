@@ -20,7 +20,7 @@ import com.GameName.Util.Time;
 import com.GameName.World.World;
 import com.GameName.World.Cube.Cube;
 
-public class RenderEngin {
+public class RenderEngine {
 	
 	private UnicodeFont font;
 		
@@ -32,7 +32,7 @@ public class RenderEngin {
 	private FloatBuffer perspectiveProjectionMatrix;
 	private FloatBuffer orthographicProjectionMatrix;
 
-	public RenderEngin() {		
+	public RenderEngine() {		
 		RenderUtil.init();
 		
 		setUpOpenGL();  

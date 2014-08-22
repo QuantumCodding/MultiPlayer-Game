@@ -4,7 +4,7 @@ import com.GameName.Main.GameName;
 import com.GameName.Util.Vector3f;
 import com.GameName.World.World;
 
-public class Physics {
+public class PhysicsEngine {
 	
 	public static final float GRAVITY = 0.01f;
 	public static final float TERMINAL_VELOCITY = -4.0f;

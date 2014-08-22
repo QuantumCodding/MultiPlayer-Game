@@ -10,11 +10,11 @@ import java.util.Random;
 
 import org.newdawn.slick.openal.WaveData;
 
-public class SoundEngin {
+public class SoundEngine {
 	private int[] sounds;
 	public int defaultSource;
 	
-	public SoundEngin() {
+	public SoundEngine() {
 		sounds = new int[] {
 				loadSound("01 In The End"),
 				loadSound("Awesome Music"),
