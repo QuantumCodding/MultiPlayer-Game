@@ -47,16 +47,10 @@ public class Cube {
 	public static Cube TestCube = new TestCube();
 	public static Cube ColorfulTestCube = new ColorfulTestCube();
 	
+	public static Cube StoneCube = new StoneCube();
+	
 	public static Cube GoldCube = new GoldCube();
 	public static Cube CopperCube = new CopperCube();
-	
-	public static Cube TestCube3 = new TestCube();
-	public static Cube TestCube4 = new TestCube();
-	public static Cube TestCube5 = new TestCube();
-	public static Cube TestCube6 = new TestCube();
-	public static Cube TestCube7 = new TestCube();
-	public static Cube TestCube8 = new TestCube();
-	public static Cube TestCube9 = new TestCube();
 
 	static {
 		cubeRegestries = new ArrayList<CubeRegistry>();
@@ -165,10 +159,9 @@ public class Cube {
 		
 		regestry.addCube(Air); regestry.addCube(TestCube); regestry.addCube(ColorfulTestCube); 
 		
-		regestry.addCube(GoldCube); regestry.addCube(CopperCube);
+		regestry.addCube(StoneCube);
 		
-		regestry.addCube(TestCube3); regestry.addCube(TestCube4); regestry.addCube(TestCube5);
-		regestry.addCube(TestCube6); regestry.addCube(TestCube7); regestry.addCube(TestCube8); regestry.addCube(TestCube9);
+		regestry.addCube(GoldCube); regestry.addCube(CopperCube);
 		
 		cubeRegestries.add(regestry);
 	}

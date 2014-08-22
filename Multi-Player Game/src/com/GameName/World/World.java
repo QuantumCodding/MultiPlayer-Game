@@ -59,7 +59,7 @@ public class World {
 				for(int y = 0; y < CHUNK_SIZE; y ++) {
 					for(int z = 0; z < CHUNK_SIZE; z ++) {// % 2
 						chunks[cx + (cy * chunkX) + (cz * chunkX * chunkY)].setCube(x, y, z, 
-								Math.random() > 0.9 ? Cube.GoldCube : Cube.TestCube); // : Math.random() > 0.7 ? Cube.CopperCube//(int)(Math.random() * 10) > 6 ? Cube.Air : (int)(Math.random() * 10) > 6 ? Cube.ColorfulTestCube : Cube.TestCube); // 
+								Math.random() > 0.9 ? Cube.GoldCube : Cube.StoneCube); // : Math.random() > 0.7 ? Cube.CopperCube//(int)(Math.random() * 10) > 6 ? Cube.Air : (int)(Math.random() * 10) > 6 ? Cube.ColorfulTestCube : Cube.TestCube); // 
 					}
 				}				
 			}
@@ -83,7 +83,7 @@ public class World {
 		
 		for(int z = 0; z < sizeZ / 2; z ++) {
 			for(int x = 0; x < sizeX/2; x ++) {
-				for(int y = 0; y < sizeY - ((int)(((float) sizeY / 8f) * 3f)); y ++) {
+				for(int y = 0; y < sizeY - (sizeY / 3); y ++) {
 					setCube(x + sizeX/4, y, z + sizeZ/4, Cube.Air.getId());
 				}
 			}
