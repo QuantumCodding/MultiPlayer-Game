@@ -12,12 +12,12 @@ import org.lwjgl.input.Controller;
 import org.lwjgl.input.Controllers;
 import org.lwjgl.opengl.Display;
 
-import com.GameName.Audio.SoundEngin;
+import com.GameName.Audio.SoundEngine;
 import com.GameName.Entity.EntityPlayer;
 import com.GameName.Input.Control;
 import com.GameName.Networking.Client;
 import com.GameName.Networking.Server;
-import com.GameName.Render.RenderEngin;
+import com.GameName.Render.RenderEngine;
 import com.GameName.Render.GUI.GUIManager;
 import com.GameName.World.World;
 import com.GameName.World.Cube.Cube;
@@ -27,9 +27,9 @@ public class GameName {
 	
 	public static EntityPlayer player;
 	
-	public static RenderEngin render;
+	public static RenderEngine render;
 	public static GUIManager guiManager;
-	public static SoundEngin sound;
+	public static SoundEngine sound;
 	
 	public static Server server;
 	public static Client client;
@@ -68,7 +68,7 @@ public class GameName {
 			worlds = new ArrayList<World>();
 			worlds.add(new World(10, 10, 10, worlds.size(), "Main World"));
 			
-			sound = new SoundEngin();
+			sound = new SoundEngine();
 	//		sound.playRandom();
 			
 			player = new EntityPlayer();		
@@ -79,7 +79,7 @@ public class GameName {
 			click = false;
 			guiManager = new GUIManager();
 			
-			render = new RenderEngin();		
+			render = new RenderEngine();		
 			player.getAccess().setCurrentWorld(worlds.get(0));
 				
 			guiManager.accessByName("Main HUD").open();

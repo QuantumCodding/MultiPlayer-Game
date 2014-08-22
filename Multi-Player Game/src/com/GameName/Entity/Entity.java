@@ -1,5 +1,6 @@
 package com.GameName.Entity;
 
+import com.GameName.Physics.Coalition.BoundingBox;
 import com.GameName.Physics.Object.PhysicsObject;
 import com.GameName.Util.Vector3f;
 import com.GameName.World.World;
@@ -39,6 +40,7 @@ public abstract class Entity extends PhysicsObject {
 		maxHunger = 100;       hunger = maxHunger;
 				
 		init();
+		addBounding();
 	}
 	
 	protected abstract void init();
@@ -47,6 +49,13 @@ public abstract class Entity extends PhysicsObject {
 		renderPos = pos.multiply(adjust);
 		
 		applyGravity(currentWorld);
+	}
+	
+	public void addBounding() {
+		bounding.add(new BoundingBox(
+				new Vector3f(pos.getX() - (width / 2f), pos.getY() - (height / 2f), pos.getZ() - (length / 2f)), 
+				new Vector3f(pos.getX() + (width / 2f), pos.getY() + (height / 2f), pos.getZ() + (length / 2f))
+			));
 	}
 	
 	public EntityAccess getAccess() {

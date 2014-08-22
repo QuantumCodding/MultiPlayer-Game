@@ -35,4 +35,8 @@ public class BoundingSphere extends Collidable {
 	public float getRadius() {
 		return radius;
 	}
+
+	public Vector3f getCenter() {
+		return pos;
+	}
 }

@@ -6,7 +6,7 @@ public abstract class Collidable {
 	private Shape shape;
 	
 	protected enum Shape {
-		BoundingSphere, BoundingBox, //TODO BoundingPlain
+		BoundingSphere, BoundingBox//, BoundingPlain
 	}
 	
 	protected Collidable(Shape shape) {
@@ -38,6 +38,8 @@ public abstract class Collidable {
 	}
 	
 	public abstract void translate(Vector3f amount);
+	
+	public abstract Vector3f getCenter();
 	
 	public Shape getShape() {
 		return shape;

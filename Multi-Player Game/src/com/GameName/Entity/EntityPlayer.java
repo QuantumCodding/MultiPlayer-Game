@@ -21,7 +21,7 @@ import com.GameName.Networking.Packets.PacketPlayerInventorySize;
 import com.GameName.Networking.Packets.PacketPlayerInventorySlot;
 import com.GameName.Networking.Packets.PacketPlayerLocation;
 import com.GameName.Networking.Packets.PacketPlayerStats;
-import com.GameName.Physics.Physics;
+import com.GameName.Physics.PhysicsEngine;
 import com.GameName.Util.Vector3f;
 
 public class EntityPlayer extends Entity {
@@ -127,12 +127,12 @@ public class EntityPlayer extends Entity {
 			if(ctr.isActive() != 0.0){
 				
 				switch(ctr.control) {
-					case "forward": if(!GameName.lockMovement) if(Physics.canMove(pos, Physics.FORWARD, currentWorld)) 	access.moveZ((float) (ctr.isActive() / speed)); 	break;						
-					case "back": 	if(!GameName.lockMovement) if(Physics.canMove(pos, Physics.BACKWARD, currentWorld)) access.moveZ((float) (ctr.isActive() / speed)); 	break;		
-					case "left": 	if(!GameName.lockMovement) if(Physics.canMove(pos, Physics.LEFT, currentWorld)) 	access.moveX((float) (ctr.isActive() / speed)); 	break;
-					case "right":   if(!GameName.lockMovement) if(Physics.canMove(pos, Physics.RIGHT, currentWorld)) 	access.moveX((float) (ctr.isActive() / speed));     break;
-					case "up": 		if(!GameName.lockMovement) if(Physics.canMove(pos, Physics.UP, currentWorld)) 		access.moveY(0.1f); 								break;		
-					case "down": 	if(!GameName.lockMovement) if(Physics.canMove(pos, Physics.DOWN, currentWorld)) 	access.moveY(-0.1f); 								break;
+					case "forward": if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.FORWARD, currentWorld)) 	access.moveZ((float) (ctr.isActive() / speed)); 	break;						
+					case "back": 	if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.BACKWARD, currentWorld)) access.moveZ((float) (ctr.isActive() / speed)); 	break;		
+					case "left": 	if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.LEFT, currentWorld)) 	access.moveX((float) (ctr.isActive() / speed)); 	break;
+					case "right":   if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.RIGHT, currentWorld)) 	access.moveX((float) (ctr.isActive() / speed));     break;
+					case "up": 		if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.UP, currentWorld)) 		access.moveY(0.1f); 								break;		
+					case "down": 	if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.DOWN, currentWorld)) 	access.moveY(-0.1f); 								break;
 					
 					case "lookUp": 	if(!GameName.lockMovement)  /*if(entityPhisics(0))*/ access.rotateX((float) (ctr.isActive() / lookSpeedUp));  break;				
 					case "lookDown": if(!GameName.lockMovement) /*if(entityPhisics(0))*/ access.rotateX((float) (ctr.isActive() / lookSpeedUp)); break;			

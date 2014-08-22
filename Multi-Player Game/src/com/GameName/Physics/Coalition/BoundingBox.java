@@ -36,4 +36,8 @@ public class BoundingBox extends Collidable {
 	public Vector3f getMaxPos() {
 		return maxPos;
 	}
+
+	public Vector3f getCenter() {		
+		return minPos.add(maxPos.subtract(minPos));
+	}
 }

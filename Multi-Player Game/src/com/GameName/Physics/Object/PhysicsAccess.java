@@ -1,5 +1,6 @@
 package com.GameName.Physics.Object;
 
+import com.GameName.Physics.Coalition.BoundingArea;
 import com.GameName.Util.Vector3f;
 
 public class PhysicsAccess {
@@ -21,6 +22,10 @@ public class PhysicsAccess {
 		return object.vel;
 	}	
 
+	public BoundingArea getBoundingArea() {
+		return object.bounding;
+	}
+	
 	public boolean isOnGorund() {
 		return object.onGround;
 	}
