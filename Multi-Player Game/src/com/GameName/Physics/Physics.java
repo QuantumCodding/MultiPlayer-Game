@@ -36,17 +36,6 @@ public class Physics {
 		return true;
 	}
 	
-	public static float applyGravity(float x, float y, float z, float vel, World w, float groundHeight) {
-		float newVel = 0.0f;
-				
-		if(y <= groundHeight) return newVel; 
-		
-		newVel = vel - GRAVITY;		
-		if(newVel < TERMINAL_VELOCITY) newVel = TERMINAL_VELOCITY;
-		
-		return newVel;
-	}
-	
 	public static Vector3f getLookPosition(float x, float y, float z, float rotX, float rotY, float rotZ, World w, int maxDistance) {
 		Vector3f pos = new Vector3f(x, y, z);		
 		Vector3f change = new Vector3f(

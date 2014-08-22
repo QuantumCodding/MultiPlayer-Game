@@ -113,33 +113,33 @@ public class EntityAccess extends PhysicsAccess {
 	}
 	
 	public void moveX(float amount) {
-		entity.getAccess().setPos(entity.getAccess().getPos().add(new Vector3f(				
-			(float) (amount * Math.cos(Math.toRadians(entity.getAccess().getRot().getY()))), 0.0f,
-			(float) (amount * Math.sin(Math.toRadians(entity.getAccess().getRot().getY())))
+		setPos(getPos().add(new Vector3f(				
+			(float) (amount * Math.cos(Math.toRadians(getRot().getY()))), 0.0f,
+			(float) (amount * Math.sin(Math.toRadians(getRot().getY())))
 		)));
 				
 	}
 	
 	public void moveY(float amount) {
-		entity.getAccess().setPos(entity.getAccess().getPos().add(new Vector3f(0.0f, amount, 0.0f)));
+		setPos(getPos().add(new Vector3f(0.0f, amount, 0.0f)));
 	}
 	
 	public void moveZ(float amount) {
-		entity.getAccess().setPos(entity.getAccess().getPos().add(new Vector3f(				
-				(float) (amount * Math.cos(Math.toRadians(entity.getAccess().getRot().getY() + 90))), 0.0f,
-				(float) (amount * Math.sin(Math.toRadians(entity.getAccess().getRot().getY() + 90)))
+		setPos(getPos().add(new Vector3f(				
+				(float) (amount * Math.cos(Math.toRadians(getRot().getY() + 90))), 0.0f,
+				(float) (amount * Math.sin(Math.toRadians(getRot().getY() + 90)))
 			)));
 	}
 	
 	public void rotateX(float amount) {
-		entity.getAccess().setRot(entity.getAccess().getRot().add(new Vector3f(amount, 0.0f, 0.0f)));
+		setRot(getRot().add(new Vector3f(amount, 0.0f, 0.0f)));
 	}
 	
 	public void rotateY(float amount) {
-		entity.getAccess().setRot(entity.getAccess().getRot().add(new Vector3f(0.0f, amount, 0.0f)));
+		setRot(getRot().add(new Vector3f(0.0f, amount, 0.0f)));
 	}
 	
 	public void rotateZ(float amount) {
-		entity.getAccess().setRot(entity.getAccess().getRot().add(new Vector3f(0.0f, amount, 0.0f)));
+		setRot(getRot().add(new Vector3f(0.0f, amount, 0.0f)));
 	}
 }

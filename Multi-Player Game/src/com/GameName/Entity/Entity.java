@@ -46,7 +46,7 @@ public abstract class Entity extends PhysicsObject {
 	public void updata() {
 		renderPos = pos.multiply(adjust);
 		
-		
+		applyGravity(currentWorld);
 	}
 	
 	public EntityAccess getAccess() {

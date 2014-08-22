@@ -19,7 +19,7 @@ public abstract class PhysicsObject {
 		vel = new Vector3f(0, 0, 0);
 	}
 	
-	void applyGravity(World w) {
+	protected void applyGravity(World w) {
 		float newVel = 0.0f;
 		float groundHeight = w.getGroundHeight(pos);
 		
