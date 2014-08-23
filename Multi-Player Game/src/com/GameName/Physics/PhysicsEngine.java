@@ -92,7 +92,7 @@ public class PhysicsEngine {
 		}
 	}
 	
-	private class Collision {
+	public class Collision {
 		private CollisionEvent event;
 		
 		private int object1;

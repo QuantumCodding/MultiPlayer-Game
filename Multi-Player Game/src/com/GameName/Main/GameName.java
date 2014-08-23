@@ -13,10 +13,17 @@ import org.lwjgl.input.Controllers;
 import org.lwjgl.opengl.Display;
 
 import com.GameName.Audio.SoundEngine;
+import com.GameName.Entity.Entity;
 import com.GameName.Entity.EntityPlayer;
 import com.GameName.Input.Control;
+import com.GameName.Main.Threads.EntityThread;
+import com.GameName.Main.Threads.PhysicsThread;
+import com.GameName.Main.Threads.PlayerThread;
+import com.GameName.Main.Threads.RenderThread;
+import com.GameName.Main.Threads.WorldThread;
 import com.GameName.Networking.Client;
 import com.GameName.Networking.Server;
+import com.GameName.Physics.PhysicsEngine;
 import com.GameName.Render.RenderEngine;
 import com.GameName.Render.GUI.GUIManager;
 import com.GameName.World.World;
@@ -27,6 +34,7 @@ public class GameName {
 	
 	public static EntityPlayer player;
 	
+	public static PhysicsEngine physics;
 	public static RenderEngine render;
 	public static GUIManager guiManager;
 	public static SoundEngine sound;
@@ -43,8 +51,15 @@ public class GameName {
 	
 	private static int FPS;
 	private int FPSTicks;
+	private int tickRate;
 	
 	private int oldW, oldH;
+	
+	private RenderThread  renderThread;
+	private PhysicsThread physicsThread;
+	private WorldThread   worldThread;
+	private EntityThread  entityThread;
+	private PlayerThread  playerThread;
 	
 	private Thread FPS_Thread = new Thread() {
 		public void run() {
@@ -61,6 +76,8 @@ public class GameName {
 	};
 
 	public GameName() {
+		tickRate = 60;
+		
 		try {
 			Cube.regesterCubes();
 			Cube.concludeInit();
@@ -70,6 +87,8 @@ public class GameName {
 			
 			sound = new SoundEngine();
 	//		sound.playRandom();
+			
+			physics = new PhysicsEngine();
 			
 			player = new EntityPlayer();		
 			player.setRenderDistance(1000);
@@ -94,6 +113,17 @@ public class GameName {
 				w.checkChunks();
 			}
 			
+			renderThread  = new RenderThread (tickRate, render);
+			physicsThread = new PhysicsThread(tickRate, physics);
+			worldThread   = new WorldThread  (tickRate, player.getAccess().getCurrentWorld()); 
+			entityThread  = new EntityThread (tickRate);
+			playerThread  = new PlayerThread (tickRate, player);
+			
+			for(Entity entity : player.getAccess().getCurrentWorld().getEntityList()) {
+				physicsThread.add(entity);
+				entityThread.add(entity);
+			}
+			
 			isRunning  = true;
 			
 		} catch(FileNotFoundException | InstanceAlreadyExistsException e) {
@@ -106,6 +136,12 @@ public class GameName {
 	public void gameLoop() {
 		c = checkControllers();		
 		FPS_Thread.start();
+		
+		renderThread .start();
+		physicsThread.start();
+		worldThread  .start(); 
+		entityThread .start(); 
+		playerThread .start(); 		
 		
 		while(isRunning && !Display.isCloseRequested()) {
 			player.updata();
@@ -134,6 +170,12 @@ public class GameName {
 		}
 		
 		FPS_Thread.interrupt();
+		
+		renderThread .requesteStop();
+		physicsThread.requesteStop();
+		worldThread  .requesteStop();
+		entityThread .requesteStop();
+		playerThread .requesteStop();
 	}
 	
 	
