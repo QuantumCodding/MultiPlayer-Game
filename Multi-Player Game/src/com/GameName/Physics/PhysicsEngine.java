@@ -58,6 +58,8 @@ public class PhysicsEngine {
 	
 	public void simulate(ArrayList<PhysicsObject> objects, float delta) {
 		for(PhysicsObject obj : objects) {
+			if(obj == null) continue;
+			
 			obj.intergrate(delta);
 		}
 	}
@@ -66,7 +68,10 @@ public class PhysicsEngine {
 		ArrayList<Collision> collisions = new ArrayList<Collision>();
 		
 		for(int i = 0; i < objects.size(); i ++) {
+			if(objects.get(i) == null) continue;
+			
 			for(int j = i + 1; j < objects.size(); j ++) {
+				if(objects.get(j) == null) continue;
 				
 				CollisionEvent event = objects.get(i).getAccess().getBoundingArea().intersect(
 									   objects.get(j).getAccess().getBoundingArea());

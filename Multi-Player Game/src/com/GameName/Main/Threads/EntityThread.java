@@ -20,9 +20,11 @@ public class EntityThread extends Timer {
 	}
 
 	void tick() {
-		for(Entity entity : entities) {
-			entity.updata();
-		}
+//		for(Entity entity : entities) {
+//			if(entity == null) { remove(entity); continue; }
+//			
+//			entity.updata();
+//		}
 	}
 	
 	public void add(Entity entity) {

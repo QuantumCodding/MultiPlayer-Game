@@ -2,11 +2,11 @@ package com.GameName.Main.Threads;
 
 import com.GameName.World.World;
 
-public class WorldThread extends Timer {
+public class WorldLoadThread extends Timer {
 
 	private World world;
 	
-	public WorldThread(int tickRate, World world) {
+	public WorldLoadThread(int tickRate, World world) {
 		super(tickRate, "World Thread");
 		
 		this.world = world;
