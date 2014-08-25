@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -17,6 +16,7 @@ import com.GameName.Audio.SoundEngine;
 import com.GameName.Entity.Entity;
 import com.GameName.Entity.EntityPlayer;
 import com.GameName.Input.Control;
+import com.GameName.Main.Debugging.DebugWindow;
 import com.GameName.Main.Threads.EntityThread;
 import com.GameName.Main.Threads.PhysicsThread;
 import com.GameName.Main.Threads.PlayerThread;
@@ -26,8 +26,6 @@ import com.GameName.Networking.Server;
 import com.GameName.Physics.PhysicsEngine;
 import com.GameName.Render.RenderEngine;
 import com.GameName.Render.GUI.GUIManager;
-import com.GameName.Util.FileLoader;
-import com.GameName.Util.Vector3f;
 import com.GameName.World.World;
 import com.GameName.World.Cube.Cube;
 
@@ -111,9 +109,6 @@ public class GameName {
 			
 			FPS_Thread.setName("FPS Thread");
 			
-			HashMap<Object, Object> data = FileLoader.readFile(new File("C:\\Users\\User\\Desktop\\test.txt"));
-			worlds.get(0).setCube((Vector3f) data.get("pos"), ((Integer) data.get("Id")).intValue());
-			
 			for(World w : worlds.toArray(new World[worlds.size()])) {
 				w.checkChunks();
 			}
@@ -140,9 +135,9 @@ public class GameName {
 	
 	public void gameLoop() {
 		debugWindow.add(physicsThread.getTracker());
-//		debugWindow.add(worldLoadThread.getTracker());
-//		debugWindow.add(entityThread.getTracker());
-//		debugWindow.add(playerThread.getTracker());
+		debugWindow.add(worldLoadThread.getTracker());
+		debugWindow.add(entityThread.getTracker());
+		debugWindow.add(playerThread.getTracker());
 		
 		debugWindow.reload();
 		

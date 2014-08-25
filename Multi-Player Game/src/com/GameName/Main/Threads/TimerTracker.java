@@ -1,8 +1,6 @@
 package com.GameName.Main.Threads;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
@@ -10,13 +8,13 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 
-public class TimerTracker extends JPanel {
+import com.GameName.Main.Debugging.DebugPanel;
 
-	private static final long serialVersionUID = -2215123316984545119L;
+public class TimerTracker extends DebugPanel {	
+	private static final long serialVersionUID = 1L;
 	
 	private JLabel nameLabel;
 	private JTextField tpsLabel;
@@ -30,6 +28,8 @@ public class TimerTracker extends JPanel {
 	private int avgTPS;
 	
 	public TimerTracker(final Timer timer) {
+		super();
+		
 		this.timer = timer;
 		Font font = new Font("", 0, 20);
 		
@@ -56,13 +56,8 @@ public class TimerTracker extends JPanel {
 		});
 		
 		tpsLabel.setEditable(false);
-		
-		setPreferredSize(new Dimension(400, 300));
-		setSize(new Dimension(400, 100));
-		
-		setLayout(new FlowLayout());		
-		add(nameLabel); add(tpsLabel); add(pauseButton);
-		
+				
+		add(nameLabel); add(tpsLabel); add(pauseButton);		
 		update();
 	}
 	
@@ -96,20 +91,20 @@ public class TimerTracker extends JPanel {
 		super.paintComponent(g);
 		
 		g.setColor(Color.DARK_GRAY);
-		g.fill3DRect(10 - 3, 50 - 3, 360 + 6, 40 + 6, false);
+		g.fill3DRect(20 - 3, 50 - 3, 360 + 6, 40 + 6, false);
 
 		g.setColor(new Color(150, 150, 150));
-		g.fill3DRect(10, 50, 360, 40, false);
+		g.fill3DRect(20, 50, 360, 40, false);
 		
 		float ratio = 40 / ((float) timer.getTickRate() + 5f);
 		
 		for(int i = 0; i < pastTPS.length; i ++) {
 			g.setColor(new Color(pastColors[i]));
-			g.fillRect(i * 10 + 10, 90, 10, (int) -(ratio * pastTPS[i]));
+			g.fillRect(i * 10 + 20, 90, 10, (int) -(ratio * pastTPS[i]));
 		}
 		
-		g.setColor(Color.WHITE);//(int) (Math.random() * 10 * 5 + 10)
-		g.drawLine(10, 90 - (int) (ratio * avgTPS), 370, 90 - (int) (ratio * avgTPS));
+		g.setColor(Color.BLUE);//(int) (Math.random() * 10 * 5 + 10)
+		g.drawLine(20, 90 - (int) (ratio * avgTPS), 380, 90 - (int) (ratio * avgTPS));
 		
 		try {
 			Thread.sleep(10);

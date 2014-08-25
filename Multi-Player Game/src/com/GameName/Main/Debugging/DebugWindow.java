@@ -1,8 +1,8 @@
-package com.GameName.Main;
+package com.GameName.Main.Debugging;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridLayout;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -11,6 +11,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.lwjgl.opengl.Display;
+
+import com.GameName.Main.GameName;
 
 public class DebugWindow {
 	private JFrame frame;
@@ -26,17 +28,19 @@ public class DebugWindow {
 		FPSLabel = new JLabel("FPS: " + GameName.getFPS()); FPSLabel.setFont(new Font("", 1, 15));
 		
 		scrollPanel = new JPanel();
-		scrollPanel.setLayout(new BoxLayout(scrollPanel, BoxLayout.Y_AXIS));
-		scrollPanel.setPreferredSize(new Dimension(200, 300));
-		
-		scrollPane = new JScrollPane(scrollPanel);
+		scrollPanel.setLayout(new GridLayout(0, 2)); //BoxLayout(scrollPanel, BoxLayout.Y_AXIS));
+				
+		scrollPane = new JScrollPane(scrollPanel);		
+//		scrollPane.setMinimumSize(new Dimension(400, 300));
+//		scrollPane.setPreferredSize(new Dimension(400, 300));
+//		scrollPane.setMaximumSize(new Dimension(400, 300));
 		
 		JPanel tempPanel = new JPanel();
 		tempPanel.setLayout(new BoxLayout(tempPanel, BoxLayout.Y_AXIS));
 		tempPanel.add(FPSLabel); tempPanel.add(scrollPane);
 		frame.add(tempPanel);
 		
-		frame.setSize(400, 400);
+		frame.setSize(410, 410);
 		frame.setVisible(true);
 	}
 	
@@ -50,6 +54,7 @@ public class DebugWindow {
 	
 	public void reload() {
 		scrollPane.setViewportView(scrollPanel);
+		frame.pack();
 	}
 	
 	public void tick() {
