@@ -1,4 +1,4 @@
-package com.GameName.World;
+package com.GameName.World.Generation;
 
 public class Biom {
 	public static String[] biomTypes = new String[] {

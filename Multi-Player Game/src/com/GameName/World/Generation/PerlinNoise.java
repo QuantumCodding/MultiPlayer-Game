@@ -1,4 +1,4 @@
-package com.GameName.World;
+package com.GameName.World.Generation;
 
 import java.awt.Color;
 import java.awt.Image;

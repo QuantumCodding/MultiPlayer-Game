@@ -15,5 +15,5 @@
 1,1,pointerUp,true,true,0.0
 1,0,click,false,false
 2,31,back,false,false
-2,44,down,false,true
+2,44,down,false,false
 2,30,left,false,false
