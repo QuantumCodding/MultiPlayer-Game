@@ -100,7 +100,8 @@ public class EntityPlayer extends Entity {
 	public void updata() {
 		if(gravityOn) {
 			super.updata();
-//			selectedCube = Physics.getLookPosition(worldPos.getX(), worldPos.getY(), worldPos.getZ(), rotX, rotY, rotZ, currentWorld, maxReach);
+			
+			selectedCube = PhysicsEngine.getLookPosition(pos, rot, currentWorld, maxReach); 
 		}		
 
 		renderPos = pos.multiply(adjust);
@@ -131,8 +132,8 @@ public class EntityPlayer extends Entity {
 					case "back": 	if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.BACKWARD, currentWorld)) access.moveZ((float) (ctr.isActive() / speed)); 	break;		
 					case "left": 	if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.LEFT, currentWorld)) 	access.moveX((float) (ctr.isActive() / speed)); 	break;
 					case "right":   if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.RIGHT, currentWorld)) 	access.moveX((float) (ctr.isActive() / speed));     break;
-					case "up": 		if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.UP, currentWorld)) 		access.moveY(0.1f); 								break;		
-					case "down": 	if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.DOWN, currentWorld)) 	access.moveY(-0.1f); 								break;
+					case "up": 		if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.UP, currentWorld)) 		access.moveY((float) (ctr.isActive() / speed)); 								break;		
+					case "down": 	if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.DOWN, currentWorld)) 	access.moveY((float) (ctr.isActive() / speed)); 								break;
 					
 					case "lookUp": 	if(!GameName.lockMovement)  /*if(entityPhisics(0))*/ access.rotateX((float) (ctr.isActive() / lookSpeedUp));  break;				
 					case "lookDown": if(!GameName.lockMovement) /*if(entityPhisics(0))*/ access.rotateX((float) (ctr.isActive() / lookSpeedUp)); break;			

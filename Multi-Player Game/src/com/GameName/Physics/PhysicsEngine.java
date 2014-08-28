@@ -40,13 +40,13 @@ public class PhysicsEngine {
 		return true;
 	}
 	
-	public static Vector3f getLookPosition(Vector3f pos, float rotX, float rotY, float rotZ, World w, int maxDistance) {	
-		Vector3f change = new Vector3f(
-				(float) Math.cos(Math.toRadians(rotY + 90)),
-				(float) 5,
-				(float) Math.sin(Math.toRadians(rotY + 90))
-			);
+	public static Vector3f getLookPosition(Vector3f pos, Vector3f rot, World w, int maxDistance) {	
+		float f1 = (float)  Math.cos(-Math.toRadians(rot.getY()) - (float) Math.PI);
+		float f2 = (float)  Math.sin(-Math.toRadians(rot.getY()) - (float) Math.PI);
+		float f3 = (float) -Math.cos(-Math.toRadians(rot.getX()));
+		float f4 = (float)  Math.sin(-Math.toRadians(rot.getX()));
 		
+		Vector3f change = new Vector3f((f2 * f3), f4, (f1 * f3));	
 		
 		int checkDistance = 0;
 		while(checkDistance < maxDistance && !w.getCube((pos = pos.add(change))).isSolid()) {checkDistance ++;}				

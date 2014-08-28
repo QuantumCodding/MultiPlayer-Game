@@ -24,6 +24,11 @@ public abstract class PhysicsObject {
 		vel = new Vector3f(0, 0, 0);
 		
 		bounding = new BoundingArea();
+		addBounding();
+	}
+	
+	public void updata() {
+		rot.modE(360);
 	}
 	
 	protected abstract void addBounding();

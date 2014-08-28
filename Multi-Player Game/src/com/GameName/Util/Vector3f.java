@@ -52,8 +52,8 @@ public class Vector3f {
 			);
 	}
 
-	public void addE(Vector3f add) {set(add(add));}
-	public void addE(float add) {set(add(add));}
+	public Vector3f addE(Vector3f add) {set(add(add)); return this;}
+	public Vector3f addE(float add) {set(add(add));	   return this;}
 	
 	public Vector3f subtract(Vector3f subtract) {
 		return new Vector3f(
@@ -71,8 +71,8 @@ public class Vector3f {
 			);
 	}
 
-	public void subtractE(Vector3f subtract) {set(subtract(subtract));}
-	public void subtractE(float subtract) {set(subtract(subtract));}
+	public Vector3f subtractE(Vector3f subtract) {set(subtract(subtract)); return this;}
+	public Vector3f subtractE(float subtract) {set(subtract(subtract));	   return this;}
 	
 	public Vector3f multiply(Vector3f mult) {
 		return new Vector3f(
@@ -90,8 +90,8 @@ public class Vector3f {
 			);
 	}
 	
-	public void multiplyE(Vector3f mult) {set(multiply(mult));}
-	public void multiplyE(float mult) {set(multiply(mult));}
+	public Vector3f multiplyE(Vector3f mult) {set(multiply(mult)); return this;}
+	public Vector3f multiplyE(float mult) {set(multiply(mult));	   return this;}
 	
 	public Vector3f divide(Vector3f divide) {
 		return new Vector3f(
@@ -109,8 +109,27 @@ public class Vector3f {
 			);
 	}
 	
-	public void divideE(Vector3f divide) {set(divide(divide));}
-	public void divideE(float divide) {set(divide(divide));}
+	public Vector3f divideE(Vector3f divide) {set(divide(divide)); return this;}
+	public Vector3f divideE(float divide) {set(divide(divide));	   return this;}
+	
+	public Vector3f mod(Vector3f mod) {
+		return new Vector3f(
+				x % mod.getX(),
+				y % mod.getY(),
+				z % mod.getZ()
+			);
+	}
+	
+	public Vector3f mod(float mod) {
+		return new Vector3f(
+				x % mod,
+				y % mod,
+				z % mod
+			);
+	}
+	
+	public Vector3f modE(Vector3f mod) {set(mod(mod)); return this;}
+	public Vector3f modE(float mod) {set(mod(mod));    return this;}
 	
 	public float distance(Vector3f other) {
 		return (float) Math.sqrt(

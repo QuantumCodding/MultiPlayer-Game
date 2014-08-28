@@ -1,14 +1,11 @@
 package com.GameName.Entity;
 
 import com.GameName.Physics.Coalition.BoundingBox;
-import com.GameName.Physics.Object.PhysicsObject;
 import com.GameName.Util.Vector3f;
 import com.GameName.World.World;
+import com.GameName.World.Object.WorldObject;
 
-public abstract class Entity extends PhysicsObject {
-	protected Vector3f renderPos, adjust;	
-	protected float height, width, length;
-	
+public abstract class Entity extends WorldObject {
 	protected int maxHealth;
 	protected int health;	
 	
@@ -18,8 +15,6 @@ public abstract class Entity extends PhysicsObject {
 	protected int maxHunger;
 	protected int hunger;	
 
-	protected World currentWorld;	
-	
 	EntityAccess access;
 	
 	/**
@@ -30,32 +25,21 @@ public abstract class Entity extends PhysicsObject {
 	 *    Sets max hunger to 100
 	 */
 	public Entity() {
-		super();		
-		height = 1;	width = 1; length = 1;
-		
-		renderPos = new Vector3f(0, 0, 0);
+		super();
 		
 		maxHealth = 10;        health = maxHealth;
 		maxMana = 10;          mana = maxMana;    
 		maxHunger = 100;       hunger = maxHunger;
 				
 		init();
-		addBounding();
 	}
 	
 	protected abstract void init();
 	
 	public void updata() {
-		renderPos = pos.multiply(adjust);
+		super.updata();
 		
 		applyGravity(currentWorld);
-	}
-	
-	public void addBounding() {
-		bounding.add(new BoundingBox(
-				new Vector3f(pos.getX() - (width / 2f), pos.getY() - (height / 2f), pos.getZ() - (length / 2f)), 
-				new Vector3f(pos.getX() + (width / 2f), pos.getY() + (height / 2f), pos.getZ() + (length / 2f))
-			));
 	}
 	
 	public EntityAccess getAccess() {
