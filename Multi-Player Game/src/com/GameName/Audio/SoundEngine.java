@@ -1,66 +1,65 @@
 package com.GameName.Audio;
 
-import static org.lwjgl.openal.AL10.*;
+import static org.lwjgl.openal.AL10.AL_BUFFER;
+import static org.lwjgl.openal.AL10.AL_GAIN;
+import static org.lwjgl.openal.AL10.AL_PITCH;
+import static org.lwjgl.openal.AL10.AL_POSITION;
+import static org.lwjgl.openal.AL10.alDeleteBuffers;
+import static org.lwjgl.openal.AL10.alDeleteSources;
+import static org.lwjgl.openal.AL10.alGenSources;
+import static org.lwjgl.openal.AL10.alGetSourcei;
+import static org.lwjgl.openal.AL10.alSource3f;
+import static org.lwjgl.openal.AL10.alSourcePause;
+import static org.lwjgl.openal.AL10.alSourceStop;
+import static org.lwjgl.openal.AL10.alSourcei;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.Random;
-
-import org.newdawn.slick.openal.WaveData;
+import java.util.ArrayList;
 
 public class SoundEngine {
-	private int[] sounds;
-	public int defaultSource;
+	private Sound[] sounds;
+	public static int defaultSource;
+	private boolean isConcluded;
 	
-	public SoundEngine() {
-		sounds = new int[] {
-				loadSound("01 In The End"),
-				loadSound("Awesome Music"),
-//				loadSound("Can\'t Hold Us"),
-//				loadSound("Come And Get It")
-		};
-		
+	private ArrayList<SoundRegistry> registries;
+	
+	static {
 		defaultSource = alGenSources();
 		alSourcei(defaultSource, AL_GAIN, 100);
 		alSourcei(defaultSource, AL_PITCH, 1);
 		alSource3f(defaultSource, AL_POSITION, 0, 0, 0);
 	}
 	
-	private int loadSound(String name) {
-		try {
-			WaveData data = WaveData.create(new BufferedInputStream(new FileInputStream(new File("res/audio/" + name + ".wav"))));
-			int buffer = alGenBuffers();
-			alBufferData(buffer, data.format, data.data, data.samplerate);
-			data.dispose();
-			
-			return buffer;
-		} catch (FileNotFoundException e) {
-			return -1;
+	public SoundEngine() {
+		SoundRegistry reg = new SoundRegistry();
+		
+		reg.addSound(new Sound("01 In The End", "wav"));		
+		reg.addSound(new Sound("Awesome Music", "wav"));	
+		reg.addSound(new Sound("Can\'t Hold Us", "wav"));	
+		reg.addSound(new Sound("Come And Get It", "wav"));
+				
+		addRegister(reg);
+	}
+	
+	public void addRegister(SoundRegistry regester) {
+		registries.add(regester);
+	}
+	
+	public void registerSounds() {
+		if(isConcluded) throw new IllegalStateException("Sound Engine is already Concluded! Run clean-up befor Concluded");
+		
+		ArrayList<Sound> toAdd = new ArrayList<Sound>();
+		for(SoundRegistry reg : registries) {
+			for(Sound sound : reg.toArray()) {
+				toAdd.add(sound);
+			}
 		}
+		
+		registries.clear();
+		sounds = toAdd.toArray(new Sound[toAdd.size()]);
+		
+		isConcluded = true;
 	}
-	
-	public void playSound(final String sound) {		
-		playSound(accessByName(sound));
-	}
-	
-	public void playSound(final int sound) {		
-		playSound(sound, defaultSource);
-	}
-	
-	public synchronized void playSound(final int sound, final int source) {
-		alSourcei(source, AL_BUFFER, sound);	
-		alSourcePlay(source);
-	}
-	
-	public int playRandom() {
-		int r = new Random().nextInt(sounds.length);
-		playSound(sounds[r]);
-		return r;
-	}
-	
-	
+		
 	public synchronized void pauseSound(final int source) {
 		alSourcePause(source);
 	}
@@ -73,34 +72,37 @@ public class SoundEngine {
 		return alGetSourcei(source, AL_BUFFER);
 	}
 	
-	public int accessByName(String name) {
-		switch(name) {
-			case "In The End": return sounds[0];
-			case "Awesome Music": return sounds[1];
-			case "Cant Hold Us": return sounds[1];
-			case "Come And Get It": return sounds[2];
-			default: return -1;
-		}
+	public boolean isConcluded() {
+		return isConcluded;
 	}
 	
-	public String accessNameByID(int id) {
-		int i;
-		for(i = 0; i < sounds.length; i ++)
-			if(sounds[i] == id)
-				break;
+	public Sound accessByName(String name) {
+		for(Sound sound : sounds) {
+			if(sound.getName().equals(name)) {
+				return sound;
+			}
+		}
 		
-		switch(i) {
-			case 0: return "In The End";
-			case 1: return "Awesome Music";//"Can\'t Hold Us";
-			case 2: return "Come And Get It";
-			
-			default: return "";
-		}
+		return null;
 	}
 	
+	public Sound accessById(int id) {
+		for(Sound sound : sounds) {
+			if(sound.getId() == id) {
+				return sound;
+			}
+		}
+		
+		return null;
+	}
+	
+	public Sound getSound(int index) {
+		return sounds[index];
+	}
+
 	public void cleanUp() {
 		for(int i = 0; i < sounds.length; i ++)
-			alDeleteBuffers(sounds[i]);
+			alDeleteBuffers(sounds[i].getId());
 		
 		alDeleteSources(defaultSource);
 	}
