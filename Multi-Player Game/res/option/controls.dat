@@ -17,3 +17,5 @@
 2,31,back,false,false
 2,44,down,false,false
 2,30,left,false,false
+2,25,placeTest,false,false
+2,24,removeCube,true,false

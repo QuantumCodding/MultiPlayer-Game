@@ -1,4 +1,4 @@
-package com.GameName.Util;
+package com.GameName.Util.Vectors;
 
 public class Vector4d {
 	private double x;

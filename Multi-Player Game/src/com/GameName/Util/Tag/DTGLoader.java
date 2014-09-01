@@ -1,4 +1,4 @@
-package com.GameName.Util;
+package com.GameName.Util.Tag;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,7 +8,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
-public class DTGManager {
+import com.GameName.Util.Vectors.Vector2d;
+import com.GameName.Util.Vectors.Vector2f;
+import com.GameName.Util.Vectors.Vector3d;
+import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.Vector4d;
+import com.GameName.Util.Vectors.Vector4f;
+
+public class DTGLoader {
 	
 	public static HashSet<Tag> readDTGFile(File f) throws IOException {
 		BufferedReader read = new BufferedReader(new FileReader(f));		
@@ -85,51 +92,6 @@ public class DTGManager {
 		return data;
 	}
 	
-	public static String generateTag(String tagName, Vector2d data) {return tagName + "=<"+data.getX() + "d," + data.getY() + "d> ";}
-	public static String generateTag(String tagName, Vector2f data) {return tagName + "=<"+data.getX() + "f," + data.getY() + "f> ";}
-	public static String generateTag(String tagName, Vector3d data) {return tagName + "=<"+data.getX() + "d," + data.getY() + "d," + data.getZ() + "d> ";}
-	public static String generateTag(String tagName, Vector3f data) {return tagName + "=<"+data.getX() + "f," + data.getY() + "f," + data.getZ() + "f> ";}
-	public static String generateTag(String tagName, Vector4d data) {return tagName + "=<"+data.getX() + "d," + data.getY() + "d," + data.getZ() + "d," + data.getW() + "d> ";}
-	public static String generateTag(String tagName, Vector4f data) {return tagName + "=<"+data.getX() + "f," + data.getY() + "f," + data.getZ() + "f," + data.getW() + "f> ";}
-
-	public static String generateTag(String tagName, float data)  {return tagName + "=" + data + "f ";}
-	public static String generateTag(String tagName, double data) {return tagName + "=" + data + "d ";}
-	public static String generateTag(String tagName, long data)   {return tagName + "=" + data + "l ";}
-	public static String generateTag(String tagName, short data)  {return tagName + "=" + data + "s ";}
-	public static String generateTag(String tagName, int data)    {return tagName + "=" + data + "i ";}
-	public static String generateTag(String tagName, byte data)   {return tagName + "=" + data + "b ";}
-	
-	public static String generateTag(String tagName, char data)   {return tagName + "=\'" + data + "\' ";}
-	public static String generateTag(String tagName, String data) {return tagName + "=\"" + data + "\" ";}
-	
-	public static String generateTag(String tagName, float[] data)  {return tagName + "=" + arrayFormat(toStringArray(data), 'f') + " ";}
-	public static String generateTag(String tagName, double[] data) {return tagName + "=" + arrayFormat(toStringArray(data), 'd') + " ";}
-	public static String generateTag(String tagName, long[] data)   {return tagName + "=" + arrayFormat(toStringArray(data), 'l') + " ";}
-	public static String generateTag(String tagName, short[] data)  {return tagName + "=" + arrayFormat(toStringArray(data), 's') + " ";}
-	public static String generateTag(String tagName, int[] data)    {return tagName + "=" + arrayFormat(toStringArray(data), 'i') + " ";}
-	public static String generateTag(String tagName, byte[] data)   {return tagName + "=" + arrayFormat(toStringArray(data), 'b') + " ";}
-	public static String generateTag(String tagName, char[] data)   {return tagName + "=" + arrayFormat(toStringArray(data), '\'') + " ";}
-	public static String generateTag(String tagName, String[] data) {return tagName + "=" + arrayFormat(              data , '\"') + " ";}
-	
-	private static String arrayFormat(String[] data, char end) {
-		String toRep = "{";
-		
-		for(String t : data) {
-			if(end == '\'' || end == '\"') toRep += end;				
-			toRep += (t + "") + end + ",";
-		}
-		
-		return removeLast(toRep) + "}";
-	}
-	
-	private static String[] toStringArray(float[] data)  {String[] toRep = new String[data.length]; for(int i = 0; i < data.length; i ++) toRep[i] = data[i] + ""; return toRep;}
-	private static String[] toStringArray(double[] data) {String[] toRep = new String[data.length]; for(int i = 0; i < data.length; i ++) toRep[i] = data[i] + ""; return toRep;}
-	private static String[] toStringArray(long[] data)   {String[] toRep = new String[data.length]; for(int i = 0; i < data.length; i ++) toRep[i] = data[i] + ""; return toRep;}
-	private static String[] toStringArray(short[] data)  {String[] toRep = new String[data.length]; for(int i = 0; i < data.length; i ++) toRep[i] = data[i] + ""; return toRep;}
-	private static String[] toStringArray(int[] data)    {String[] toRep = new String[data.length]; for(int i = 0; i < data.length; i ++) toRep[i] = data[i] + ""; return toRep;}
-	private static String[] toStringArray(byte[] data)   {String[] toRep = new String[data.length]; for(int i = 0; i < data.length; i ++) toRep[i] = data[i] + ""; return toRep;}
-	private static String[] toStringArray(char[] data)   {String[] toRep = new String[data.length]; for(int i = 0; i < data.length; i ++) toRep[i] = data[i] + ""; return toRep;}
-		
 	private static double asDouble(String as) 	{return Double.parseDouble(removeLast(as));}
 	private static float  asFloat(String as) 	{return Float.parseFloat(removeLast(as));}
 	private static int    asInt(String as) 		{return Integer.parseInt(removeLast(as));}
@@ -137,8 +99,8 @@ public class DTGManager {
 	private static long   asLong(String as) 	{return Long.parseLong(removeLast(as));}
 	private static byte   asByte(String as) 	{return Byte.parseByte(removeLast(as));}
 	
-	private static String removeLast(String s)  {return s.substring(0, s.length() - 1);}
-	private static String removeFirst(String s)  {return s.substring(1);}
+	protected static String removeLast(String s)  {return s.substring(0, s.length() - 1);}
+	protected static String removeFirst(String s)  {return s.substring(1);}
 	
 	private static String[] split(String toSplit, String spl) {
 		if(!toSplit.contains(spl)) return new String[] {toSplit};

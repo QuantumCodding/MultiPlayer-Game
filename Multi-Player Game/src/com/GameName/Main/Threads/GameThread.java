@@ -2,8 +2,8 @@ package com.GameName.Main.Threads;
 
 import com.GameName.Util.Time;
 
-public abstract class Timer implements Runnable {
-	private TimerTracker tracker;
+public abstract class GameThread implements Runnable {
+	private GameThreadTracker tracker;
 	
 	private double tickTime;
 	private boolean isRunning, isStopRequested, isPaused;
@@ -14,7 +14,7 @@ public abstract class Timer implements Runnable {
 	
 	private Thread thread;
 	
-	public Timer(int tickRate, String name) {
+	public GameThread(int tickRate, String name) {
 		tickTime = 1.0 / (double) tickRate;	
 		
 		this.name = name;
@@ -22,7 +22,7 @@ public abstract class Timer implements Runnable {
 		
 		thread = new Thread(this, name);
 		
-		tracker = new TimerTracker(this);
+		tracker = new GameThreadTracker(this);
 	}
 
 	public void start() {
@@ -32,12 +32,10 @@ public abstract class Timer implements Runnable {
 	
 	public void pause() throws InterruptedException {
 		isPaused = true;
-//		thread.wait();
 	}
 	
 	public void resume() {
 		isPaused = false;
-//		thread.notify();
 	}
 	
 	private void stop() throws InterruptedException {
@@ -49,6 +47,19 @@ public abstract class Timer implements Runnable {
 		isStopRequested = false;
 	}
 	
+	public void restart() {
+		try {
+			stop();
+			
+			thread = null;
+			thread = new Thread(this, name);
+			
+			start();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void run() {		
 		init();
 
@@ -58,9 +69,7 @@ public abstract class Timer implements Runnable {
 		int frames = 0;
 		long frameCounter = 0;
 		
-		while(isRunning) {
-			if(isPaused) continue;
-			
+		while(isRunning) {			
 			boolean tick = false;
 
 			long startTime = Time.getTime();
@@ -70,10 +79,10 @@ public abstract class Timer implements Runnable {
 			unprocessedTime += passedTime / (double) Time.getSECONDS();
 			frameCounter += passedTime;
 			
-			while(unprocessedTime > tickTime) {
+			while(unprocessedTime > (isPaused ? 0 : tickTime)) {
 				tick = true;
 				
-				unprocessedTime -= tickTime;
+				unprocessedTime -= (isPaused ? 0 : tickTime);
 				
 				if(isStopRequested)	try { stop(); } catch (InterruptedException e) { e.printStackTrace(); }
 
@@ -89,7 +98,9 @@ public abstract class Timer implements Runnable {
 				tick();				
 				frames ++;
 				
-				tracker.update();				
+				tracker.update();
+				
+				if(isPaused) System.out.println("How did " + name + " updata?");
 			} else {				
 				try	{
 					Thread.sleep(1);
@@ -128,7 +139,12 @@ public abstract class Timer implements Runnable {
 		return tickRate;
 	}
 
-	public TimerTracker getTracker() {
+	public GameThreadTracker getTracker() {
 		return tracker;
+	}
+
+	
+	public boolean isLive() {
+		return thread.isAlive();
 	}
 }

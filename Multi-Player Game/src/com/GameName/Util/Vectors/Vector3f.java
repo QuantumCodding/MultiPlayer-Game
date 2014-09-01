@@ -1,4 +1,4 @@
-package com.GameName.Util;
+package com.GameName.Util.Vectors;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
@@ -167,6 +167,14 @@ public class Vector3f {
 		if(z > max) max = z;
 		
 		return max;
+	}
+	
+	public Vector3f truncate() {
+		return new Vector3f(
+				(int) x, 
+				(int) y, 
+				(int) z
+			);
 	}
 	
 	public Vector3f normalized() {

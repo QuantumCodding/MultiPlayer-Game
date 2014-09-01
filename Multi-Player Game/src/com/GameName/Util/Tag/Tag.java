@@ -1,4 +1,4 @@
-package com.GameName.Util;
+package com.GameName.Util.Tag;
 
 public class Tag {
 	private String tagName;
@@ -50,6 +50,10 @@ public class Tag {
 		return "Tag [tagName=" + tagName + ", tagInfo=" + tagInfo + "]";
 	}
 
+	public String getTagString() {
+		String tagString = DTGGenerator.generateTag(tagName, tagInfo);
+	}
+	
 	public String getTagName() {
 		return tagName;
 	}
