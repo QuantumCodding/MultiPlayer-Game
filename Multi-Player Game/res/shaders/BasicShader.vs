@@ -1,8 +1,8 @@
 #version 330
 
 layout (location = 0) in vec3 position;
-layout (location = 5) in vec2 texCoord_;
-layout (location = 6) in vec3 colour_;
+layout (location = 1) in vec2 texCoord_;
+layout (location = 2) in vec3 colour_;
 
 out vec2 texCoordData;
 out vec3 colour;
