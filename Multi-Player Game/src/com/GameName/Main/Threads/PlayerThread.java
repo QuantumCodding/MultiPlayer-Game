@@ -2,7 +2,7 @@ package com.GameName.Main.Threads;
 
 import com.GameName.Entity.EntityPlayer;
 
-public class PlayerThread extends Timer {
+public class PlayerThread extends GameThread {
 
 	private EntityPlayer player;
 	
@@ -13,7 +13,7 @@ public class PlayerThread extends Timer {
 	}
 
 	void init() {
-
+		player.resetPlayer();
 	}
 
 	void tick() {

@@ -5,7 +5,7 @@ import java.util.Collection;
 
 import com.GameName.Entity.Entity;
 
-public class EntityThread extends Timer {
+public class EntityThread extends GameThread {
 
 	private ArrayList<Entity> entities;
 	

@@ -16,6 +16,12 @@ import com.GameName.Main.Debugging.DebugPanel;
 
 public class GameThreadTracker extends DebugPanel {	
 	private static final long serialVersionUID = 1L;
+
+	private static final int CHART_OFFSET = 20;
+	private static final int CHART_WIDTH = 360;
+	private static final int CHART_AMOUNT = 360;
+	private static final int TICK_SIZE = Math.round((float) CHART_WIDTH / (float) CHART_AMOUNT);
+	private static final int TICK_CHECK_TIME = 1;
 	
 	private JLabel nameLabel;
 	private JTextField tpsLabel;
@@ -36,7 +42,7 @@ public class GameThreadTracker extends DebugPanel {
 		Font font = new Font("", 0, 15);
 		Font font2 = new Font("", 0, 20);
 		
-		pastTPS = new int[360 / 10];
+		pastTPS = new int[CHART_AMOUNT];
 		pastColors = new int[pastTPS.length];
 		avgTPS = 0;
 		
@@ -81,7 +87,7 @@ public class GameThreadTracker extends DebugPanel {
 		else
 			tpsLabel.setText(gameThread.getTPS() + "");
 		
-		if(count ++ > 10) {
+		if(count ++ > TICK_CHECK_TIME) {
 			updateChart();
 			count = 0;
 		}
@@ -106,21 +112,21 @@ public class GameThreadTracker extends DebugPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
-		g.setColor(gameThread.isLive() ? gameThread.isPaused() ? Color.CYAN : Color.DARK_GRAY : Color.RED);
-		g.fillRect(20 - 3, 50 - 3, 360 + 6, 40 + 6);
+		g.setColor(gameThread.isLive() ? gameThread.isPaused() ? Color.BLUE : Color.DARK_GRAY : Color.RED);
+		g.fillRect(CHART_OFFSET - 3, 50 - 3, CHART_WIDTH + 6, 40 + 6);
 
 		g.setColor(new Color(150, 150, 150));
-		g.fillRect(20, 50, 360, 40);
+		g.fillRect(CHART_OFFSET, 50, CHART_WIDTH, 40);
 		
 		float ratio = 40 / ((float) gameThread.getTickRate() + 5f);
 		
 		for(int i = 0; i < pastTPS.length; i ++) {
 			g.setColor(new Color(pastColors[i]));
-			g.fillRect(i * 10 + 20, 90, 10, (int) -(ratio * pastTPS[i]));
+			g.fillRect(i * TICK_SIZE + CHART_OFFSET, 90, TICK_SIZE, (int) -(ratio * pastTPS[i]));
 		}
 		
-		g.setColor(Color.BLUE);//(int) (Math.random() * 10 * 5 + 10)
-		g.drawLine(20, 90 - (int) (ratio * avgTPS), 380, 90 - (int) (ratio * avgTPS));
+		g.setColor(Color.ORANGE);//(int) (Math.random() * 10 * 5 + 10)
+		g.drawLine(CHART_OFFSET, 90 - (int) (ratio * avgTPS), CHART_WIDTH + CHART_OFFSET, 90 - (int) (ratio * avgTPS));
 		
 		try {
 			Thread.sleep(10);

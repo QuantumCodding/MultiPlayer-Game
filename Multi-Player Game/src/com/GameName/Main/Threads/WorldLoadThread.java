@@ -2,7 +2,7 @@ package com.GameName.Main.Threads;
 
 import com.GameName.World.World;
 
-public class WorldLoadThread extends Timer {
+public class WorldLoadThread extends GameThread {
 
 	private World world;
 	

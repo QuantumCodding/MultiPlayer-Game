@@ -6,7 +6,7 @@ import java.util.Collection;
 import com.GameName.Physics.PhysicsEngine;
 import com.GameName.Physics.Object.PhysicsObject;
 
-public class PhysicsThread extends Timer {
+public class PhysicsThread extends GameThread {
 
 	private PhysicsEngine physicsEngine;
 	private ArrayList<PhysicsObject> objects;
