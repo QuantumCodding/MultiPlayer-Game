@@ -15,6 +15,8 @@ import static org.lwjgl.openal.AL10.alSourcei;
 
 import java.util.ArrayList;
 
+import javax.management.InstanceAlreadyExistsException;
+
 public class SoundEngine {
 	private Sound[] sounds;
 	public static int defaultSource;
@@ -30,6 +32,8 @@ public class SoundEngine {
 	}
 	
 	public SoundEngine() {
+		registries = new ArrayList<SoundRegistry>();
+		
 		SoundRegistry reg = new SoundRegistry();
 		
 		reg.addSound(new Sound("01 In The End", "wav"));		
@@ -44,8 +48,8 @@ public class SoundEngine {
 		registries.add(regester);
 	}
 	
-	public void registerSounds() {
-		if(isConcluded) throw new IllegalStateException("Sound Engine is already Concluded! Run clean-up befor Concluded");
+	public void registerSounds() throws InstanceAlreadyExistsException {
+		if(isConcluded) throw new InstanceAlreadyExistsException("Sound Engine is already Concluded! Run clean-up befor Concluded");
 		
 		ArrayList<Sound> toAdd = new ArrayList<Sound>();
 		for(SoundRegistry reg : registries) {

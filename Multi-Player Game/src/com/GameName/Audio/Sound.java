@@ -80,7 +80,8 @@ public class Sound {
 	}
 	
 	private static String getName(String location) {
-		return location.substring(location.lastIndexOf('/'));
+		int splitloc = location.lastIndexOf('/'); splitloc = splitloc < 0  ? 0 : splitloc;
+		return location.substring(splitloc);
 	}
 
 	public String getName() {

@@ -1,14 +1,21 @@
 package com.GameName.Render.GUI;
 
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTexCoord2f;
+import static org.lwjgl.opengl.GL11.glVertex2f;
+
 import java.awt.Color;
 
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.opengl.Texture;
-
-import com.GameName.Main.GameName;
-
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.openal.AL10.*;
 
 public class GUI_Music extends GUI {
 	private final float HEIGHT = 77;
@@ -102,7 +109,6 @@ public class GUI_Music extends GUI {
 			if(endY > startY ? y < endY : y > endY) { y += ySpeed; for(GUIComponent component : comp) {component.y += ySpeed; if(component instanceof GUISlideBar) {GUISlideBar s = (GUISlideBar) component; s.setUseY(s.y);}}}	
 		}
 		
-		comp[0].text = (GameName.sound.accessNameByID(GameName.sound.getPlaying(GameName.sound.defaultSource)));
 				
 		for(GUIComponent component : comp) {
 			component.update();
@@ -110,10 +116,6 @@ public class GUI_Music extends GUI {
 	}
 	
 	protected void actions(int id) {
-		if(GameName.sound.getPlaying(GameName.sound.defaultSource) == 0) {
-			GameName.sound.playRandom();
-			GameName.sound.pauseSound(GameName.sound.defaultSource);
-		}
 		
 		try {
 			switch(id) {	
@@ -126,33 +128,7 @@ public class GUI_Music extends GUI {
 					fOpen = !fOpen;
 				break;
 				
-				case 2: 
-					GameName.sound.playSound(GameName.sound.getPlaying(GameName.sound.defaultSource));
-				break;
 				
-				case 3:
-					GameName.sound.pauseSound(GameName.sound.defaultSource);
-				break;
-					
-				case 4:
-					GameName.sound.stopSound(GameName.sound.defaultSource);
-				break;
-				
-				case 5:
-					GameName.sound.stopSound(GameName.sound.defaultSource);
-					int old = GameName.sound.getPlaying(GameName.sound.defaultSource);
-					while(GameName.sound.playRandom() == old);
-				break;	
-				
-				case 6: 
-					GUISlideBar temp = (GUISlideBar) comp[6];
-					alSourcef(GameName.sound.defaultSource, AL_GAIN, temp.getValue());
-				break;
-				
-				case 7: 
-					GUISlideBar temp2 = (GUISlideBar) comp[7];
-					alSourcef(GameName.sound.defaultSource, AL_PITCH, temp2.getValue());
-				break;
 									
 				default: break;
 			}
