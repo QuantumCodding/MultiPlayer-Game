@@ -1,10 +1,35 @@
 package com.GameName.World;
 
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.GL_LIGHTING;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glDrawArrays;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glScalef;
+import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glDeleteBuffers;
+import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
+
 import com.GameName.Main.GameName;
+import com.GameName.Render.RenderUtil;
+import com.GameName.Render.Texture;
+import com.GameName.Render.Shader.Shader;
 import com.GameName.World.Cube.Cube;
 
 public class Chunk {
 	private final float MINIMUM_LIGHT_DEFUTION = 0.5f;
+	
+	private int[] vboData;
 	
 	private int worldId;
 	private int x, y, z;
@@ -95,9 +120,62 @@ public class Chunk {
 	}
 	
 	public void updataVBO() {
-		GameName.render.updataChunk(getX(), getY(), getZ(), getWorldId());
+		vboData = RenderUtil.generateChunk(
+				x, y, z, GameName.worlds.get(worldId), vboData);
 		
 		vboUpdataRequested = false;
+	}
+	
+	public void render() {
+//		System.out.println("Chunk " + x + " " + y + " " + z + " in world " + worldId + " rendered");
+		
+		glPushMatrix();
+			glDisable(GL_LIGHTING);
+			
+			glEnableVertexAttribArray(0); // Position
+			glEnableVertexAttribArray(1); // Texture Data
+			glEnableVertexAttribArray(2); // Color
+			
+		    glEnable(GL_TEXTURE_2D);
+			
+		    	Cube.getTextureSheet().bind();
+		    	GameName.render.basicShader.bind();
+	
+		        glRotatef(180, 0, 1, 0);
+		    	glTranslatef(0, -(GameName.worlds.get(worldId).getSizeY() * (World.SCALE * 0.1f)), 0);
+		    	glScalef(World.SCALE, World.SCALE, World.SCALE);
+		        	    		
+	    		if(vboData != null) {
+	    			glColor3f((float) Math.random(), (float) Math.random(), (float) Math.random());
+		        	
+		        	glBindBuffer(GL_ARRAY_BUFFER, vboData[0]);
+		        		glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);		
+		        		
+		        	glBindBuffer(GL_ARRAY_BUFFER, vboData[1]);
+		        		glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+		        		
+		        	glBindBuffer(GL_ARRAY_BUFFER, vboData[2]);
+		        		glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
+	
+		        	glDrawArrays(GL_QUADS, 0, vboData[3]);
+	    		}
+	    		
+		        Shader.unbind();
+		        Texture.unbind();
+		        
+		    glDisableVertexAttribArray(0); // Position						
+		    glDisableVertexAttribArray(1); // Texture Data
+		    glDisableVertexAttribArray(2); // Color
+			
+		    glDisable(GL_TEXTURE_2D);	                
+	    glPopMatrix();
+	}
+	
+	public void cleanUp() {
+		glDeleteBuffers(vboData[0]);
+		glDeleteBuffers(vboData[1]);
+		glDeleteBuffers(vboData[2]);
+		glDeleteBuffers(vboData[3]);
 	}
 	
 	public float[] getLightColor(int x, int y, int z) {
@@ -126,5 +204,13 @@ public class Chunk {
 
 	public boolean isVboUpdataRequested() {
 		return vboUpdataRequested;
+	}
+
+	public int[] getVboData() {
+		return vboData;
+	}
+
+	public void setVboData(int[] vboData) {
+		this.vboData = vboData;
 	}
 }

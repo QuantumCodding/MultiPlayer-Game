@@ -1,14 +1,15 @@
 package com.GameName.Render;
 
-import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
 
-import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.GameName.Main.GameName;
 import com.GameName.Util.Util;
-import com.GameName.Util.Vector3f;
+import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.World;
 import com.GameName.World.Cube.Cube;
 
@@ -31,14 +32,22 @@ public class RenderUtil {
 		isIntialized = true;
 	}
 
-	protected static int[][] generateWorldRender(World w) {
+	public static int[][] generateWorldRender(World w) {
 		
 		int[][] worldVBOs = new int[w.getChunkX() * w.getChunkY() * w.getChunkZ()][5];
+		int[] chunkData;
 		
 		for(int x = 0; x < w.getChunkX(); x ++) {
 			for(int y = 0; y < w.getChunkY(); y ++) {
 				for(int z = 0; z < w.getChunkZ(); z ++) {
-					worldVBOs[z + (y * w.getChunkZ()) + (x * w.getChunkZ()  * w.getChunkY())] = generateChunk(x, y, z, w);
+					
+					int[] ids = GameName.getGLContext().genBufferIds(3);	
+					chunkData = new int[] {
+							ids[0], ids[1], // 0: Vertices  	1: TexCoords							
+							ids[2], 0		// 2: Light Values  3: Indices Size
+						};
+					
+					worldVBOs[z + (y * w.getChunkZ()) + (x * w.getChunkZ()  * w.getChunkY())] = generateChunk(x, y, z, w, chunkData);
 				}	
 			}
 		}
@@ -46,18 +55,10 @@ public class RenderUtil {
 		return worldVBOs;
 	}
 	
-	protected static int[] generateChunk(int startX, int startY, int startZ, World w) {
-		int[] chunkData = new int[] {
-				glGenBuffers(), // 0: Vertices
-				glGenBuffers(), // 1: TexCoords
-				glGenBuffers(), // 2: Light Values
-				
-				0				// 3: Indices Size
-			};
-		
+	public static int[] generateChunk(int startX, int startY, int startZ, World w, int[] chunkData) {
 		List<Vector3f> chunkVertices = new ArrayList<Vector3f>();
 		
-		List<Double> chunkTexData = new ArrayList<Double>();
+		List<Float> chunkTexData = new ArrayList<Float>();
 		List<Float> chunklightValues = new ArrayList<Float>();
 		
 		List<Integer> chunkIndices = new ArrayList<Integer>();
@@ -109,19 +110,17 @@ public class RenderUtil {
 		}
 		
 		FloatBuffer verticeBuffer = Util.createFillipedFloatBuffer(vertices);
-		DoubleBuffer texDataBuffer = Util.createFillipedDoubleBuffer(chunkTexData);
+		FloatBuffer texDataBuffer = Util.createFillipedFloatBuffer(chunkTexData);
 		FloatBuffer lightBuffer = Util.createFillipedFloatBuffer(chunklightValues);
 		
-	    glBindBuffer(GL_ARRAY_BUFFER, chunkData[0]);
-	    glBufferData(GL_ARRAY_BUFFER, verticeBuffer, GL_DYNAMIC_DRAW);	    
+		GameName.getGLContext()
+			.addBufferBind(verticeBuffer, GL_ARRAY_BUFFER, chunkData[0], GL_DYNAMIC_DRAW, 'f');
+		
+		GameName.getGLContext()
+			.addBufferBind(texDataBuffer, GL_ARRAY_BUFFER, chunkData[1], GL_DYNAMIC_DRAW, 'f');
 
-	    glBindBuffer(GL_ARRAY_BUFFER, chunkData[1]);
-	    glBufferData(GL_ARRAY_BUFFER, texDataBuffer, GL_DYNAMIC_DRAW);
-	    
-	    glBindBuffer(GL_ARRAY_BUFFER, chunkData[2]);
-	    glBufferData(GL_ARRAY_BUFFER, lightBuffer, GL_DYNAMIC_DRAW);
-	    
-	    glBindBuffer(GL_ARRAY_BUFFER, 0);
+		GameName.getGLContext()
+			.addBufferBind(lightBuffer, GL_ARRAY_BUFFER, chunkData[2], GL_DYNAMIC_DRAW, 'f');
 	    
 	    chunkData[3] = faceCount * 4;
 	    
@@ -204,8 +203,8 @@ public class RenderUtil {
 		return lightValue;
 	}
 	
-	protected static List<Double> getCubeTexture(int cx, int px, int cy, int py, int cz, int pz, int cSize, World w, boolean[] visableFaces) {
-		List<Double> texData = new ArrayList<Double>();		
+	protected static List<Float> getCubeTexture(int cx, int px, int cy, int py, int cz, int pz, int cSize, World w, boolean[] visableFaces) {
+		List<Float> texData = new ArrayList<Float>();		
 
 		Cube cube = w.getCube(
 				(cx * cSize) + px, 
@@ -222,15 +221,15 @@ public class RenderUtil {
 			if(!visableFaces[k]) continue;
 						
 			for(int i = 0; i < 4; i ++) {
-				double useX = (textureSideLength * k) + x;
-				double useY = y;
+				float useX = (float) ((textureSideLength * k) + x);
+				float useY = (float) y;
 				
-				double xAdd = 0.0, yAdd = 0.0;
+				float xAdd = 0.0f, yAdd = 0.0f;
 				
 				switch(i) {
-					case 1: xAdd = textureSideLength; break;
-					case 2: xAdd = textureSideLength; yAdd = textureSideLength; break;
-					case 3: yAdd = textureSideLength; break;
+					case 1: xAdd = (float) textureSideLength; break;
+					case 2: xAdd = (float) textureSideLength; yAdd = (float) textureSideLength; break;
+					case 3: yAdd = (float) textureSideLength; break;
 						
 					default: break;
 				}

@@ -9,7 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
-import com.GameName.Util.Vector3f;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class Shader {
 	private int programId;

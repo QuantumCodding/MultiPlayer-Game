@@ -153,7 +153,7 @@ public class Cube {
 	}
 	
 	public static void regesterCubes() throws InstanceAlreadyExistsException {
-		if(concluded) throw new InstanceAlreadyExistsException("Initialization already Concluded! Run clean befor re-concluding");
+		if(concluded) throw new InstanceAlreadyExistsException("Initialization already Concluded! Run clean-up befor re-concluding");
 	
 		CubeRegistry regestry = new CubeRegistry();
 		
