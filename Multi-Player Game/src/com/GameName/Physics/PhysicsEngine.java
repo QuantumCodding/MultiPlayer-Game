@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.GameName.Main.GameName;
 import com.GameName.Physics.Coalition.CollisionEvent;
 import com.GameName.Physics.Object.PhysicsObject;
-import com.GameName.Util.Vector3f;
+import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.World;
 
 public class PhysicsEngine {
@@ -21,21 +21,21 @@ public class PhysicsEngine {
 		if(!GameName.player.getAccess().isGravityOn()) {
 			return true;
 		}
-		
-		float x = pos.getX(), y = pos.getY(), z = pos.getZ();
-		
-		if(
-			(x == 0 && direction == LEFT) 	  || (x == w.getSizeX() && direction == RIGHT)   || 
-			(y == 0 && direction == DOWN) 	  || (y == w.getSizeY() && direction == UP)      || 
-			(z == 0 && direction == BACKWARD) || (z == w.getSizeZ() && direction == FORWARD) 
-		) return false;
-		
-		if(direction == FORWARD) return w.getCube(x, y, z + 1).isSolid();
-		if(direction == BACKWARD) return w.getCube(x, y, z - 1).isSolid();
-		if(direction == RIGHT) return w.getCube(x + 1, y, z).isSolid();
-		if(direction == LEFT) return w.getCube(x - 1, y, z).isSolid();
-		if(direction == UP) return w.getCube(x, y + 1, z).isSolid();
-		if(direction == DOWN) return w.getCube(x, y - 1, z).isSolid(); 
+//		
+//		float x = pos.getX(), y = pos.getY(), z = pos.getZ();
+//		
+//		if(
+//			(x == 0 && direction == LEFT) 	  || (x == w.getSizeX() && direction == RIGHT)   || 
+//			(y == 0 && direction == DOWN) 	  || (y == w.getSizeY() && direction == UP)      || 
+//			(z == 0 && direction == BACKWARD) || (z == w.getSizeZ() && direction == FORWARD) 
+//		) return false;
+//		
+//		if(direction == FORWARD) return w.getCube(x, y, z + 1).isSolid();
+//		if(direction == BACKWARD) return w.getCube(x, y, z - 1).isSolid();
+//		if(direction == RIGHT) return w.getCube(x + 1, y, z).isSolid();
+//		if(direction == LEFT) return w.getCube(x - 1, y, z).isSolid();
+//		if(direction == UP) return w.getCube(x, y + 1, z).isSolid();
+//		if(direction == DOWN) return w.getCube(x, y - 1, z).isSolid(); 
 	
 		return true;
 	}
@@ -44,16 +44,20 @@ public class PhysicsEngine {
 		float f1 = (float)  Math.cos(-Math.toRadians(rot.getY()) - (float) Math.PI);
 		float f2 = (float)  Math.sin(-Math.toRadians(rot.getY()) - (float) Math.PI);
 		float f3 = (float) -Math.cos(-Math.toRadians(rot.getX()));
-		float f4 = (float)  Math.sin(-Math.toRadians(rot.getX()));
+		float f4 = (float) -Math.sin(-Math.toRadians(rot.getX()));
 		
 		Vector3f change = new Vector3f((f2 * f3), f4, (f1 * f3));	
+		Vector3f check = pos.clone();
 		
 		int checkDistance = 0;
-		while(checkDistance < maxDistance && !w.getCube((pos = pos.add(change))).isSolid()) {checkDistance ++;}				
+		while(checkDistance < maxDistance && !w.getCube(check.addE(change)).isSolid()) {checkDistance ++; }//System.out.println("Checking " + checkDistance + " at " + check);}				
+//		System.out.println(w.getCube(check) + ", " + checkDistance + " : " + maxDistance);
 		
-		if(checkDistance >= maxDistance) return null;
+		if(checkDistance >= maxDistance) return pos;
 		
-		return pos;
+		check = check.truncate();
+//		System.out.println(check);
+		return check;
 	}
 	
 	public void simulate(ArrayList<PhysicsObject> objects, float delta) {
