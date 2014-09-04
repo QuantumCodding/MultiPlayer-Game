@@ -1,5 +1,9 @@
 package com.GameName.Entity;
 
+import static org.lwjgl.openal.AL10.AL_ORIENTATION;
+import static org.lwjgl.openal.AL10.AL_POSITION;
+import static org.lwjgl.openal.AL10.alListener3f;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,7 +14,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-import static org.lwjgl.openal.AL10.*;
 import org.lwjgl.opengl.Display;
 
 import com.GameName.Input.Control;
@@ -22,7 +25,8 @@ import com.GameName.Networking.Packets.PacketPlayerInventorySlot;
 import com.GameName.Networking.Packets.PacketPlayerLocation;
 import com.GameName.Networking.Packets.PacketPlayerStats;
 import com.GameName.Physics.PhysicsEngine;
-import com.GameName.Util.Vector3f;
+import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.World.Cube.Cube;
 
 public class EntityPlayer extends Entity {
 	protected ItemStack[] inv;
@@ -62,15 +66,16 @@ public class EntityPlayer extends Entity {
 		cam = new Camera(70, (float)Display.getWidth() / (float)Display.getHeight(), 0.3f, renderDistance);
 	}
 	
-	private void resetPlayer() {
+	public void resetPlayer() {
 		System.out.println("Player Reset");
 		
 		invSize = 10;
 		inv = new ItemStack[invSize];
 		
-		pos = new Vector3f(20, 110, 20);
-		
+		pos = new Vector3f(20, 110, 20);		
 		rot = new Vector3f(180, 0, 0);
+		
+		gravityOn = false;
 		
 		health = maxHealth;
 		hunger = maxHunger;
@@ -79,7 +84,7 @@ public class EntityPlayer extends Entity {
 		power = 0;
 		money = 0.0;
 		
-		maxReach = 5;
+		maxReach = 50;
 
 		selectedCube = new Vector3f(0, 0, 0);
 		
@@ -99,7 +104,7 @@ public class EntityPlayer extends Entity {
 	
 	public void updata() {
 		if(gravityOn) {
-			super.updata();
+//			super.updata();
 			
 			selectedCube = PhysicsEngine.getLookPosition(pos, rot, currentWorld, maxReach); 
 		}		
@@ -157,6 +162,9 @@ public class EntityPlayer extends Entity {
 					case "click": 			GameName.click = true; break;
 					
 					case "toggle": if(!GameName.lockMovement) { GameName.guiManager.toggle("Test"); GameName.guiManager.toggle("Pause"); } break;
+					
+					case "placeTest": currentWorld.setCube(selectedCube, Cube.ColorfulTestCube.getId()); break;
+					case "removeCube": currentWorld.setCube(selectedCube, Cube.Air.getId()); break;
 					
 					default: System.err.println("Default Called: Player is not using control " + ctr.control); break;					
 				} 				

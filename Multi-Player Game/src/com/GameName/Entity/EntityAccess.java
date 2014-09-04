@@ -1,6 +1,6 @@
 package com.GameName.Entity;
 
-import com.GameName.Util.Vector3f;
+import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Object.WorldObject;
 import com.GameName.World.Object.WorldObjectAccess;
 

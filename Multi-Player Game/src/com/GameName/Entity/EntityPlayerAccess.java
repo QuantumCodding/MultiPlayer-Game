@@ -9,7 +9,7 @@ import com.GameName.Networking.Client;
 import com.GameName.Networking.Packets.PacketPlayerInventorySize;
 import com.GameName.Networking.Packets.PacketPlayerInventorySlot;
 import com.GameName.Networking.Packets.PacketPlayerStats;
-import com.GameName.Util.Vector3f;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class EntityPlayerAccess extends EntityAccess {
 	

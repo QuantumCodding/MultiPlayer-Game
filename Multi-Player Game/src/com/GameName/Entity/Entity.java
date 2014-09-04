@@ -1,8 +1,5 @@
 package com.GameName.Entity;
 
-import com.GameName.Physics.Coalition.BoundingBox;
-import com.GameName.Util.Vector3f;
-import com.GameName.World.World;
 import com.GameName.World.Object.WorldObject;
 
 public abstract class Entity extends WorldObject {
