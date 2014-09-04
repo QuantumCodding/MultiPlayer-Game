@@ -14,20 +14,18 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Controllers;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.openal.AL;
-
-import com.GameName.World.Cube.Cube;
 //import static org.lwjgl.opengl.GL15.*;
 
 /**
- * @author Soren
+ * @author QuantumCodding
  *
  */
 
 public class Start {
-	public static final String vertion = "0.00.3";
+	public static final String vertion = "0.00.4";
 	public static final int WIDTH = 800;
 	public static final int HEIGHT = 600;
 	
@@ -77,7 +75,7 @@ public class Start {
 		}
 	}
 	
-	protected static void initDisplay(int width, int height) {
+	public static void initDisplay(int width, int height) {
 		try {
 			Display.destroy();
 			AL.destroy();
@@ -106,15 +104,7 @@ public class Start {
 	}
 	
 	public static void cleanUp() {	
-		
-		if(GameName.sound != null)
-			GameName.sound.cleanUp();
-		
-		if(GameName.render != null) 
-			GameName.render.cleanUp();
-		
-		if(Cube.isConcluded())
-			Cube.cleanUp();
+		GameName.cleanUp();
 		
 		Display.destroy();
 		

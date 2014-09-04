@@ -4,7 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import com.GameName.Util.Vector3f;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class PacketPlayerLocation extends Packet {
 	public static final int id = 1;	
