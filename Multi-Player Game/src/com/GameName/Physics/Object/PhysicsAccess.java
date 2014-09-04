@@ -1,7 +1,7 @@
 package com.GameName.Physics.Object;
 
 import com.GameName.Physics.Coalition.BoundingArea;
-import com.GameName.Util.Vector3f;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class PhysicsAccess {
 	PhysicsObject object;

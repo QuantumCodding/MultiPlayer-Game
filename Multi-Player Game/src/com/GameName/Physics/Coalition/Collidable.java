@@ -1,6 +1,6 @@
 package com.GameName.Physics.Coalition;
 
-import com.GameName.Util.Vector3f;
+import com.GameName.Util.Vectors.Vector3f;
 
 public abstract class Collidable {
 	private Shape shape;

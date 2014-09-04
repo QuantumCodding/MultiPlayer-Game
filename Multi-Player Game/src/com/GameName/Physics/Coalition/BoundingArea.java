@@ -3,7 +3,7 @@ package com.GameName.Physics.Coalition;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.GameName.Util.Vector3f;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class BoundingArea {
 	private ArrayList<Collidable> boundingObjetcts;
