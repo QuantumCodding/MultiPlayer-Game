@@ -8,7 +8,6 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 
-import com.GameName.World.Biom;
 import com.GameName.World.World;
 
 public class BiomGenerator {

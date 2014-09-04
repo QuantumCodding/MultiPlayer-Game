@@ -2,7 +2,7 @@ package com.GameName.World.Object;
 
 import com.GameName.Physics.Coalition.BoundingBox;
 import com.GameName.Physics.Object.PhysicsObject;
-import com.GameName.Util.Vector3f;
+import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.World;
 
 public abstract class WorldObject extends PhysicsObject {

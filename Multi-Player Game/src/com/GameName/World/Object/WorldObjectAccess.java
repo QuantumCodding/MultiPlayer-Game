@@ -2,7 +2,7 @@ package com.GameName.World.Object;
 
 import com.GameName.Physics.Object.PhysicsAccess;
 import com.GameName.Physics.Object.PhysicsObject;
-import com.GameName.Util.Vector3f;
+import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.World;
 
 public class WorldObjectAccess extends PhysicsAccess {

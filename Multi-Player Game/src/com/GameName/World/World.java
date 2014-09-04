@@ -3,7 +3,7 @@ package com.GameName.World;
 import com.GameName.Entity.Entity;
 import com.GameName.Render.RenderEngine;
 import com.GameName.Util.Time;
-import com.GameName.Util.Vector3f;
+import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Cube.Cube;
 
 public class World {
@@ -38,6 +38,7 @@ public class World {
 		this.name = name;
 		
 		chunks = new Chunk[chunkX * chunkY * chunkZ];
+		EntityList = new Entity[100];
 		
 		double time = Time.getTime();
 		
@@ -89,6 +90,21 @@ public class World {
 			}
 		}
 		
+		int maxRadius = 10;
+		for(int layer = 0; layer < maxRadius; layer ++) {
+			int cubeID = layer % 3 + 3;
+			
+		for(int radius = 0; radius < layer; radius ++) {
+		for(int rot = 0; rot < 360; rot ++) {		
+			
+			Vector3f loadPos = new Vector3f(
+					Math.round(Math.cos(Math.toRadians(rot)) * radius), 
+					Math.round(Math.sin(Math.toRadians(rot)) * radius), 
+				layer).add(new Vector3f(50, 50, 50));
+			
+			setCube(loadPos, cubeID);//(float) Math.sin(z) * 5
+		}}}
+		
 		setCube(0, 0, 0, Cube.ColorfulTestCube.getId());
 		
 		isGenerated = true;
@@ -102,7 +118,11 @@ public class World {
 		chunks[chunkCoordX + (chunkCoordY * chunkX) + (chunkCoordZ * chunkX * chunkY)]
 				.setCube(indexX, indexY, indexZ, Cube.getCubeByID(cubeId));
 	}
-
+	
+	public void setCube(Vector3f pos, int cubeId) {
+		setCube((int) pos.getX(), (int) pos.getY(), (int) pos.getZ(), cubeId);
+	}
+ 
 	public Cube getCube(float x, float y, float z) {
 		int ix = (int) x, chunkCoordX = ix / CHUNK_SIZE, indexX = ix % CHUNK_SIZE;
 		int iy = (int) y, chunkCoordY = iy / CHUNK_SIZE, indexY = iy % CHUNK_SIZE;
@@ -135,15 +155,21 @@ public class World {
 				.getLightValue(indexX, indexY, indexZ);
 	}
 	
-	public Chunk[] getChunks() {
-		return chunks;
-	}
-	
 	public float getGroundHeight(float x, float y, float z) {
 		int groundHeight = Math.min(Math.round(y), sizeY - 1);
 		while(groundHeight > 0 && !getCube(x, groundHeight, z).isSolid())  groundHeight --; 
 		
 		return groundHeight;
+	}
+	
+	public void setWorldVBO(int[][] vbosData) {
+		for(int i = 0; i < vbosData.length; i ++) {
+			chunks[i].setVboData(vbosData[i]);
+		}
+	}
+	
+	public Chunk[] getChunks() {
+		return chunks;
 	}
 	
 	public float getGroundHeight(Vector3f pos) {
@@ -206,16 +232,32 @@ public class World {
 		return name  + "[ID=" + id + "]";
 	}
 
-	public void checkChunks() {
+	public boolean checkChunks() {
 		for(Chunk chunk : chunks) {
-			if(chunk.isVboUpdataRequested()) {
-				chunk.updataVBO();
+			if(!chunk.isVboUpdataRequested()) {
+				return  false;
 			}	
-		}		
+		}	
+		
+		return true;
 	}
 
+	public void updataChunks() {
+		for(Chunk chunk : chunks) {
+			if(!chunk.isVboUpdataRequested()) {
+				chunk.updataVBO();
+			}	
+		}	
+	}
+	
 	public Cube getCube(Vector3f cord) {
 		return getCube(cord.getX(), cord.getY(), cord.getZ());
+	}
+	
+	public void cleanUp() {
+		for(Chunk chunk : chunks) {
+			chunk.cleanUp();
+		}
 	}
 }
 
