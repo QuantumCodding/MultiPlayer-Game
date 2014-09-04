@@ -51,7 +51,7 @@ public class Tag {
 	}
 
 	public String getTagString() {
-		String tagString = DTGGenerator.generateTag(tagName, tagInfo);
+		return DTGGenerator.generateTag(tagName, tagInfo);
 	}
 	
 	public String getTagName() {
