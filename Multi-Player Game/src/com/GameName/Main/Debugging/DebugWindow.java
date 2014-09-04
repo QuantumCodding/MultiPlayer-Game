@@ -28,7 +28,7 @@ public class DebugWindow {
 		FPSLabel = new JLabel("FPS: " + GameName.getFPS()); FPSLabel.setFont(new Font("", 1, 15));
 		
 		scrollPanel = new JPanel();
-		scrollPanel.setLayout(new GridLayout(0, 2)); //BoxLayout(scrollPanel, BoxLayout.Y_AXIS));
+		scrollPanel.setLayout(new GridLayout(5, 0)); //BoxLayout(scrollPanel, BoxLayout.Y_AXIS));
 				
 		scrollPane = new JScrollPane(scrollPanel);		
 //		scrollPane.setMinimumSize(new Dimension(400, 300));

@@ -15,12 +15,11 @@ import org.lwjgl.opengl.Display;
 import com.GameName.Audio.SoundEngine;
 import com.GameName.Entity.Entity;
 import com.GameName.Entity.EntityPlayer;
-import com.GameName.Input.Control;
 import com.GameName.Main.Debugging.DebugWindow;
 import com.GameName.Main.Threads.EntityThread;
+import com.GameName.Main.Threads.GLContextThread;
 import com.GameName.Main.Threads.PhysicsThread;
-import com.GameName.Main.Threads.PlayerThread;
-import com.GameName.Main.Threads.WorldLoadThread;
+import com.GameName.Main.Threads.ThreadManager;
 import com.GameName.Networking.Client;
 import com.GameName.Networking.Server;
 import com.GameName.Physics.PhysicsEngine;
@@ -31,7 +30,10 @@ import com.GameName.World.Cube.Cube;
 
 public class GameName {	
 	public static boolean isRunning;
-	private DebugWindow debugWindow;
+	public static DebugWindow debugWindow;
+
+	public static ThreadManager threadManager;
+	public static GLContextThread glContextThread;
 	
 	public static EntityPlayer player;
 	
@@ -52,14 +54,6 @@ public class GameName {
 	
 	private static int FPS;
 	private int FPSTicks;
-	private int tickRate;
-	
-	private int oldW, oldH;
-	
-	private PhysicsThread   physicsThread;
-	private WorldLoadThread worldLoadThread;
-	private EntityThread    entityThread;
-	private PlayerThread    playerThread;
 	
 	private Thread FPS_Thread = new Thread() {
 		public void run() {
@@ -75,10 +69,10 @@ public class GameName {
 		}
 	};
 
-	public GameName() {
-		tickRate = 60;
+	public GameName() {			
+		try {			
+			glContextThread = new GLContextThread(ThreadManager.UNCAPED_TICK_RATE);
 			
-		try {
 			Cube.regesterCubes();
 			Cube.concludeInit();
 			
@@ -86,6 +80,7 @@ public class GameName {
 			worlds.add(new World(10, 10, 10, worlds.size(), "Main World"));
 			
 			sound = new SoundEngine();
+			sound.registerSounds();
 	//		sound.playRandom();
 			
 			physics = new PhysicsEngine();
@@ -113,14 +108,11 @@ public class GameName {
 				w.checkChunks();
 			}
 			
-			physicsThread   = new PhysicsThread(tickRate, physics);
-			worldLoadThread = new WorldLoadThread(tickRate, player.getAccess().getCurrentWorld()); 
-			entityThread    = new EntityThread(tickRate);
-			playerThread    = new PlayerThread(tickRate, player);
+			threadManager = new ThreadManager();
 			
 			for(Entity entity : player.getAccess().getCurrentWorld().getEntityList()) {
-				physicsThread.add(entity);
-				entityThread.add(entity);
+				((PhysicsThread) threadManager.accessByName("Physics Thread")).add(entity);
+				((EntityThread) threadManager.accessByName("Entity Thread")).add(entity);
 			}
 
 			debugWindow = new DebugWindow();
@@ -134,53 +126,26 @@ public class GameName {
 	}
 	
 	public void gameLoop() {
-		debugWindow.add(physicsThread.getTracker());
-		debugWindow.add(worldLoadThread.getTracker());
-		debugWindow.add(entityThread.getTracker());
-		debugWindow.add(playerThread.getTracker());
-		
+		threadManager.addAll(debugWindow);		
 		debugWindow.reload();
 		
 		c = checkControllers();		
 		FPS_Thread.start();
 		
-		physicsThread  .start();
-		worldLoadThread.start(); 
-		entityThread   .start(); 
-		playerThread   .start(); 		
+		threadManager.startAll();
 		
 		while(isRunning && !Display.isCloseRequested()) {
-						
-			Control.tick();
-			guiManager.update();
+			getGLContext().tick();
 			
 			render.render3D();
-			render.render2D();			
+			render.render2D();
 			
+			FPSTicks ++;
 			Display.update();
 			Display.sync(60);
-			
-			if(oldW != Display.getWidth() || oldH != Display.getHeight()){
-	//			Start.initDisplay(Display.getWidth(), Display.getHeight());
-				
-				player.resetCam();
-				render.setUpPerspectives();
-				guiManager.resize(Start.WIDTH, Start.HEIGHT);
-				
-				oldW = Display.getWidth();
-				oldH = Display.getHeight();
-			}
-			
-			debugWindow.tick();			
-			FPSTicks ++;
-		}
-		
+		}		
+
 		FPS_Thread.interrupt();
-		
-		physicsThread  .requesteStop();
-		worldLoadThread.requesteStop();
-		entityThread   .requesteStop();
-		playerThread   .requesteStop();
 	}
 	
 	
@@ -197,4 +162,20 @@ public class GameName {
 	public static int getFPS() {
 		return FPS;
 	}	
+	
+	public static GLContextThread getGLContext() {
+		return glContextThread;
+	}
+	
+	public static void cleanUp() {
+		threadManager.stopAll();
+		
+		Cube.cleanUp();		
+		render.cleanUp();
+		sound.cleanUp();
+		
+		for(World w : worlds) {
+			w.cleanUp();
+		}
+	}
 }
