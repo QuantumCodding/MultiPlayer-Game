@@ -64,7 +64,7 @@ public class ClientPacketProcesor {
 				PacketNPCLocation packet = new PacketNPCLocation();
 				packet.readInfo(in);
 				
-				EntityNPC npc = (EntityNPC) GameName.worlds.get(packet.getWorldID()).getEntity(packet.getNpcID());
+				EntityNPC npc = (EntityNPC) GameName.worlds.get(packet.getWorldID()).getObject(packet.getNpcID());
 								
 				npc.getAccess().setX(packet.getX());
 				npc.getAccess().setY(packet.getY());

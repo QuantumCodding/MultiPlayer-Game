@@ -1,7 +1,5 @@
 package com.GameName.Main.Threads;
 
-import com.GameName.Main.GameName;
-import com.GameName.Render.RenderUtil;
 import com.GameName.World.World;
 
 public class VBOUpdateThread extends GameThread {
@@ -14,14 +12,11 @@ public class VBOUpdateThread extends GameThread {
 	}
 
 	void init() {
-		System.out.println("Generating World " + world.getId() + ": " + GameName.worlds.get(world.getId()));
-		world.setWorldVBO(RenderUtil.generateWorldRender(world));
+		
 	}	
 
 	void tick() {
-		if(world.checkChunks()) {
-			world.updataChunks();
-		}
+		world.updataChunks();
 	}
 
 	public void setWorld(World world) {

@@ -113,6 +113,14 @@ public class RenderUtil {
 		FloatBuffer texDataBuffer = Util.createFillipedFloatBuffer(chunkTexData);
 		FloatBuffer lightBuffer = Util.createFillipedFloatBuffer(chunklightValues);
 		
+		if(chunkData == null) {
+			int[] ids = GameName.getGLContext().genBufferIds(3);	
+			chunkData = new int[] {
+					ids[0], ids[1], // 0: Vertices  	1: TexCoords							
+					ids[2], 0		// 2: Light Values  3: Indices Size
+				};
+		}
+		
 		GameName.getGLContext()
 			.addBufferBind(verticeBuffer, GL_ARRAY_BUFFER, chunkData[0], GL_DYNAMIC_DRAW, 'f');
 		

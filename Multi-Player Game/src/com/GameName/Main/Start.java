@@ -103,17 +103,23 @@ public class Start {
 		}
 	}
 	
-	public static void cleanUp() {	
-		GameName.cleanUp();
-		
-		Display.destroy();
-		
-		Controllers.destroy();
-		Mouse.destroy();
-		Keyboard.destroy();
-		
-		AL.destroy();
-		
-		System.exit(1);
+	public static void cleanUp() {
+		try {
+			GameName.cleanUp();
+			
+			Display.destroy();
+			
+			Controllers.destroy();
+			Mouse.destroy();
+			Keyboard.destroy();
+			
+			AL.destroy();
+			
+		} catch(NullPointerException e) {
+			e.printStackTrace();
+			
+		} finally {			
+			System.exit(1);
+		}
 	}
 }

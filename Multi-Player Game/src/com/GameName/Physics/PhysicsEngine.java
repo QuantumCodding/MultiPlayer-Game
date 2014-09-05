@@ -44,19 +44,20 @@ public class PhysicsEngine {
 		float f1 = (float)  Math.cos(-Math.toRadians(rot.getY()) - (float) Math.PI);
 		float f2 = (float)  Math.sin(-Math.toRadians(rot.getY()) - (float) Math.PI);
 		float f3 = (float) -Math.cos(-Math.toRadians(rot.getX()));
-		float f4 = (float) -Math.sin(-Math.toRadians(rot.getX()));
+		float f4 = (float)  Math.sin(-Math.toRadians(rot.getX()));
 		
 		Vector3f change = new Vector3f((f2 * f3), f4, (f1 * f3));	
 		Vector3f check = pos.clone();
 		
 		int checkDistance = 0;
-		while(checkDistance < maxDistance && !w.getCube(check.addE(change)).isSolid()) {checkDistance ++; }//System.out.println("Checking " + checkDistance + " at " + check);}				
-//		System.out.println(w.getCube(check) + ", " + checkDistance + " : " + maxDistance);
+		
+		try {
+			while(checkDistance < maxDistance && !w.getCube(check.addE(change)).isSolid()) {checkDistance ++; }			
+		} catch(IndexOutOfBoundsException | NullPointerException e) {return pos;}
 		
 		if(checkDistance >= maxDistance) return pos;
 		
 		check = check.truncate();
-//		System.out.println(check);
 		return check;
 	}
 	

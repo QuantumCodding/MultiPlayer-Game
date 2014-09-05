@@ -104,7 +104,7 @@ public class EntityPlayer extends Entity {
 	
 	public void updata() {
 		if(gravityOn) {
-//			super.updata();
+			super.updata();
 			
 			selectedCube = PhysicsEngine.getLookPosition(pos, rot, currentWorld, maxReach); 
 		}		

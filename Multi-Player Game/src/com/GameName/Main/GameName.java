@@ -27,6 +27,7 @@ import com.GameName.Render.RenderEngine;
 import com.GameName.Render.GUI.GUIManager;
 import com.GameName.World.World;
 import com.GameName.World.Cube.Cube;
+import com.GameName.World.Object.WorldObject;
 
 public class GameName {	
 	public static boolean isRunning;
@@ -77,7 +78,7 @@ public class GameName {
 			Cube.concludeInit();
 			
 			worlds = new ArrayList<World>();
-			worlds.add(new World(10, 10, 10, worlds.size(), "Main World"));
+			worlds.add(new World(10, 10, 10, worlds.size(), "MainWorld"));
 			
 			sound = new SoundEngine();
 			sound.registerSounds();
@@ -110,9 +111,11 @@ public class GameName {
 			
 			threadManager = new ThreadManager();
 			
-			for(Entity entity : player.getAccess().getCurrentWorld().getEntityList()) {
-				((PhysicsThread) threadManager.accessByName("Physics Thread")).add(entity);
-				((EntityThread) threadManager.accessByName("Entity Thread")).add(entity);
+			for(WorldObject object : player.getAccess().getCurrentWorld().getWorldObjects()) {
+				((PhysicsThread) threadManager.accessByName("Physics Thread")).add(object);
+				
+				if(object instanceof Entity)
+					((EntityThread) threadManager.accessByName("Entity Thread")).add((Entity) object);
 			}
 
 			debugWindow = new DebugWindow();

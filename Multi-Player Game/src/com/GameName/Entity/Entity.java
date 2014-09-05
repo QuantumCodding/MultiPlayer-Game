@@ -36,7 +36,7 @@ public abstract class Entity extends WorldObject {
 	public void updata() {
 		super.updata();
 		
-		applyGravity(currentWorld);
+//		applyGravity(currentWorld);
 	}
 	
 	public EntityAccess getAccess() {
