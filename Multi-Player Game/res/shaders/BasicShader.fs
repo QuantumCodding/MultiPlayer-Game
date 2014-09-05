@@ -1,4 +1,4 @@
-#version 330
+#version 120 //300
 
 in vec2 texCoordData;
 in vec3 colour;
