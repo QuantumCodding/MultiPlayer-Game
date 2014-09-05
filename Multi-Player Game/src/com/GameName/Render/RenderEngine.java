@@ -25,6 +25,7 @@ import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL11.glColor4f;
 import static org.lwjgl.opengl.GL11.glColorMaterial;
 import static org.lwjgl.opengl.GL11.glCullFace;
 import static org.lwjgl.opengl.GL11.glDisable;
@@ -65,7 +66,7 @@ public class RenderEngine {
 	
 	private UnicodeFont font;
 	
-	private Shader textureShader;
+//	private Shader textureShader;
 	public Shader basicShader;
 	
 	private FloatBuffer perspectiveProjectionMatrix;
@@ -173,6 +174,33 @@ public class RenderEngine {
 		    glEnd();
 		glPopMatrix();		    
 		
+		glPushMatrix();
+			glBegin(GL_LINES);
+				glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
+			
+				float f1, f2, f3, f4;		
+				
+				for(int rotY = 0; rotY < 360; rotY ++) {
+				for(int rotX = 0; rotX < 360; rotX ++) {
+					
+					int radius = 10;			
+					
+					f1 = (float)  Math.cos(Math.toRadians(rotY));
+					f2 = (float)  Math.sin(Math.toRadians(rotY));
+					f3 = (float)  Math.cos(Math.toRadians(rotX));                  
+					f4 = (float)  Math.sin(Math.toRadians(rotX));             
+					
+					Vector3f loadPos = new Vector3f(
+							Math.round(f2 * f3 * radius), 
+							Math.round(f4 * radius), 
+							Math.round(f1 * f3 * radius))
+						.add(GameName.player.getAccess().getCurrentWorld().getLoadedWorld().getAccess().getCenter());
+					
+//					glVertex3f(loadPos.getX(), loadPos.getY(), loadPos.getZ());
+				}}
+			glEnd();
+		glPopMatrix();
+		
 		for(Chunk chunk : GameName.player.getAccess().getCurrentWorld().getChunks()) {
 			chunk.render();
 		}
@@ -214,7 +242,7 @@ public class RenderEngine {
 	}
 
 	private void setUpShaders() {
-		textureShader = new Shader("TextureShader", false);
+//		textureShader = new Shader("TextureShader", false);
 //		textureShader.addUniform("sampler");
 		
 		basicShader = new Shader("BasicShader", false);
@@ -232,7 +260,7 @@ public class RenderEngine {
 	}
 
 	public void cleanUp() {		
-		textureShader.cleanUp();
+//		textureShader.cleanUp();
 		basicShader.cleanUp();
 	}
 }

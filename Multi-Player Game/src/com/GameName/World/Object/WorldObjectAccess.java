@@ -30,6 +30,10 @@ public class WorldObjectAccess extends PhysicsAccess {
 		return wObject.currentWorld;
 	}
 	
+	public Vector3f getChunk() {
+		return wObject.chunk;
+	}
+	
 	public Vector3f getRenderPos() {
 		return wObject.renderPos;
 	}

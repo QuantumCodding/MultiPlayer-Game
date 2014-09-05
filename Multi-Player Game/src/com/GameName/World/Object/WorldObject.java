@@ -7,6 +7,7 @@ import com.GameName.World.World;
 
 public abstract class WorldObject extends PhysicsObject {
 
+	protected Vector3f chunk;
 	protected Vector3f renderPos, adjust;	
 	protected float height, width, length;
 	protected World currentWorld;
@@ -24,6 +25,7 @@ public abstract class WorldObject extends PhysicsObject {
 		super.updata();
 		
 		renderPos = pos.multiply(adjust);
+		chunk = pos.divide(World.CHUNK_SIZE).truncate();
 	}
 	
 	public void addBounding() {

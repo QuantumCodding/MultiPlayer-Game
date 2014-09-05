@@ -20,10 +20,14 @@ import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 
+import java.util.ArrayList;
+
 import com.GameName.Main.GameName;
 import com.GameName.Render.RenderUtil;
 import com.GameName.Render.Texture;
 import com.GameName.Render.Shader.Shader;
+import com.GameName.Util.Tag.DTGGenerator;
+import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Cube.Cube;
 
 public class Chunk {
@@ -119,7 +123,7 @@ public class Chunk {
 		vboUpdataRequested = true;
 	}
 	
-	public void updataVBO() {
+	public void updataVBO() {		
 		vboData = RenderUtil.generateChunk(
 				x, y, z, GameName.worlds.get(worldId), vboData);
 		
@@ -146,7 +150,7 @@ public class Chunk {
 		    	glScalef(World.SCALE, World.SCALE, World.SCALE);
 		        	    		
 	    		if(vboData != null) {
-	    			glColor3f((float) Math.random(), (float) Math.random(), (float) Math.random());
+	    			glColor3f((float) Math.random() * 10 % 3 / 10, (float) Math.random() * 10 % 3 / 10, (float) Math.random() * 10 % 3 / 10);
 		        	
 		        	glBindBuffer(GL_ARRAY_BUFFER, vboData[0]);
 		        		glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);		
@@ -201,6 +205,10 @@ public class Chunk {
 	public int getZ() {
 		return z;
 	}
+	
+	public Vector3f getPos() {
+		return new Vector3f(x, y, z);
+	}
 
 	public boolean isVboUpdataRequested() {
 		return vboUpdataRequested;
@@ -212,5 +220,20 @@ public class Chunk {
 
 	public void setVboData(int[] vboData) {
 		this.vboData = vboData;
+	}
+
+	public ArrayList<String> getTagLines() {
+		ArrayList<String> tagLines = new ArrayList<String>();
+		
+		for(int z = 0; z < size; z ++) {
+		for(int y = 0; y < size; y ++) {
+		for(int x = 0; x < size; x ++) {
+			int cube = getCube(x, y, z);
+			
+			tagLines.add(DTGGenerator.generateTag("cubeId", cube));
+			tagLines.add(DTGGenerator.generateTag("pos", new Vector3f(x, y, z)));	
+		}}}
+		
+		return tagLines;
 	}
 }

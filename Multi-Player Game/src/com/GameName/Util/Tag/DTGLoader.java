@@ -1,8 +1,10 @@
 package com.GameName.Util.Tag;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,6 +92,18 @@ public class DTGLoader {
 		
 		for(Tag tag : data) System.out.println(tag);
 		return data;
+	}
+	
+	public static void saveDTGFile(File f, ArrayList<String> tagLines) throws IOException {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(f));
+		
+		for(String tagLine : tagLines) {
+			writer.write(tagLine);
+			writer.newLine();
+			writer.flush();
+		}
+		
+		writer.close();
 	}
 	
 	private static double asDouble(String as) 	{return Double.parseDouble(removeLast(as));}

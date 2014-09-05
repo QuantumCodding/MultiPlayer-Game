@@ -1,10 +1,10 @@
 package com.GameName.World;
 
-import com.GameName.Entity.Entity;
 import com.GameName.Render.RenderEngine;
 import com.GameName.Util.Time;
 import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Cube.Cube;
+import com.GameName.World.Object.WorldObject;
 
 public class World {
 	
@@ -18,11 +18,9 @@ public class World {
 	private int chunkX, chunkY, chunkZ;
 	
 	private String name;
+	private LoadedWorld loadedWorld;
 	private int id;
-	
-	private Chunk[] chunks;	
-	private Entity[] EntityList;
-	
+		
 	private boolean isGenerated = false;
 	
 	public World(int x, int y, int z, int id, String name) {
@@ -36,9 +34,8 @@ public class World {
 		
 		this.id = id;
 		this.name = name;
-		
-		chunks = new Chunk[chunkX * chunkY * chunkZ];
-		EntityList = new Entity[100];
+			
+		loadedWorld = new LoadedWorld(this, name);
 		
 		double time = Time.getTime();
 		
@@ -50,6 +47,8 @@ public class World {
 	}
 	
 	private void generate() {
+		Chunk[] chunks = new Chunk[chunkX * chunkY * chunkZ];
+		
 		for(int cz = 0; cz < chunkZ; cz ++) {
 		for(int cy = 0; cy < chunkY; cy ++) {
 		for(int cx = 0; cx < chunkX; cx ++) {
@@ -69,7 +68,7 @@ public class World {
 		for(int x = 0; x < sizeX / 2; x ++) {
 			for(int y = 0; y < sizeY/2; y ++) {
 				for(int z = 0; z < sizeZ; z ++) {
-					setCube(x + sizeX/4, y + sizeY/4, z, Cube.Air.getId());
+					setCube(x + sizeX/4, y + sizeY/4, z, Cube.Air, chunks);
 				}
 			}
 		}
@@ -77,7 +76,7 @@ public class World {
 		for(int z = 0; z < sizeZ / 2; z ++) {
 			for(int y = 0; y < sizeY/2; y ++) {
 				for(int x = 0; x < sizeX; x ++) {
-					setCube(x, y + sizeY/4, z + sizeZ/4, Cube.Air.getId());
+					setCube(x, y + sizeY/4, z + sizeZ/4, Cube.Air, chunks);
 				}
 			}
 		}
@@ -85,101 +84,76 @@ public class World {
 		for(int z = 0; z < sizeZ / 2; z ++) {
 			for(int x = 0; x < sizeX/2; x ++) {
 				for(int y = 0; y < sizeY - (sizeY / 3); y ++) {
-					setCube(x + sizeX/4, y, z + sizeZ/4, Cube.Air.getId());
+					setCube(x + sizeX/4, y, z + sizeZ/4, Cube.Air, chunks);
 				}
 			}
 		}
 		
-		int maxRadius = 10;
-		for(int layer = 0; layer < maxRadius; layer ++) {
-			int cubeID = layer % 3 + 3;
+		final int RADIUS = 10;
+		
+		float f1, f2, f3, f4;
+		
+		for(int rotY = 0; rotY < 360; rotY ++) {
+		for(int rotX = 0; rotX < 360; rotX ++) {
+				
 			
-		for(int radius = 0; radius < layer; radius ++) {
-		for(int rot = 0; rot < 360; rot ++) {		
+		for(int radius = 0; radius < RADIUS; radius ++) {			
+			
+			f1 = (float)  Math.cos(Math.toRadians(rotY));
+			f2 = (float)  Math.sin(Math.toRadians(rotY));
+			f3 = (float)  Math.cos(Math.toRadians(rotX));                  
+			f4 = (float)  Math.sin(Math.toRadians(rotX));                  
+			
+			int cubeID = Math.abs(Math.round(f4 * radius)) % 3 + 3;	
 			
 			Vector3f loadPos = new Vector3f(
-					Math.round(Math.cos(Math.toRadians(rot)) * radius), 
-					Math.round(Math.sin(Math.toRadians(rot)) * radius), 
-				layer).add(new Vector3f(50, 50, 50));
+					Math.round(f2 * f3 * radius), 
+					Math.round(f4 * radius), 
+					Math.round(f1 * f3 * radius))
+				.add(new Vector3f(50, 50, 50));
 			
-			setCube(loadPos, cubeID);//(float) Math.sin(z) * 5
+			setCube((int) loadPos.getX(), (int) loadPos.getY(), (int) loadPos.getZ(), Cube.getCubeByID(cubeID), chunks);//(float) Math.sin(z) * 5
 		}}}
 		
-		setCube(0, 0, 0, Cube.ColorfulTestCube.getId());
-		
+		loadedWorld.getAccess().setCunks(chunks);
 		isGenerated = true;
 	}
-
-	public void setCube(int x, int y, int z, int cubeId) {		
+	
+	public boolean checkChunks() {return loadedWorld.checkChunks();}
+	public void updataChunks()	 {loadedWorld.updataChunks();}
+	
+	public Cube getCube(float x, float y, float z)  {return loadedWorld.getAccess().getCube(x, y, z);}
+	public Cube getCube(Vector3f pos) 				{return loadedWorld.getAccess().getCube(pos);}
+	
+	private void setCube(int x, int y, int z, Cube cubeId, Chunk[] chunks) {		
 		int ix = (int) x, chunkCoordX = ix / CHUNK_SIZE, indexX = ix % CHUNK_SIZE;
 		int iy = (int) y, chunkCoordY = iy / CHUNK_SIZE, indexY = iy % CHUNK_SIZE;
 		int iz = (int) z, chunkCoordZ = iz / CHUNK_SIZE, indexZ = iz % CHUNK_SIZE;
 
 		chunks[chunkCoordX + (chunkCoordY * chunkX) + (chunkCoordZ * chunkX * chunkY)]
-				.setCube(indexX, indexY, indexZ, Cube.getCubeByID(cubeId));
+				.setCube(indexX, indexY, indexZ, cubeId);
 	}
 	
-	public void setCube(Vector3f pos, int cubeId) {
-		setCube((int) pos.getX(), (int) pos.getY(), (int) pos.getZ(), cubeId);
-	}
- 
-	public Cube getCube(float x, float y, float z) {
-		int ix = (int) x, chunkCoordX = ix / CHUNK_SIZE, indexX = ix % CHUNK_SIZE;
-		int iy = (int) y, chunkCoordY = iy / CHUNK_SIZE, indexY = iy % CHUNK_SIZE;
-		int iz = (int) z, chunkCoordZ = iz / CHUNK_SIZE, indexZ = iz % CHUNK_SIZE;
-		
-		if(chunkCoordX + (chunkCoordY * chunkX) + (chunkCoordZ * chunkX * chunkY) >= chunks.length) 
-			System.out.println("Chunk: " + chunkCoordX + " " + chunkCoordY + " " + chunkCoordZ);
-		
-		return Cube.getCubeByID(
-				chunks[chunkCoordX + (chunkCoordY * chunkX) + (chunkCoordZ * chunkX * chunkY)]
-				.getCube(indexX, indexY, indexZ)
-			);
-	}
+	public void setCube(int x, int y, int z, int cubeId)  {loadedWorld.getAccess().setCube(x, y, z, cubeId);}
+	public void setCube(Vector3f pos, int cubeId) 		  {loadedWorld.getAccess().setCube(pos, cubeId);}
 	
-	public float[] getLightColor(float x, float y, float z) {
-		int ix = (int) x, chunkCoordX = ix / CHUNK_SIZE, indexX = ix % CHUNK_SIZE;
-		int iy = (int) y, chunkCoordY = iy / CHUNK_SIZE, indexY = iy % CHUNK_SIZE;
-		int iz = (int) z, chunkCoordZ = iz / CHUNK_SIZE, indexZ = iz % CHUNK_SIZE;
-			
-		return chunks[chunkCoordX + (chunkCoordY * chunkX) + (chunkCoordZ * chunkX * chunkY)]
-				.getLightColor(indexX, indexY, indexZ);
-	}
+	public float[] getLightColor(float x, float y, float z) {return loadedWorld.getAccess().getLightColor(x, y, z);}
+	public float[] getLightColor(Vector3f pos) 				{return getLightColor(pos.getX(), pos.getY(), pos.getZ());}
 	
-	public float getLightValue(float x, float y, float z) {
-		int ix = (int) x, chunkCoordX = ix / CHUNK_SIZE, indexX = ix % CHUNK_SIZE;
-		int iy = (int) y, chunkCoordY = iy / CHUNK_SIZE, indexY = iy % CHUNK_SIZE;
-		int iz = (int) z, chunkCoordZ = iz / CHUNK_SIZE, indexZ = iz % CHUNK_SIZE;
-			
-		return chunks[chunkCoordX + (chunkCoordY * chunkX) + (chunkCoordZ * chunkX * chunkY)]
-				.getLightValue(indexX, indexY, indexZ);
-	}
+	public float getLightValue(float x, float y, float z) 	{return loadedWorld.getAccess().getLightValue(x, y, z);}
+	public float getLightValue(Vector3f pos) 				{return getLightValue(pos.getX(), pos.getY(), pos.getZ());}
 	
-	public float getGroundHeight(float x, float y, float z) {
-		int groundHeight = Math.min(Math.round(y), sizeY - 1);
-		while(groundHeight > 0 && !getCube(x, groundHeight, z).isSolid())  groundHeight --; 
-		
-		return groundHeight;
-	}
+	public Chunk getChunk(int x, int y, int z)  {return loadedWorld.getAccess().getChunk(x, y, z);}
+	public Chunk getChunk(Vector3f pos) 	 	{return loadedWorld.getAccess().getChunk(pos);}
 	
-	public void setWorldVBO(int[][] vbosData) {
-		for(int i = 0; i < vbosData.length; i ++) {
-			chunks[i].setVboData(vbosData[i]);
-		}
-	}
+	public float getGroundHeight(int x, int y, int z)	{return loadedWorld.getAccess().getGroundHeight(x, y, z);}
+	public float getGroundHeight(Vector3f pos)	{return loadedWorld.getAccess().getGroundHeight(pos);}
 	
-	public Chunk[] getChunks() {
-		return chunks;
-	}
+	public WorldObject getObject(int index) {return loadedWorld.getAccess().getObject(index);}
 	
-	public float getGroundHeight(Vector3f pos) {
-		return getGroundHeight(pos.getX(), pos.getY(), pos.getZ());
-	}
-		
-	public Entity getEntity(int index) {
-		return EntityList[index];
-	}
-
+	public Chunk[] 		 getChunks()	   	{return loadedWorld.getAccess().getChunks();}
+	public WorldObject[] getWorldObjects() 	{return loadedWorld.getAccess().getObjects();}
+	
 	public int getSizeX() {
 		return sizeX;
 	}
@@ -208,14 +182,6 @@ public class World {
 		return id;
 	}
 
-	public Chunk getChunk(int x, int y, int z) {
-		return chunks[x + (y * chunkX) + (z * chunkX * chunkY)];
-	}
-
-	public Entity[] getEntityList() {
-		return EntityList;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -223,41 +189,17 @@ public class World {
 	public boolean isGenerated() {
 		return isGenerated;
 	}
-
-	public void setEntityList(Entity[] entityList) {
-		EntityList = entityList;
-	}
 	
 	public String toString() {
 		return name  + "[ID=" + id + "]";
-	}
-
-	public boolean checkChunks() {
-		for(Chunk chunk : chunks) {
-			if(!chunk.isVboUpdataRequested()) {
-				return  false;
-			}	
-		}	
-		
-		return true;
-	}
-
-	public void updataChunks() {
-		for(Chunk chunk : chunks) {
-			if(!chunk.isVboUpdataRequested()) {
-				chunk.updataVBO();
-			}	
-		}	
-	}
+	}	
 	
-	public Cube getCube(Vector3f cord) {
-		return getCube(cord.getX(), cord.getY(), cord.getZ());
+	public LoadedWorld getLoadedWorld() {
+		return loadedWorld;
 	}
 	
 	public void cleanUp() {
-		for(Chunk chunk : chunks) {
-			chunk.cleanUp();
-		}
+		loadedWorld.cleanUp();
 	}
 }
 

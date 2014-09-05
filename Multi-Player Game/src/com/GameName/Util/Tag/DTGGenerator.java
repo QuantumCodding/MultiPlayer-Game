@@ -1,5 +1,7 @@
 package com.GameName.Util.Tag;
 
+import java.util.HashSet;
+
 import com.GameName.Util.Vectors.Vector2d;
 import com.GameName.Util.Vectors.Vector2f;
 import com.GameName.Util.Vectors.Vector3d;
@@ -103,5 +105,24 @@ public class DTGGenerator {
 		if(data.getClass().equals(String[].class))    {return generateTag(tagName, (String[]) data);}
 		
 		return null;
+	}
+	
+	public static String generateTagLine(HashSet<Tag> tags) {
+		String tagLine = "";
+		
+		boolean first = true;
+		for(Tag tag : tags) {
+			tagLine += tag.getTagString();
+			
+			if(first) {
+				tagLine += "[";
+				first = false;
+				
+			} else {
+				tagLine += " ";
+			}
+		}
+		
+		return tagLine + "]";
 	}
 }
