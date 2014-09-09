@@ -5,6 +5,10 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
+import com.GameName.Main.GameName;
+import com.GameName.Util.Tag.Tag;
+import com.GameName.Util.Tag.TagGroup;
+
 public class Control {
 	public static final int CONTROLLER = 0;
 	public static final int MOUSE = 1;
@@ -154,6 +158,32 @@ public class Control {
 				forward + "," +
 				onlyOnce;
 		
+	}
+	
+	public static Control getControlFormTagGroup(TagGroup group) {
+		Control control = new Control();
+		
+		control.control = (String) group.getIdTag().getTagInfo();
+		control.deadZone = (Double) group.getTagByName("deadzone").getTagInfo();
+		control.forward = (Integer) group.getTagByName("forward").getTagInfo() == 1;
+		control.id = (Integer) group.getTagByName("id").getTagInfo();
+		control.isAxis = (Integer) group.getTagByName("isAxis").getTagInfo() == 1;
+		control.onlyOnce = (Integer) group.getTagByName("onlyOnce").getTagInfo() == 1;
+		control.type = (Integer) group.getTagByName("type").getTagInfo();
+		control.c = GameName.c;
+		
+		return control;		
+	}
+	
+	public TagGroup getTagGroup() {
+		return new TagGroup(new Tag("control", control), new Tag[] {
+			new Tag("deadzone", deadZone),
+			new Tag("forward", forward ? 1 : 0),
+			new Tag("id", id),
+			new Tag("isAxis", isAxis ? 1 : 0),
+			new Tag("onlyOnce", onlyOnce ? 1 : 0),
+			new Tag("type", type),
+		});
 	}
 	
 	public static void tick() {			

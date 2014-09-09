@@ -60,15 +60,15 @@ public class EntityPlayerAccess extends EntityAccess {
 		return player.gravityOn;
 	}
 
-	public int getLookSpeed() {
+	public float getLookSpeed() {
 		return player.lookSpeed;
 	}
 
-	public int getLookSpeedUp() {
+	public float getLookSpeedUp() {
 		return player.lookSpeedUp;
 	}
 
-	public int getSpeed() {
+	public float getSpeed() {
 		return player.speed;
 	}
 

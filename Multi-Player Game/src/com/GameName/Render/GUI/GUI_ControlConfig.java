@@ -1,9 +1,19 @@
 package com.GameName.Render.GUI;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_QUADS;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.glBegin;
+import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glEnd;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTexCoord2f;
+import static org.lwjgl.opengl.GL11.glVertex2f;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -58,7 +68,7 @@ public class GUI_ControlConfig extends GUI {
 		
 		controls = new HashSet<Control>();
 		controlsGUI = new ArrayList<GUI_Control>();
-		try {refreshControls();} catch(FileNotFoundException e) {e.printStackTrace();}
+		try {refreshControls();} catch(IOException e) {e.printStackTrace();}
 		
 		genTextures();
 		
@@ -171,8 +181,8 @@ public class GUI_ControlConfig extends GUI {
 		} catch(Exception e) {e.printStackTrace();}
 	}
 	
-	private void refreshControls() throws FileNotFoundException {
-		GameName.player.getAccess().setControls(EntityPlayer.loadControls(new File("res/option/controls.dat")));
+	private void refreshControls() throws IOException {
+		GameName.player.getAccess().setControls(EntityPlayer.loadControls(new File("res/option/controls.dtg")));
 		controlsGUI = new ArrayList<GUI_Control>();
 		
 		int i = 0;

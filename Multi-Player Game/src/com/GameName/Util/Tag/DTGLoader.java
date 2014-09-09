@@ -19,17 +19,28 @@ import com.GameName.Util.Vectors.Vector4f;
 
 public class DTGLoader {
 	
-	public static HashSet<Tag> readDTGFile(File f) throws IOException {
+	public static HashSet<TagGroup> readDTGFile(File f) throws IOException {
+		fileTypeCheck(f);
+		
 		BufferedReader read = new BufferedReader(new FileReader(f));		
-		HashSet<Tag> data = new HashSet<Tag>();
+		HashSet<TagGroup> data = new HashSet<TagGroup>();
 		String line = "";
 		
 		while((line = read.readLine()) != null) {
+			if(line.trim().equals("")) continue;
+			
+			Tag idTag = null;
+			HashSet<Tag> temp = new HashSet<Tag>();
+			
 			for(String tagGroup : split(line, "[")) {	
-				for(String tag : split(tagGroup, " ")) {											
+				for(String tag : split(tagGroup, " ")) {
+					if(tag.trim().equals("")) continue;
+					if(tag.trim().equals("]")) continue;
+					
 					String[] tagInfo = split(tag, "=");		
 					
 					String tagName = tagInfo[0];
+//					System.out.println(tag);
 					char c = tagInfo[1].toCharArray()[0];					
 					String info = tagInfo[1];
 						
@@ -83,22 +94,27 @@ public class DTGLoader {
 							else if(type == 's') obj = new Short(asShort(info));
 						}
 						
-					data.add(new Tag(tagName, obj));
+					if(idTag == null) idTag = new Tag(tagName, obj);
+					else temp.add(new Tag(tagName, obj));
 				}
 			}
+			
+			data.add(new TagGroup(idTag, temp.toArray(new Tag[temp.size()])));
 		}
 				
 		read.close();
 		
-		for(Tag tag : data) System.out.println(tag);
+		for(TagGroup tag : data) System.out.println(tag);
 		return data;
 	}
-	
-	public static void saveDTGFile(File f, ArrayList<String> tagLines) throws IOException {
+		
+	public static void saveDTGFile(File f, ArrayList<TagGroup> tagLines) throws IOException {
+		fileTypeCheck(f);
+		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(f));
 		
-		for(String tagLine : tagLines) {
-			writer.write(tagLine);
+		for(TagGroup tagLine : tagLines) {
+			writer.write(tagLine.toString());
 			writer.newLine();
 			writer.flush();
 		}
@@ -142,5 +158,11 @@ public class DTGLoader {
 		
 		splits.add(toAdd);		
 		return splits.toArray(new String[splits.size()]);
+	}
+	
+	private static void fileTypeCheck(File f) throws IOException {
+		String fileType = f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf('.')).toLowerCase();
+		if(fileType.equals("dtg")) 
+				throw new IOException("File " + f + " is a unknown file type " + fileType);
 	}
 }

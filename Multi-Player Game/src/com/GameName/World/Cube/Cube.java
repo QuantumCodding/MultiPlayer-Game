@@ -3,15 +3,19 @@ package com.GameName.World.Cube;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.HashSet;
 
 import javax.imageio.ImageIO;
 import javax.management.InstanceAlreadyExistsException;
 
+import com.GameName.Physics.Coalition.BoundingArea;
+import com.GameName.Physics.Coalition.BoundingBox;
 import com.GameName.Render.Texture;
+import com.GameName.Util.Tag.DTGLoader;
+import com.GameName.Util.Tag.TagGroup;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class Cube {
 	private final int TEXTURE_SIZE = 10;
@@ -19,6 +23,8 @@ public class Cube {
 	private String name;
 	private String displayName;
 	private int id;
+	
+	private BoundingArea boundingArea;
 	
 	private int[][] texture;
 	
@@ -66,13 +72,14 @@ public class Cube {
 		
 		setLightSorce(false);
 		setLightValue(0f);
+		setBoundingArea(getDefaultBoundingArea());
 		
 		loadExtraInfo();
 		texture = loadTextures();
 	}
 
 	private void loadExtraInfo() {
-		File extraInfo = new File("res/textures/cubes/info/" + name + ".txt");
+		File extraInfo = new File("res/textures/cubes/info/" + name + ".dtg");
 		
 		if(!extraInfo.exists()) {
 			textureSize = TEXTURE_SIZE;
@@ -80,28 +87,18 @@ public class Cube {
 			return;
 		}
 		
-		Scanner scan = null;
 		try {
-			scan = new Scanner(extraInfo);
+			HashSet<TagGroup> info = DTGLoader.readDTGFile(extraInfo);
 			
-			while(scan.hasNext()) {
-				String line = scan.nextLine();
-				String[] info = line.split("=");
-				
-				if(info.length == 1) continue;
-				
-				switch(info[0]) {
-					case "Texture Size": textureSize = Integer.parseInt(info[1]); break;
+			for(TagGroup group : info) {
+				if(group.containsTag("size")) {
+					textureSize = (Integer) group.getTagByName("size").getTagInfo();
 				}
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 			
-		} finally {
-			if(scan != null)
-				scan.close();
-		}
-		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
 	}
 
 	private int[][] loadTextures() {
@@ -150,6 +147,13 @@ public class Cube {
 	    }
 		      
 	    return toRep;
+	}
+	
+	private BoundingArea getDefaultBoundingArea() {
+		BoundingArea bound = new BoundingArea();		
+		bound.add(new BoundingBox(new Vector3f(0, 0, 0), new Vector3f(1, 1, 1)));
+		
+		return bound;
 	}
 	
 	public static void regesterCubes() throws InstanceAlreadyExistsException {
@@ -368,6 +372,10 @@ public class Cube {
 	protected void setDisplayName(String displayName) {
 		this.displayName = displayName;
 	}
+	
+	protected void setBoundingArea(BoundingArea boundingArea) {
+		this.boundingArea = boundingArea;
+	}
 
 	public static int[] getCubeTexCoords() {
 		return cubeTexCoords;
@@ -427,6 +435,10 @@ public class Cube {
 
 	public int getTextureSize() {
 		return textureSize;
+	}
+	
+	public BoundingArea getBoundingArea() {
+		return boundingArea;
 	}
 
 	public static Cube[] getCubes() {

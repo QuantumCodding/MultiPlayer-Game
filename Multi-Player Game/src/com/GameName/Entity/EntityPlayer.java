@@ -4,16 +4,13 @@ import static org.lwjgl.openal.AL10.AL_ORIENTATION;
 import static org.lwjgl.openal.AL10.AL_POSITION;
 import static org.lwjgl.openal.AL10.alListener3f;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
 import com.GameName.Input.Control;
@@ -25,6 +22,8 @@ import com.GameName.Networking.Packets.PacketPlayerInventorySlot;
 import com.GameName.Networking.Packets.PacketPlayerLocation;
 import com.GameName.Networking.Packets.PacketPlayerStats;
 import com.GameName.Physics.PhysicsEngine;
+import com.GameName.Util.Tag.DTGLoader;
+import com.GameName.Util.Tag.TagGroup;
 import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Cube.Cube;
 
@@ -46,9 +45,9 @@ public class EntityPlayer extends Entity {
 	
 	protected boolean gravityOn;
 	
-	protected int lookSpeed;
-	protected int lookSpeedUp;
-	protected int speed;
+	protected float lookSpeed;
+	protected float lookSpeedUp;
+	protected float speed;
 		
 	protected int maxReach;
 	protected Vector3f selectedCube;
@@ -106,7 +105,8 @@ public class EntityPlayer extends Entity {
 		if(gravityOn) {
 			super.updata();
 			
-			selectedCube = PhysicsEngine.getLookPosition(pos, rot, currentWorld, maxReach); 
+			selectedCube = PhysicsEngine.getLookPosition(pos, rot, currentWorld, maxReach); //rayTrace(pos.clone(), pos.add(getLook().multiply(maxReach)), currentWorld);//
+			if(selectedCube == null) selectedCube = pos.clone();
 		}		
 
 		renderPos = pos.multiply(adjust);
@@ -124,8 +124,8 @@ public class EntityPlayer extends Entity {
 	
 	private void checkControls() {
 		speed = 7; //15
-		lookSpeed = 1;
-		lookSpeedUp = 1;
+		lookSpeed = Keyboard.isKeyDown(Keyboard.KEY_Y) ? 0.1f : Keyboard.isKeyDown(Keyboard.KEY_U) ? 5 : 1;
+		lookSpeedUp = lookSpeed;
 				
 		Vector3f oldPos = pos.clone();
 		
@@ -163,7 +163,7 @@ public class EntityPlayer extends Entity {
 					
 					case "toggle": if(!GameName.lockMovement) { GameName.guiManager.toggle("Test"); GameName.guiManager.toggle("Pause"); } break;
 					
-					case "placeTest": currentWorld.setCube(selectedCube, Cube.ColorfulTestCube.getId()); break;
+					case "placeTest": currentWorld.setCube(selectedCube.add(PhysicsEngine.getPosNextToFace(PhysicsEngine.getDirection(rot))), Cube.ColorfulTestCube.getId()); break;
 					case "removeCube": currentWorld.setCube(selectedCube, Cube.Air.getId()); break;
 					
 					default: System.err.println("Default Called: Player is not using control " + ctr.control); break;					
@@ -198,55 +198,26 @@ public class EntityPlayer extends Entity {
 		return (EntityPlayerAccess) access;
 	}
 	
-	public static List<Control> loadControls(File f) throws FileNotFoundException {
+	public static List<Control> loadControls(File f) throws IOException {
 		List<Control> controlls = new ArrayList<Control>();
-		Scanner reader = new Scanner(f);
-		String in = "";
+		HashSet<TagGroup> groups = DTGLoader.readDTGFile(f);
 		
-		while(in != null) {
-			try{in = reader.nextLine();}catch(NoSuchElementException e){in = null; continue;}
-			String[] line = in.split(",");
-			Control c;
-			
-			if(line.length == 6)
-				c = new Control(
-					Integer.parseInt(line[0]) == Control.CONTROLLER ? Control.CONTROLLER :
-					Integer.parseInt(line[0]) == Control.MOUSE ? Control.MOUSE : Control.KEYBOARD, 
-							Integer.parseInt(line[1]), 
-							line[2], 
-							Boolean.parseBoolean(line[3]), 
-							Boolean.parseBoolean(line[4]), 
-							Double.parseDouble(line[5]), 
-							GameName.c
-					);
-			else
-				c = new Control(
-						Integer.parseInt(line[0]) == Control.CONTROLLER ? Control.CONTROLLER :
-						Integer.parseInt(line[0]) == Control.MOUSE ? Control.MOUSE : Control.KEYBOARD, 
-								Integer.parseInt(line[1]), 
-								line[2], 
-								Boolean.parseBoolean(line[3]),
-								Boolean.parseBoolean(line[4]),
-								GameName.c
-						);
-				
-			controlls.add(c);
+		for(TagGroup group : groups) {
+			controlls.add(Control.getControlFormTagGroup(group));
 		}
 		
-		reader.close();
 		return controlls;
 	}
 	
 	
 	public File saveControls(File f) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(f));
+		ArrayList<TagGroup> tagLines = new ArrayList<TagGroup>();
 		
-		for(Control cont : controls) {
-			writer.write(cont.toString());
-			writer.newLine();
+		for(Control control : controls) {
+			tagLines.add(control.getTagGroup());
 		}
 		
-		writer.close();
+		DTGLoader.saveDTGFile(f, tagLines);		
 		return f;
 	}
 }
