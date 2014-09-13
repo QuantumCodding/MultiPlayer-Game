@@ -101,7 +101,7 @@ public class GameName {
 			guiManager.accessByName("Music").open();
 //			guiManager.accessByName("Pause").open();
 			
-			player.getAccess().setControls(EntityPlayer.loadControls(new File("res/option/controls.dat")));
+			player.getAccess().setControls(EntityPlayer.loadControls(new File("res/option/controls.dtg")));
 			
 			FPS_Thread.setName("FPS Thread");
 			

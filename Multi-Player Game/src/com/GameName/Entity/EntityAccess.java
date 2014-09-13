@@ -66,9 +66,9 @@ public class EntityAccess extends WorldObjectAccess {
 	}
 	
 	public void moveX(float amount) {
-		getPos().addE(new Vector3f(				
-			(float) (amount * Math.cos(Math.toRadians(getRot().getY())) * (Math.abs(getRot().getX()) > 90 && Math.abs(getRot().getX()) <= 270 ? -1 : 1)), 0.0f,
-			(float) (amount * Math.sin(Math.toRadians(getRot().getY())) * (Math.abs(getRot().getX()) > 90 && Math.abs(getRot().getX()) <= 270 ? -1 : 1))
+		getPos().addAndSet(new Vector3f(				
+			(float) (amount * Math.cos(Math.toRadians(getRot().getY())) * -1), 0.0f,
+			(float) (amount * Math.sin(Math.toRadians(getRot().getY())) * -1)
 		));
 				
 	}
@@ -78,21 +78,21 @@ public class EntityAccess extends WorldObjectAccess {
 	}
 	
 	public void moveZ(float amount) {
-		getPos().addE(new Vector3f(				
-				(float) (amount * Math.cos(Math.toRadians(getRot().getY() + 90)) * (Math.abs(getRot().getX()) > 90 && Math.abs(getRot().getX()) <= 270 ? -1 : 1)), 0.0f,
-				(float) (amount * Math.sin(Math.toRadians(getRot().getY() + 90)) * (Math.abs(getRot().getX()) > 90 && Math.abs(getRot().getX()) <= 270 ? -1 : 1))
+		getPos().addAndSet(new Vector3f(				
+				(float) (amount * Math.cos(Math.toRadians(getRot().getY() + 90)) * -1), 0.0f,
+				(float) (amount * Math.sin(Math.toRadians(getRot().getY() + 90)) * -1)
 			));
 	}
 	
 	public void rotateX(float amount) {
-		getRot().addE(new Vector3f(amount, 0.0f, 0.0f));
+		getRot().addAndSet(new Vector3f(amount, 0.0f, 0.0f));
 	}
 	
 	public void rotateY(float amount) {
-		getRot().addE(new Vector3f(0.0f, amount * (Math.abs(getRot().getX()) > 90 && Math.abs(getRot().getX()) <= 270 ? -1 : 1), 0.0f));
+		getRot().addAndSet(new Vector3f(0.0f, amount * -1, 0.0f));
 	}
 	
 	public void rotateZ(float amount) {
-		getRot().addE(new Vector3f(0.0f, amount, 0.0f));
+		getRot().addAndSet(new Vector3f(0.0f, amount, 0.0f));
 	}
 }

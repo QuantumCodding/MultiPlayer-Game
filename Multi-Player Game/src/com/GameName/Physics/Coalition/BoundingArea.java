@@ -36,6 +36,16 @@ public class BoundingArea {
 		return new CollisionEvent(false, getAvgCenter().subtract(other.getAvgCenter()));
 	}
 	
+	public CollisionEvent intersect(Collidable other) {
+		for(int i = 0; i < boundingObjetcts.size(); i ++) {
+			
+			CollisionEvent event = boundingObjetcts.get(i).intersect(other);				
+			if(event.isColliding()) return event;			
+		}
+		
+		return new CollisionEvent(false, getAvgCenter().subtract(other.getCenter()));
+	}
+	
 	public Vector3f getAvgCenter() {
 		Vector3f avgCenter = new Vector3f(0, 0, 0);
 		
@@ -62,5 +72,13 @@ public class BoundingArea {
 		}
 		
 		return toRep;
+	}
+	
+	public BoundingArea translate(Vector3f amount) {
+		for(Collidable c : boundingObjetcts) {
+			c.translate(amount);
+		}
+		
+		return this;
 	}
 }

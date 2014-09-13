@@ -25,7 +25,17 @@ public abstract class WorldObject extends PhysicsObject {
 		super.updata();
 		
 		renderPos = pos.multiply(adjust);
-		chunk = pos.divide(World.CHUNK_SIZE).truncate();
+		
+		Vector3f tempChunk = pos.divide(World.CHUNK_SIZE).truncate();
+		
+		if(tempChunk.getX() > currentWorld.getChunkX() - 1) tempChunk.setX(currentWorld.getChunkX() - 1); 
+		else if(tempChunk.getX() < 0) tempChunk.setX(0);			
+		if(tempChunk.getY() > currentWorld.getChunkY() - 1) tempChunk.setY(currentWorld.getChunkY() - 1); 
+		else if(tempChunk.getY() < 0) tempChunk.setY(0);		
+		if(tempChunk.getZ() > currentWorld.getChunkZ() - 1) tempChunk.setZ(currentWorld.getChunkZ() - 1); 
+		else if(tempChunk.getZ() < 0) tempChunk.setZ(0);
+		
+		chunk = tempChunk.clone();
 	}
 	
 	public void addBounding() {

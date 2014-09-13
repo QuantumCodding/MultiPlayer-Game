@@ -24,9 +24,11 @@ public class BoundingBox extends Collidable {
 		}
 	}
 
-	public void translate(Vector3f amount) {
+	public Collidable translate(Vector3f amount) {
 		minPos.add(amount);
 		maxPos.add(amount);
+		
+		return this;
 	}
 
 	public Vector3f getMinPos() {

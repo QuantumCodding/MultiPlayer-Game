@@ -28,7 +28,7 @@ public abstract class PhysicsObject {
 	}
 	
 	public void updata() {
-		rot.modE(360);
+		rot.modAndSet(360);
 	}
 	
 	protected abstract void addBounding();
@@ -46,9 +46,18 @@ public abstract class PhysicsObject {
 		vel.setY(newVel);
 	}
 	
+	public Vector3f getLook() {
+		float f1 = (float)  Math.cos(-Math.toRadians(rot.getY()) - (float) Math.PI);
+		float f2 = (float)  Math.sin(-Math.toRadians(rot.getY()) - (float) Math.PI);
+		float f3 = (float) -Math.cos(-Math.toRadians(rot.getX()));
+		float f4 = (float)  Math.sin(-Math.toRadians(rot.getX()));
+		
+		return new Vector3f((f2 * f3), f4, (f1 * f3));
+	}
+	
 	public void intergrate(float delta) {
-		pos.addE(vel.multiply(delta));
-		rot.addE(rotVel.multiply(delta));
+		pos.addAndSet(vel.multiply(delta));
+		rot.addAndSet(rotVel.multiply(delta));
 	}
 	
 	public PhysicsAccess getAccess() {

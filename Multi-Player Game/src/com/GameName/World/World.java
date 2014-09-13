@@ -40,12 +40,13 @@ public class World {
 		double time = Time.getTime();
 		
 		System.out.print("World " + id + " Starting Generation: ");
-		if(!isGenerated)
-			generate();
+//		if(!isGenerated)
+//			generate();
 		
 		System.out.println("Done In " + RenderEngine.oneDecimal(((double) Time.getTime() - time) / Time.getSECONDS()) + " Seconds");
 	}
 	
+	@SuppressWarnings("unused") //TODO: Remove / Edit
 	private void generate() {
 		Chunk[] chunks = new Chunk[chunkX * chunkY * chunkZ];
 		
@@ -115,6 +116,8 @@ public class World {
 			setCube((int) loadPos.getX(), (int) loadPos.getY(), (int) loadPos.getZ(), Cube.getCubeByID(cubeID), chunks);//(float) Math.sin(z) * 5
 		}}}
 		
+		setCube(0, 0, 0, Cube.ColorfulTestCube, chunks);
+		
 		loadedWorld.getAccess().setCunks(chunks);
 		isGenerated = true;
 	}
@@ -133,6 +136,12 @@ public class World {
 		chunks[chunkCoordX + (chunkCoordY * chunkX) + (chunkCoordZ * chunkX * chunkY)]
 				.setCube(indexX, indexY, indexZ, cubeId);
 	}
+	
+	public boolean checkCube(int x, int y, int z)	{return loadedWorld.getAccess().checkChunk(x, y, z);}
+	public boolean checkCube(Vector3f pos)			{return loadedWorld.getAccess().checkChunk(pos);}
+	
+	public Cube[] getSurroundingCubes(int x, int y, int z) 	{return loadedWorld.getAccess().getSurroundingCubes(x, y, z);}	
+	public Cube[] getSurroundingCubes(Vector3f pos) 		{return loadedWorld.getAccess().getSurroundingCubes(pos);} 
 	
 	public void setCube(int x, int y, int z, int cubeId)  {loadedWorld.getAccess().setCube(x, y, z, cubeId);}
 	public void setCube(Vector3f pos, int cubeId) 		  {loadedWorld.getAccess().setCube(pos, cubeId);}
@@ -153,6 +162,9 @@ public class World {
 	
 	public Chunk[] 		 getChunks()	   	{return loadedWorld.getAccess().getChunks();}
 	public WorldObject[] getWorldObjects() 	{return loadedWorld.getAccess().getObjects();}
+	
+	public Vector3f getSizeAsVector() {return new Vector3f(sizeX, sizeY, sizeZ);}
+	public Vector3f getChunkSizeAsVector() {return new Vector3f(chunkX, chunkY, chunkZ);}
 	
 	public int getSizeX() {
 		return sizeX;

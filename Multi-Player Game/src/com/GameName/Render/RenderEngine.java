@@ -25,7 +25,6 @@ import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glColor4f;
 import static org.lwjgl.opengl.GL11.glColorMaterial;
 import static org.lwjgl.opengl.GL11.glCullFace;
 import static org.lwjgl.opengl.GL11.glDisable;
@@ -43,6 +42,7 @@ import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glShadeModel;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex3f;
+import static org.lwjgl.opengl.GL11.glVertex2f;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.awt.Color;
@@ -172,37 +172,49 @@ public class RenderEngine {
 		    glVertex3f(pos2.getX(), pos2.getY(), pos2.getZ());
 		    
 		    glEnd();
+		    
+		    glBegin(GL_LINES);
+		    
+		    pos2 = GameName.player.getAccess().getPos().add(GameName.player.getLook().multiplyAndSet(GameName.player.getAccess().getMaxReach())).add(0.5f).multiply(GameName.player.getAccess().getAdjust()); 
+		    		pos1 = GameName.player.getAccess().getRenderPos();
+		    
+		    glColor3f(0.5f, 1, 0);
+		    glVertex3f(pos1.getX(), pos1.getY(), pos1.getZ());
+		    
+		    glColor3f(0.5f, 1, 0);
+		    glVertex3f(pos2.getX(), pos2.getY(), pos2.getZ());
+		    
+		    glEnd();
 		glPopMatrix();		    
 		
-		glPushMatrix();
-			glBegin(GL_LINES);
-				glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
-			
-				float f1, f2, f3, f4;		
-				
-				for(int rotY = 0; rotY < 360; rotY ++) {
-				for(int rotX = 0; rotX < 360; rotX ++) {
-					
-					int radius = 10;			
-					
-					f1 = (float)  Math.cos(Math.toRadians(rotY));
-					f2 = (float)  Math.sin(Math.toRadians(rotY));
-					f3 = (float)  Math.cos(Math.toRadians(rotX));                  
-					f4 = (float)  Math.sin(Math.toRadians(rotX));             
-					
-					Vector3f loadPos = new Vector3f(
-							Math.round(f2 * f3 * radius), 
-							Math.round(f4 * radius), 
-							Math.round(f1 * f3 * radius))
-						.add(GameName.player.getAccess().getCurrentWorld().getLoadedWorld().getAccess().getCenter());
-					
-//					glVertex3f(loadPos.getX(), loadPos.getY(), loadPos.getZ());
-				}}
-			glEnd();
-		glPopMatrix();
-		
+//		glPushMatrix();
+//			glBegin(GL_LINES);
+//				glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
+//			
+//				float f1, f2, f3, f4;		
+//				
+//				for(int rotY = 0; rotY < 360; rotY ++) {
+//				for(int rotX = 0; rotX < 360; rotX ++) {
+//					
+//					int radius = 10;			
+//					
+//					f1 = (float)  Math.cos(Math.toRadians(rotY));
+//					f2 = (float)  Math.sin(Math.toRadians(rotY));
+//					f3 = (float)  Math.cos(Math.toRadians(rotX));                  
+//					f4 = (float)  Math.sin(Math.toRadians(rotX));             
+//					
+//					Vector3f loadPos = new Vector3f(
+//							Math.round(f2 * f3 * radius), 
+//							Math.round(f4 * radius), 
+//							Math.round(f1 * f3 * radius))
+//						.add(GameName.player.getAccess().getCurrentWorld().getLoadedWorld().getAccess().getCenter());
+//					
+////					glVertex3f(loadPos.getX(), loadPos.getY(), loadPos.getZ());
+//				}}
+//			glEnd();
+//		glPopMatrix();
 		for(Chunk chunk : GameName.player.getAccess().getCurrentWorld().getChunks()) {
-			chunk.render();
+			if(chunk != null && chunk.getVboData() != null) chunk.render();
 		}
 	}
 	
@@ -227,13 +239,29 @@ public class RenderEngine {
 			
 			org.newdawn.slick.Color col = new org.newdawn.slick.Color(Color.BLUE.getRGB());	        
 			
-	        font.drawString(0, 0, "FPS: " + GameName.getFPS(), col);// + ", " + GameName.player.getAccess().getSelectedCube().getX() + " " + GameName.player.getAccess().getSelectedCube().getY() + " " + GameName.player.getAccess().getSelectedCube().getZ(), col); // 
+	        font.drawString(0, 0, "FPS: " + GameName.getFPS() + ", " + GameName.player.getAccess().getSelectedCube().getX() + " " + GameName.player.getAccess().getSelectedCube().getY() + " " + GameName.player.getAccess().getSelectedCube().getZ(), col); // 
 	        font.drawString(0, 20, x + "," + y + "," + z, col);
 	        font.drawString(0, 40, oneDecimal(GameName.player.getAccess().getRot().getX()) + "," + oneDecimal(GameName.player.getAccess().getRot().getY()) + "," + oneDecimal(GameName.player.getAccess().getRot().getZ()), col);
 
 	        glDisable(GL_TEXTURE_2D);
 	        glEnable(GL_DEPTH_TEST);
 	        glEnable(GL_CULL_FACE);
+		glPopMatrix();
+		
+		glPushMatrix();
+			glBegin(GL_LINES);
+			
+			glVertex2f(Display.getWidth() / 2, 0);
+			glVertex2f(Display.getWidth() / 2, Display.getHeight());
+			
+			glEnd();
+			
+			glBegin(GL_LINES);
+			
+			glVertex2f(0, Display.getHeight() / 2);
+			glVertex2f(Display.getWidth(), Display.getHeight() / 2);
+			
+			glEnd();
 		glPopMatrix();
 		
 		glMatrixMode(GL_PROJECTION);

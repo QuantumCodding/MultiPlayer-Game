@@ -21,7 +21,7 @@ public abstract class Collidable {
 		Vector3f direction = other.getCenter().subtract(getCenter());		
 		float centerDistance = direction.length();
 		
-		direction.divideE(centerDistance);
+		direction.divideAndSet(centerDistance);
 		float distance = centerDistance - radiusLength;
 			
 		return new CollisionEvent(distance < 0, direction.multiply(distance));	
@@ -41,7 +41,7 @@ public abstract class Collidable {
 		return null;
 	}
 	
-	public abstract void translate(Vector3f amount);
+	public abstract Collidable translate(Vector3f amount);
 	
 	public abstract Vector3f getCenter();
 	
