@@ -1,8 +1,7 @@
-package com.GameName.Render.GUI;
+package com.GameName.GUI;
 
 import java.util.ArrayList;
 
-import com.GameName.Audio.Sound;
 import com.GameName.Util.Registry;
 
 public class GuiRegistry extends Registry<GUI> {
