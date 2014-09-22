@@ -1,4 +1,6 @@
-package com.GameName.World.Cube;
+package com.GameName.Cube.Cubes;
+
+import com.GameName.Cube.Cube;
 
 public class GoldCube extends Cube {
 

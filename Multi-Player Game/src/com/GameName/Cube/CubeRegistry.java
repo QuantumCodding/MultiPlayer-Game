@@ -1,4 +1,4 @@
-package com.GameName.World.Cube;
+package com.GameName.Cube;
 
 import java.util.ArrayList;
 

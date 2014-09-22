@@ -1,4 +1,6 @@
-package com.GameName.World.Cube;
+package com.GameName.Cube.Cubes;
+
+import com.GameName.Cube.Cube;
 
 public class AirCube extends Cube {
 
@@ -7,7 +9,7 @@ public class AirCube extends Cube {
 		
 		setSolid(false);
 		setVisable(false);
-		setOpastity(0f);
+		setOpacity(0f);
 	}
 	
 }
