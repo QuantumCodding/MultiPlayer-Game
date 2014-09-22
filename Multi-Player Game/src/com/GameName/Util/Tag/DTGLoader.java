@@ -104,7 +104,7 @@ public class DTGLoader {
 				
 		read.close();
 		
-		for(TagGroup tag : data) System.out.println(tag);
+//		for(TagGroup tag : data) System.out.println(tag);
 		return data;
 	}
 		

@@ -1,13 +1,16 @@
 package com.GameName.World;
 
+import java.io.File;
+
+import com.GameName.Cube.Cube;
 import com.GameName.Render.RenderEngine;
 import com.GameName.Util.Time;
 import com.GameName.Util.Vectors.Vector3f;
-import com.GameName.World.Cube.Cube;
 import com.GameName.World.Object.WorldObject;
 
 public class World {
-	
+	private static String defaultWorldRootDir = "res/worlds/";
+		
 	public static final float AMBIANT_LIGHT = 10;
 	public static final float MAX_LIGHT = 10;
 	public static final int CHUNK_SIZE = 10;
@@ -23,7 +26,7 @@ public class World {
 		
 	private boolean isGenerated = false;
 	
-	public World(int x, int y, int z, int id, String name) {
+	public World(int x, int y, int z, String name) {
 		sizeX = x * CHUNK_SIZE;
 		sizeY = y * CHUNK_SIZE;
 		sizeZ = z * CHUNK_SIZE;
@@ -32,8 +35,8 @@ public class World {
 		chunkY = y;
 		chunkZ = z;
 		
-		this.id = id;
 		this.name = name;
+		this.id = -1;
 			
 		loadedWorld = new LoadedWorld(this, name);
 		
@@ -44,6 +47,12 @@ public class World {
 //			generate();
 		
 		System.out.println("Done In " + RenderEngine.oneDecimal(((double) Time.getTime() - time) / Time.getSECONDS()) + " Seconds");
+	}
+	
+	public void setId(int id) {
+		if(this.id == -1) {
+			this.id = id;
+		}
 	}
 	
 	@SuppressWarnings("unused") //TODO: Remove / Edit
@@ -118,17 +127,21 @@ public class World {
 		
 		setCube(0, 0, 0, Cube.ColorfulTestCube, chunks);
 		
-		loadedWorld.getAccess().setCunks(chunks);
+//		loadedWorld.getAccess().setCunks(chunks);
 		isGenerated = true;
 	}
 	
-	public boolean checkChunks() {return loadedWorld.checkChunks();}
-	public void updataChunks()	 {loadedWorld.updataChunks();}
+	public boolean checkChunks() 	{return loadedWorld.checkChunks();}
+	public void updataChunks()	 	{loadedWorld.updataChunks();}
+	public void forceChunkUpdate() 	{loadedWorld.forceChunkUpdate();}
 	
 	public Cube getCube(float x, float y, float z)  {return loadedWorld.getAccess().getCube(x, y, z);}
 	public Cube getCube(Vector3f pos) 				{return loadedWorld.getAccess().getCube(pos);}
 	
-	private void setCube(int x, int y, int z, Cube cubeId, Chunk[] chunks) {		
+	public int getCubeMetadata(float x, float y, float z)   {return loadedWorld.getAccess().getCubeMetadata(x, y, z);}
+	public int getCubeMetadata(Vector3f pos) 				{return loadedWorld.getAccess().getCubeMetadata(pos);}
+	
+	private void setCube(int x, int y, int z, Cube cubeId, Chunk[] chunks) {	//TODO: Remove Test Code	
 		int ix = (int) x, chunkCoordX = ix / CHUNK_SIZE, indexX = ix % CHUNK_SIZE;
 		int iy = (int) y, chunkCoordY = iy / CHUNK_SIZE, indexY = iy % CHUNK_SIZE;
 		int iz = (int) z, chunkCoordZ = iz / CHUNK_SIZE, indexZ = iz % CHUNK_SIZE;
@@ -146,6 +159,12 @@ public class World {
 	public void setCube(int x, int y, int z, int cubeId)  {loadedWorld.getAccess().setCube(x, y, z, cubeId);}
 	public void setCube(Vector3f pos, int cubeId) 		  {loadedWorld.getAccess().setCube(pos, cubeId);}
 	
+	public void setCubeMetadata(int x, int y, int z, int metadata)  {loadedWorld.getAccess().setCubeMetadata(x, y, z, metadata);}
+	public void setCubeMetadata(Vector3f pos, int metadata) 		  {loadedWorld.getAccess().setCubeMetadata(pos, metadata);}
+	
+	public void setCubWitheMetadata(int x, int y, int z, int cubeId, int metadata)  {loadedWorld.getAccess().setCubeWithMetadata(x, y, z, cubeId, metadata);}
+	public void setCubeWithMetadata(Vector3f pos, int cubeId, int metadata) 		{loadedWorld.getAccess().setCubeWithMetadata(pos, cubeId, metadata);}
+	
 	public float[] getLightColor(float x, float y, float z) {return loadedWorld.getAccess().getLightColor(x, y, z);}
 	public float[] getLightColor(Vector3f pos) 				{return getLightColor(pos.getX(), pos.getY(), pos.getZ());}
 	
@@ -160,11 +179,14 @@ public class World {
 	
 	public WorldObject getObject(int index) {return loadedWorld.getAccess().getObject(index);}
 	
-	public Chunk[] 		 getChunks()	   	{return loadedWorld.getAccess().getChunks();}
 	public WorldObject[] getWorldObjects() 	{return loadedWorld.getAccess().getObjects();}
 	
 	public Vector3f getSizeAsVector() {return new Vector3f(sizeX, sizeY, sizeZ);}
 	public Vector3f getChunkSizeAsVector() {return new Vector3f(chunkX, chunkY, chunkZ);}
+	
+	public File getFileLoc() {
+		return new File(defaultWorldRootDir + name + "/" );
+	}
 	
 	public int getSizeX() {
 		return sizeX;
