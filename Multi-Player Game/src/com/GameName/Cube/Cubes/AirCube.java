@@ -4,7 +4,7 @@ import com.GameName.Cube.Cube;
 
 public class AirCube extends Cube {
 
-	protected AirCube() {
+	public AirCube() {
 		super("Air");
 		
 		setSolid(false);

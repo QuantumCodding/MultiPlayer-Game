@@ -26,9 +26,15 @@ import com.GameName.Util.Vectors.Vector2f;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class Cube {
+	private static DefaultCubeRender defaultCubeRender;
+	
 	private static Texture textureSheet;
 	private static int textureSheetSideLength;
 	private static int textureSheetMaxFrames;
+	
+	static {
+		defaultCubeRender = new DefaultCubeRender();
+	}
 	
 	private final int TEXTURE_SIZE = 10;
 	
@@ -231,7 +237,7 @@ public class Cube {
 	 *  Generates the default render for a Cube
 	 */
 	private ICubeRender getDefaultRender() {
-		return new DefaultCubeRender();
+		return defaultCubeRender;
 	}
 	
 	/**
@@ -388,7 +394,7 @@ public class Cube {
 	 * Returns the render for this cube
 	 * @param metadata The metadata of the cube
 	 */
-	public CubeRender getRender(int metadata) {
+	public ICubeRender getRender(int metadata) {
 		return render;
 	}
 	
@@ -458,7 +464,7 @@ public class Cube {
 	/**
 	 *  Sets the Render for this cube
 	 */
-	protected void setRender(CubeRender render) {
+	protected void setRender(ICubeRender render) {
 		this.render = render;
 	}
 	

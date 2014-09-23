@@ -4,7 +4,7 @@ import com.GameName.Cube.Cube;
 
 public class StoneCube extends Cube {
 
-	protected StoneCube() {
+	public StoneCube() {
 		super("StoneCube");
 		
 		setDisplayName("Stone Cube");
