@@ -1,4 +1,4 @@
-package com.GameName.Render.Shader;
+package com.GameName.Render.Effects;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;

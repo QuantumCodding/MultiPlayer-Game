@@ -10,7 +10,9 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_DIFFUSE;
 import static org.lwjgl.opengl.GL11.GL_FRONT;
+//import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
 import static org.lwjgl.opengl.GL11.GL_LIGHTING;
+//import static org.lwjgl.opengl.GL11.GL_LINE;
 import static org.lwjgl.opengl.GL11.GL_LINES;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_NORMALIZE;
@@ -24,7 +26,6 @@ import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glColor3f;
 import static org.lwjgl.opengl.GL11.glColorMaterial;
 import static org.lwjgl.opengl.GL11.glCullFace;
 import static org.lwjgl.opengl.GL11.glDisable;
@@ -36,17 +37,17 @@ import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glLoadMatrix;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glOrtho;
+//import static org.lwjgl.opengl.GL11.glPolygonMode;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glShadeModel;
 import static org.lwjgl.opengl.GL11.glTranslatef;
-import static org.lwjgl.opengl.GL11.glVertex3f;
 import static org.lwjgl.opengl.GL11.glVertex2f;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.awt.Color;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.Display;
@@ -56,13 +57,16 @@ import org.newdawn.slick.font.effects.ColorEffect;
 
 import com.GameName.Main.GameName;
 import com.GameName.Main.Start;
-import com.GameName.Render.Shader.Shader;
+import com.GameName.Render.Effects.Shader;
+import com.GameName.Render.Types.Render2D;
+import com.GameName.Render.Types.Render3D;
+import com.GameName.Render.Types.Renderable;
+import com.GameName.Util.IEngine;
 import com.GameName.Util.Time;
-import com.GameName.Util.Vectors.Vector3f;
-import com.GameName.World.Chunk;
-import com.GameName.World.World;
 
-public class RenderEngine {
+public class RenderEngine implements IEngine<Renderable> {
+	private ArrayList<Render2D> render2D;
+	private ArrayList<Render3D> render3D;
 	
 	private UnicodeFont font;
 	
@@ -72,9 +76,7 @@ public class RenderEngine {
 	private FloatBuffer perspectiveProjectionMatrix;
 	private FloatBuffer orthographicProjectionMatrix;
 
-	public RenderEngine() {		
-		RenderUtil.init();
-		
+	public RenderEngine() {	
 		setUpOpenGL();  
 		setUpShaders();
 		setUpVBOs();
@@ -149,73 +151,24 @@ public class RenderEngine {
     }
 		
 	public void render3D() {
-//		System.out.println("Here");
-		
-		glLoadIdentity();
-		GameName.player.getAccess().getCamera().useView();
-		
+		glMatrixMode(GL_PROJECTION);
+			glLoadMatrix(perspectiveProjectionMatrix);
+        glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
+			
+		GameName.player.getAccess().getCamera().useView();		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
+		glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+		
 		glPushMatrix();
-	        glRotatef(180, 0, 1, 0);
-	    	glTranslatef(0, -(GameName.player.getAccess().getCurrentWorld().getSizeY() * (World.SCALE * 0.1f)), 0);
 		
-		    glBegin(GL_LINES);
-		    
-		    Vector3f pos2 = GameName.player.getAccess().getSelectedCube().add(0.5f).multiply(GameName.player.getAccess().getAdjust()), 
-		    		pos1 = pos2.subtract(new Vector3f(0, 10, 0));
-		    
-		    glColor3f(1, 0, 0);
-		    glVertex3f(pos1.getX(), pos1.getY(), pos1.getZ());
-		    
-		    glColor3f(1, 0, 0);
-		    glVertex3f(pos2.getX(), pos2.getY(), pos2.getZ());
-		    
-		    glEnd();
-		    
-		    glBegin(GL_LINES);
-		    
-		    pos2 = GameName.player.getAccess().getPos().add(GameName.player.getLook().multiplyAndSet(GameName.player.getAccess().getMaxReach())).add(0.5f).multiply(GameName.player.getAccess().getAdjust()); 
-		    		pos1 = GameName.player.getAccess().getRenderPos();
-		    
-		    glColor3f(0.5f, 1, 0);
-		    glVertex3f(pos1.getX(), pos1.getY(), pos1.getZ());
-		    
-		    glColor3f(0.5f, 1, 0);
-		    glVertex3f(pos2.getX(), pos2.getY(), pos2.getZ());
-		    
-		    glEnd();
-		glPopMatrix();		    
-		
-//		glPushMatrix();
-//			glBegin(GL_LINES);
-//				glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
-//			
-//				float f1, f2, f3, f4;		
-//				
-//				for(int rotY = 0; rotY < 360; rotY ++) {
-//				for(int rotX = 0; rotX < 360; rotX ++) {
-//					
-//					int radius = 10;			
-//					
-//					f1 = (float)  Math.cos(Math.toRadians(rotY));
-//					f2 = (float)  Math.sin(Math.toRadians(rotY));
-//					f3 = (float)  Math.cos(Math.toRadians(rotX));                  
-//					f4 = (float)  Math.sin(Math.toRadians(rotX));             
-//					
-//					Vector3f loadPos = new Vector3f(
-//							Math.round(f2 * f3 * radius), 
-//							Math.round(f4 * radius), 
-//							Math.round(f1 * f3 * radius))
-//						.add(GameName.player.getAccess().getCurrentWorld().getLoadedWorld().getAccess().getCenter());
-//					
-////					glVertex3f(loadPos.getX(), loadPos.getY(), loadPos.getZ());
-//				}}
-//			glEnd();
-//		glPopMatrix();
-		for(Chunk chunk : GameName.player.getAccess().getCurrentWorld().getChunks()) {
-			if(chunk != null && chunk.getVboData() != null) chunk.render();
+		for(Render3D render : render3D) {
+			render.draw();
 		}
+		
+		glPopMatrix();
 	}
 	
 	public void render2D() {
@@ -224,10 +177,15 @@ public class RenderEngine {
         glMatrixMode(GL_MODELVIEW);		
         	glLoadIdentity();        
         
+		glDisable(GL_TEXTURE_2D);
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);	
+        
 		glPushMatrix();
-			glDisable(GL_TEXTURE_2D);
-			glDisable(GL_DEPTH_TEST);
-			glDisable(GL_CULL_FACE);
+		
+			for(Render2D render : render2D) {
+				render.draw();
+			}
 			
 			GameName.guiManager.render();
 			
@@ -243,11 +201,10 @@ public class RenderEngine {
 	        font.drawString(0, 20, x + "," + y + "," + z, col);
 	        font.drawString(0, 40, oneDecimal(GameName.player.getAccess().getRot().getX()) + "," + oneDecimal(GameName.player.getAccess().getRot().getY()) + "," + oneDecimal(GameName.player.getAccess().getRot().getZ()), col);
 
-	        glDisable(GL_TEXTURE_2D);
-	        glEnable(GL_DEPTH_TEST);
-	        glEnable(GL_CULL_FACE);
 		glPopMatrix();
-		
+
+        glDisable(GL_TEXTURE_2D);
+        		
 		glPushMatrix();
 			glBegin(GL_LINES);
 			
@@ -263,16 +220,9 @@ public class RenderEngine {
 			
 			glEnd();
 		glPopMatrix();
-		
-		glMatrixMode(GL_PROJECTION);
-			glLoadMatrix(perspectiveProjectionMatrix);
-        glMatrixMode(GL_MODELVIEW);
 	}
 
-	private void setUpShaders() {
-//		textureShader = new Shader("TextureShader", false);
-//		textureShader.addUniform("sampler");
-		
+	private void setUpShaders() {	
 		basicShader = new Shader("BasicShader", false);
 	}
 	
@@ -288,29 +238,52 @@ public class RenderEngine {
 	}
 
 	public void cleanUp() {		
-//		textureShader.cleanUp();
 		basicShader.cleanUp();
+	}
+
+	public void add(Renderable obj) {
+		if(obj instanceof Render2D) render2D.add((Render2D) obj);
+		else if(obj instanceof Render3D) render3D.add((Render3D) obj);
+		 
+	}
+
+	public void remove(Renderable obj) {
+		if(obj instanceof Render2D) render2D.remove((Render2D) obj);
+		else if(obj instanceof Render3D) render3D.remove((Render3D) obj);
+	}
+
+	public void step(float delta) {
+		render3D();
+		render2D();
 	}
 }
 
-
-//glPushMatrix();
-//	//                Back                  Front                 Left                  Right                 Bottom                Top
-//	byte[][] xAdds = {{0, 1, 1}, {0, 0, 1}, {0, 1, 1}, {0, 0, 1}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {1, 1, 1}, {0, 1, 1}, {0, 0, 1}, {0, 1, 1}, {0, 0, 1}};
-//	byte[][] yAdds = {{0, 0, 1}, {0, 1, 1}, {0, 0, 1}, {0, 1, 1}, {0, 0, 1}, {0, 1, 1}, {0, 0, 1}, {0, 1, 1}, {0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {1, 1, 1}};
-//	byte[][] zAdds = {{0, 0, 0}, {0, 0, 0}, {1, 1, 1}, {1, 1, 1}, {0, 1, 1}, {0, 0, 1}, {0, 1, 1}, {0, 0, 1}, {0, 0, 1}, {0, 1, 1}, {0, 0, 1}, {0, 1, 1}};
+//ArrayList<Chunk> chunks = GameName.player.getAccess().getCurrentWorld()
+//.getLoadedWorld().getAccess().getChunkLoaded().getLoadedChunks();
 //
-//	for(int i = 0; i < xAdds.length; i ++) {
-//		glColor3d(Math.random(), Math.random(), Math.random());
-//		glBegin(GL_TRIANGLES);
-//		for(int j = 0; j < xAdds[i].length; j ++) {
-//			glVertex3f(xAdds[i][j], yAdds[i][j], zAdds[i][j]);
-//		}
-//		glEnd();
-//	}
-//glPopMatrix();
+//for(int i = 0; i < chunks.size(); i ++
+//) {
+//Chunk chunk = chunks.get(i);
+//if(chunk != null && chunk.getVboData() != null) chunk.render();
+//}
 
-//               Back           Front         Left          Right         Bottom        Top
-//byte[][] xAdds = {{0, 1, 1, 0}, {0, 1, 1, 0}, {0, 0, 0, 0}, {1, 1, 1, 1}, {0, 1, 1, 0}, {0, 1, 1, 0}};
-//byte[][] yAdds = {{0, 0, 1, 1}, {0, 0, 1, 1}, {0, 0, 1, 1}, {0, 0, 1, 1}, {0, 0, 0, 0}, {1, 1, 1, 1}};
-//byte[][] zAdds = {{0, 0, 0, 0}, {1, 1, 1, 1}, {0, 1, 1, 0}, {0, 1, 1, 0}, {0, 0, 1, 1}, {0, 0, 1, 1}};
+
+
+
+
+
+//glRotatef(180, 0, 1, 0);
+//glTranslatef(0, -(GameName.player.getAccess().getCurrentWorld().getSizeY() * (World.SCALE * 0.1f)), 0);
+//
+//glBegin(GL_LINES);
+//
+//Vector3f pos2 = GameName.player.getAccess().getSelectedCube().add(0.5f).multiply(GameName.player.getAccess().getAdjust()), 
+//		pos1 = pos2.subtract(new Vector3f(0, 10, 0));
+//
+//glColor3f(1, 0, 0);
+//glVertex3f(pos1.getX(), pos1.getY(), pos1.getZ());
+//
+//glColor3f(1, 0, 0);
+//glVertex3f(pos2.getX(), pos2.getY(), pos2.getZ());
+//
+//glEnd();
