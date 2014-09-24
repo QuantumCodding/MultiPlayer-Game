@@ -61,7 +61,7 @@ public abstract class GUIComponent extends Render2D {
 		textureBuffers[2] = ids[3];
 	}
 	
-	protected void updateVBOs() {
+	public void updateVBOs() {
 		List<Float> verties = new ArrayList<Float>();
 		
 		verties.add(getX());				verties.add(getY());
