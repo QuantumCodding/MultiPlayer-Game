@@ -40,6 +40,12 @@ private static Texture[] textures;
 		return textures;
 	}
 	
+	public static void cleanUp() {
+		for(Texture texture : textures) {
+			texture.cleanUp();
+		}
+	}
+	
 	public void addTexture(Texture texture) {
 		register(texture);
 	}	

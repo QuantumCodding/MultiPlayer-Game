@@ -32,12 +32,18 @@ public class ShaderRegistry extends Registry<Shader> {
 		return null;
 	}
 	
-	public static Shader getSound(int index) {
+	public static Shader getShader(int index) {
 		return getGuis()[index];
 	}
 	
 	public static Shader[] getGuis() {
 		return shaders;
+	}
+	
+	public static void cleanUp() {
+		for(Shader shader : shaders) {
+			shader.cleanUp();
+		}
 	}
 	
 	public void addShader(Shader shader) {
