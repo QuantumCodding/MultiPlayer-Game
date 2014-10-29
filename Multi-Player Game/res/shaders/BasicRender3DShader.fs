@@ -3,6 +3,7 @@
 in vec2 texCoordData;
 in vec3 colour;
 in vec3 position_;
+in vec3 normal_;
 
 uniform sampler2D sampler;
 
