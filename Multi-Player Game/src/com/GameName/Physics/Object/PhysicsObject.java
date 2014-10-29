@@ -1,6 +1,6 @@
 package com.GameName.Physics.Object;
 
-import com.GameName.Physics.PhysicsEngine;
+import com.GameName.Physics.PhysicsUtil;
 import com.GameName.Physics.Coalition.BoundingArea;
 import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.World;
@@ -40,8 +40,8 @@ public abstract class PhysicsObject {
 		onGround = pos.getY() <= groundHeight;		
 		if(onGround) { pos.setY(groundHeight); vel.setY(newVel); return;} 
 		
-		newVel = vel.getY() - PhysicsEngine.GRAVITY;		
-		if(newVel < PhysicsEngine.TERMINAL_VELOCITY) newVel = PhysicsEngine.TERMINAL_VELOCITY;
+		newVel = vel.getY() - PhysicsUtil.GRAVITY;		
+		if(newVel < PhysicsUtil.TERMINAL_VELOCITY) newVel = PhysicsUtil.TERMINAL_VELOCITY;
 		
 		vel.setY(newVel);
 	}

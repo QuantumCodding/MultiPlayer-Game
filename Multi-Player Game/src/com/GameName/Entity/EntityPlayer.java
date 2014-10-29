@@ -13,19 +13,22 @@ import java.util.List;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
+import com.GameName.Cube.Cube;
 import com.GameName.Input.Control;
 import com.GameName.Items.ItemStack;
 import com.GameName.Main.GameName;
+import com.GameName.Main.Debugging.Logger;
+import com.GameName.Main.Threads.VBOUpdateThread;
 import com.GameName.Networking.Client;
 import com.GameName.Networking.Packets.PacketPlayerInventorySize;
 import com.GameName.Networking.Packets.PacketPlayerInventorySlot;
 import com.GameName.Networking.Packets.PacketPlayerLocation;
 import com.GameName.Networking.Packets.PacketPlayerStats;
-import com.GameName.Physics.PhysicsEngine;
+import com.GameName.Physics.PhysicsUtil;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
+import com.GameName.Util.Vectors.Vector2f;
 import com.GameName.Util.Vectors.Vector3f;
-import com.GameName.World.Cube.Cube;
 
 public class EntityPlayer extends Entity {
 	protected ItemStack[] inv;
@@ -51,9 +54,15 @@ public class EntityPlayer extends Entity {
 		
 	protected int maxReach;
 	protected Vector3f selectedCube;
+	
+	protected Vector2f pointerPos;
+	protected boolean isPointerDown;
 		
+	protected PlayerMonitor monitor;
+	
 	protected void init() {
 		access = new EntityPlayerAccess(this);
+		monitor = new PlayerMonitor();
 		
 		resetCam();
 		resetPlayer();
@@ -62,11 +71,16 @@ public class EntityPlayer extends Entity {
 	}
 	
 	public void resetCam() {//                                                       0.3f
-		cam = new Camera(70, (float)Display.getWidth() / (float)Display.getHeight(), 0.3f, renderDistance);
+		cam = new Camera(70, (float)Display.getWidth() / (float)Display.getHeight(), 1f, renderDistance);
+		if(GameName.render != null) {
+			GameName.render.setUpPerspectives();
+		}
 	}
 	
 	public void resetPlayer() {
-		System.out.println("Player Reset");
+		Logger.print("Player Reseting").setType("Setup").end();
+		
+		pointerPos = new Vector2f(0, 0);
 		
 		invSize = 10;
 		inv = new ItemStack[invSize];
@@ -105,7 +119,7 @@ public class EntityPlayer extends Entity {
 		if(gravityOn) {
 			super.updata();
 			
-			selectedCube = PhysicsEngine.getLookPosition(pos, rot, currentWorld, maxReach); //rayTrace(pos.clone(), pos.add(getLook().multiply(maxReach)), currentWorld);//
+			selectedCube = PhysicsUtil.getLookPosition(pos, rot, currentWorld, maxReach); //rayTrace(pos.clone(), pos.add(getLook().multiply(maxReach)), currentWorld);//
 			if(selectedCube == null) selectedCube = pos.clone();
 		}		
 
@@ -120,11 +134,13 @@ public class EntityPlayer extends Entity {
 		if(onGround) {
 			jumpsLeft = maxJumps;	
 		}		
+		
+		monitor.tick(this);
 	}
 	
 	private void checkControls() {
-		speed = 7; //15
-		lookSpeed = Keyboard.isKeyDown(Keyboard.KEY_Y) ? 0.1f : Keyboard.isKeyDown(Keyboard.KEY_U) ? 5 : 1;
+		speed = Keyboard.isKeyDown(Keyboard.KEY_E) ? 0.5f : Keyboard.isKeyDown(Keyboard.KEY_R) ? 15 : 7; //15
+		lookSpeed = Keyboard.isKeyDown(Keyboard.KEY_Y) ? 0.5f : Keyboard.isKeyDown(Keyboard.KEY_U) ? 5 : 1;
 		lookSpeedUp = lookSpeed;
 				
 		Vector3f oldPos = pos.clone();
@@ -133,12 +149,12 @@ public class EntityPlayer extends Entity {
 			if(ctr.isActive() != 0.0){
 				
 				switch(ctr.control) {
-					case "forward": if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.FORWARD, currentWorld)) 	access.moveZ((float) (ctr.isActive() / speed)); 	break;						
-					case "back": 	if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.BACKWARD, currentWorld)) access.moveZ((float) (ctr.isActive() / speed)); 	break;		
-					case "left": 	if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.LEFT, currentWorld)) 	access.moveX((float) (ctr.isActive() / speed)); 	break;
-					case "right":   if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.RIGHT, currentWorld)) 	access.moveX((float) (ctr.isActive() / speed));     break;
-					case "up": 		if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.UP, currentWorld)) 		access.moveY((float) (ctr.isActive() / speed)); 								break;		
-					case "down": 	if(!GameName.lockMovement) if(PhysicsEngine.canMove(pos, PhysicsEngine.DOWN, currentWorld)) 	access.moveY((float) (ctr.isActive() / speed)); 								break;
+					case "forward": if(!GameName.lockMovement) if(PhysicsUtil.canMove(pos, PhysicsUtil.FORWARD, currentWorld)) 	access.moveZ((float) (ctr.isActive() / speed)); 	break;						
+					case "back": 	if(!GameName.lockMovement) if(PhysicsUtil.canMove(pos, PhysicsUtil.BACKWARD, currentWorld)) access.moveZ((float) (ctr.isActive() / speed)); 	break;		
+					case "left": 	if(!GameName.lockMovement) if(PhysicsUtil.canMove(pos, PhysicsUtil.LEFT, currentWorld)) 	access.moveX((float) (ctr.isActive() / speed)); 	break;
+					case "right":   if(!GameName.lockMovement) if(PhysicsUtil.canMove(pos, PhysicsUtil.RIGHT, currentWorld)) 	access.moveX((float) (ctr.isActive() / speed));     break;
+					case "up": 		if(!GameName.lockMovement) if(PhysicsUtil.canMove(pos, PhysicsUtil.UP, currentWorld)) 		access.moveY((float) (ctr.isActive() / speed)); 								break;		
+					case "down": 	if(!GameName.lockMovement) if(PhysicsUtil.canMove(pos, PhysicsUtil.DOWN, currentWorld)) 	access.moveY((float) (ctr.isActive() / speed)); 								break;
 					
 					case "lookUp": 	if(!GameName.lockMovement)  /*if(entityPhisics(0))*/ access.rotateX((float) (ctr.isActive() / lookSpeedUp));  break;				
 					case "lookDown": if(!GameName.lockMovement) /*if(entityPhisics(0))*/ access.rotateX((float) (ctr.isActive() / lookSpeedUp)); break;			
@@ -155,22 +171,24 @@ public class EntityPlayer extends Entity {
 					case "resetPlayer": if(!GameName.lockMovement) resetPlayer(); break;
 					case "gravity": 	if(!GameName.lockMovement) gravityOn = !gravityOn; break;
 					
-					case "pointerUp": 		GameName.pointer.y += ctr.isActive(); break;
-					case "pointerDown": 	GameName.pointer.y += ctr.isActive(); break;
-					case "pointerLeft": 	GameName.pointer.x += ctr.isActive(); break;
-					case "pointerRight": 	GameName.pointer.x += ctr.isActive(); break;
-					case "click": 			GameName.click = true; break;
+					case "pointerUp": 		pointerPos.addY((float) ctr.isActive()); break;
+					case "pointerDown": 	pointerPos.addY((float) ctr.isActive()); break;
+					case "pointerLeft": 	pointerPos.addX((float) ctr.isActive()); break;
+					case "pointerRight": 	pointerPos.addX((float) ctr.isActive()); break;
+					case "click": 			isPointerDown = true; break;
 					
 					case "toggle": if(!GameName.lockMovement) { GameName.guiManager.toggle("Test"); GameName.guiManager.toggle("Pause"); } break;
 					
-					case "placeTest": currentWorld.setCube(selectedCube.add(PhysicsEngine.getPosNextToFace(PhysicsEngine.getDirection(rot))), Cube.ColorfulTestCube.getId()); break;
+					case "placeTest": currentWorld.setCube(selectedCube.add(PhysicsUtil.getPosNextToFace(PhysicsUtil.getDirection(rot))), Cube.ColorfulTestCube.getId()); break;
 					case "removeCube": currentWorld.setCube(selectedCube, Cube.Air.getId()); break;
+					
+					case "reloadChunks": ((VBOUpdateThread) GameName.threadManager.accessByName("VBO Thread")).forceUpdate();
 					
 					default: System.err.println("Default Called: Player is not using control " + ctr.control); break;					
 				} 				
 			} else {
 				switch(ctr.control) {
-					case "click":  GameName.click = false; break;
+					case "click": isPointerDown = false; break;
 					
 					default: break;
 				}
@@ -198,12 +216,17 @@ public class EntityPlayer extends Entity {
 		return (EntityPlayerAccess) access;
 	}
 	
-	public static List<Control> loadControls(File f) throws IOException {
+	public static List<Control> loadControls(File f) {
 		List<Control> controlls = new ArrayList<Control>();
-		HashSet<TagGroup> groups = DTGLoader.readDTGFile(f);
 		
-		for(TagGroup group : groups) {
-			controlls.add(Control.getControlFormTagGroup(group));
+		try {
+			HashSet<TagGroup> groups = DTGLoader.readDTGFile(f);
+			
+			for(TagGroup group : groups) {
+				controlls.add(Control.getControlFormTagGroup(group));
+			}
+		} catch(IOException e) {
+			e.printStackTrace();
 		}
 		
 		return controlls;

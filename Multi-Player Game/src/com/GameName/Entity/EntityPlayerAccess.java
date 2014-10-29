@@ -9,6 +9,7 @@ import com.GameName.Networking.Client;
 import com.GameName.Networking.Packets.PacketPlayerInventorySize;
 import com.GameName.Networking.Packets.PacketPlayerInventorySlot;
 import com.GameName.Networking.Packets.PacketPlayerStats;
+import com.GameName.Util.Vectors.Vector2f;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class EntityPlayerAccess extends EntityAccess {
@@ -83,7 +84,19 @@ public class EntityPlayerAccess extends EntityAccess {
 	public Vector3f getSelectedCube() {
 		return player.selectedCube;
 	}
+	
+	public Vector2f getPointer() {
+		return player.pointerPos;
+	}
+	
+	public boolean isPointerDown() {
+		return player.isPointerDown;
+	}
 
+	public PlayerMonitor getMonitor() {
+		return player.monitor;
+	}
+	
 	public void setMaxReach(int maxReach) {
 		player.maxReach = maxReach;
 	}
@@ -122,6 +135,7 @@ public class EntityPlayerAccess extends EntityAccess {
 
 	public void setRenderDistance(float renderDistance) {
 		player.renderDistance = renderDistance;
+		player.resetCam();
 	}
 	
 	private void setInv(ItemStack[] inv) {

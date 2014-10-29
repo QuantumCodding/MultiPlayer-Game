@@ -6,6 +6,7 @@ import java.io.IOException;
 import com.GameName.Entity.EntityNPC;
 import com.GameName.Main.GameName;
 import com.GameName.Networking.NetworkPlayer;
+import com.GameName.World.WorldRegistry;
 
 public class ClientPacketProcesor {
 	public static void readData(int id, DataInputStream in) {
@@ -64,7 +65,7 @@ public class ClientPacketProcesor {
 				PacketNPCLocation packet = new PacketNPCLocation();
 				packet.readInfo(in);
 				
-				EntityNPC npc = (EntityNPC) GameName.worlds.get(packet.getWorldID()).getObject(packet.getNpcID());
+				EntityNPC npc = (EntityNPC) WorldRegistry.getWorld(packet.getWorldID()).getObject(packet.getNpcID());
 								
 				npc.getAccess().setX(packet.getX());
 				npc.getAccess().setY(packet.getY());
