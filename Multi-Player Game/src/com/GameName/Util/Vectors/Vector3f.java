@@ -262,6 +262,15 @@ public class Vector3f {
 			);
 	}
 	
+	public boolean greaterThen(Vector3f then) {return x > then.getX() && y > then.getY() && z > then.getZ();}	
+	public boolean greaterThen(float then) {return x > then && y > then && z > then;}
+	
+	public boolean lessThen(Vector3f then) {return x < then.getX() && y < then.getY() && z < then.getZ();}	
+	public boolean lessThen(float then) {return x < then && y < then && z < then;}
+	
+	public boolean equaleTo(Vector3f then) {return x == then.getX() && y == then.getY() && z == then.getZ();}
+	public boolean equalTo(float then) {return x == then && y == then && z == then;}
+	
 	public Vector3f toDegrees() {
 		return new Vector3f(
 				(float) Math.toDegrees(x),

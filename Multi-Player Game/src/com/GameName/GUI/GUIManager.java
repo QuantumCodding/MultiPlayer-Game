@@ -3,9 +3,6 @@ package com.GameName.GUI;
 import com.GameName.GUI.GUI;
 
 public class GUIManager {
-	public GUIManager() {
-		
-	}
 	
 	public void render() {
 		for(GUI gui : GuiRegistry.getGuis()) {

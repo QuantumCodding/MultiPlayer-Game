@@ -51,8 +51,10 @@ public class Texture {
 	 * @param fileType What the file extension is
 	 */
 	public Texture(String location, boolean useMipmap, String fileType) {
-		textureName = location.substring(location.lastIndexOf("/"));
+		textureName = location.contains("/") ? location.substring(location.lastIndexOf("/")) : 
+					location.contains("\\") ? location.substring(location.lastIndexOf("\\")) : location;
 		
+		location = location.contains(".") ? location.substring(0, location.lastIndexOf(".")) : location;
 		try {
 			org.newdawn.slick.opengl.Texture slickTexture = getTexture(location, fileType);
 			

@@ -18,7 +18,7 @@ import com.GameName.GUI.GUI;
 import com.GameName.Main.GameName;
 import com.GameName.Render.Effects.Texture;
 import com.GameName.Render.Types.Render2D;
-import com.GameName.Util.Util;
+import com.GameName.Util.BufferUtil;
 import com.GameName.Util.Vectors.Vector2f;
 
 public abstract class GUIComponent extends Render2D {
@@ -69,7 +69,7 @@ public abstract class GUIComponent extends Render2D {
 		verties.add(getX() + getWidth());	verties.add(getY() + getHeight());
 		verties.add(getX());				verties.add(getY() + getHeight());
 		
-		FloatBuffer vertexBuffer = Util.createFillipedFloatBuffer(verties);
+		FloatBuffer vertexBuffer = BufferUtil.createFillipedFloatBuffer(verties);
 		GameName.getGLContext().addBufferBind(vertexBuffer, GL_ARRAY_BUFFER_BINDING, vertexVBO, GL_STATIC_DRAW, 'f');
 		
 		Vector2f[] textureCoords = new Vector2f[] 
@@ -83,7 +83,7 @@ public abstract class GUIComponent extends Render2D {
 			texCoords.add(textureCoords[i].getX());		texCoords.add(textureCoords[i].getY());
 			texCoords.add(textureCoords[i + 1].getX());	texCoords.add(textureCoords[i].getY());
 			
-			FloatBuffer texCoordsBuffer = Util.createFillipedFloatBuffer(texCoords);
+			FloatBuffer texCoordsBuffer = BufferUtil.createFillipedFloatBuffer(texCoords);
 			GameName.getGLContext().addBufferBind(texCoordsBuffer, GL_ARRAY_BUFFER_BINDING, textureBuffers[i / 2], GL_STATIC_DRAW, 'f');
 		}
 	}
@@ -137,7 +137,7 @@ public abstract class GUIComponent extends Render2D {
 		this.texCoordsPressed2 = texCoordsPressed2;
 	}
 	
-	protected void cleanUp_() {
+	protected void cleanUp_Renderable() {
 		if(textureBuffers != null) {
 			glDeleteBuffers(textureBuffers[0]);
 			glDeleteBuffers(textureBuffers[1]);

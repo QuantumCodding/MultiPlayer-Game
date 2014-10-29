@@ -8,6 +8,7 @@ import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
 import com.GameName.Main.GameName;
+import com.GameName.Main.Threads.VBOUpdateThread;
 import com.GameName.Render.Effects.Shader;
 import com.GameName.Render.Effects.Texture;
 import com.GameName.Util.Vectors.Vector2f;
@@ -20,47 +21,79 @@ public abstract class Renderable {
 
 	protected Vector2f texCoordsTop, texCoordsBottom;
 	
-	private boolean vboUpdateNeeded;
-	private boolean needsVBOids;
+	private boolean isVboUpdating;
+	protected boolean vboUpdateNeeded;
+	protected boolean needsVBOids;
 	
 	protected int vertexVBO;
 	protected int textureVBO;
 	protected int colorVBO;
 	
+	private Vector3f center;
 	private Vector3f rotation;
 	private Vector3f translation;
 	private Vector3f scale;
+	
+	protected String name;
 	
 	public Renderable() {
 		vertexVBO = -1;
 		textureVBO = -1;
 		colorVBO = -1;
+		
+		needsVBOids = true;
+		vboUpdateNeeded = true;
+		
+		center = new Vector3f(0, 0, 0);
+		translation = new Vector3f(0, 0, 0);
+		rotation = new Vector3f(0, 0, 0);
+		scale = new Vector3f(1, 1, 1);
+		
+		name = "default";
 	}
 	
 	public void render() {
-		preDraw();	
+		if(checkVBOs()) return;		
+		preDraw();
 		
-		applyProperties();
+//		applyProperties();
 		draw();		
 		
 		postDraw();
 	}
 	
-	private void preDraw() {
-		if(shader != null) {shader.bind();}
-		if(texture != null) {glEnable(GL_TEXTURE_2D); texture.bind();}
+	private boolean checkVBOs() {
+		if(!vboUpdateNeeded && !needsVBOids) {
+			isVboUpdating = false;
+			return isVboUpdating;
+		}
 		
-		if(needsVBOids) {genVBOids();}
-		if(vboUpdateNeeded) {updateVBOs();}
+		if(needsVBOids) {
+			vboUpdateNeeded = true;
+		}
+		
+		if(vboUpdateNeeded && !isVboUpdating) {
+			isVboUpdating = true;
+//			Logger.println(name + " is getting buffers");
+			((VBOUpdateThread) GameName.threadManager.accessByName("VBO Thread")).addRenderable(this);
+		}
+		
+		return isVboUpdating;
+	}
+	
+	private void preDraw() {
+		if(shader != null) {shader.bind();} else {Shader.unbind();}
+		if(texture != null) {glEnable(GL_TEXTURE_2D); texture.bind();}
 	}
 	
 	private void applyProperties() {
-		glTranslatef(translation.getX(), translation.getY(), translation.getZ());
+		glTranslatef(center.getX(), center.getY(), center.getZ());
 
 		glRotatef(rotation.getX(), 1, 0, 0);
 		glRotatef(rotation.getY(), 0, 1, 0);
 		glRotatef(rotation.getZ(), 0, 0, 1);
-		
+
+		glTranslatef(translation.getX(), translation.getY(), translation.getZ());		
 		glScalef(scale.getX(), scale.getY(), scale.getZ());
 	}
 	
@@ -74,10 +107,10 @@ public abstract class Renderable {
 		if(texture != null) {glDisable(GL_TEXTURE_2D); Texture.unbind();}
 	}
 	
-	protected abstract void cleanUp_();
+	protected abstract void cleanUp_Renderable();
 	
 	public void cleanUp() {
-		cleanUp_();
+		cleanUp_Renderable();
 		
 		if(vertexVBO != -1)  {GameName.getGLContext().deleteBuffer(vertexVBO);}
 		if(textureVBO != -1) {GameName.getGLContext().deleteBuffer(textureVBO);}
@@ -88,6 +121,10 @@ public abstract class Renderable {
 	public Texture 	getTexture() {return texture;}
 	public Vector3f getColor() 	 {return color;}
 
+	public Vector3f getCenter() {
+		return center;
+	}
+	
 	public Vector3f getRotation() {
 		return rotation;
 	}
@@ -106,6 +143,14 @@ public abstract class Renderable {
 	
 	public boolean needsVBOids() {
 		return needsVBOids;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setCenter(Vector3f center) {
+		this.center = center;
 	}
 
 	public void setRotation(Vector3f rotation) {
@@ -136,5 +181,9 @@ public abstract class Renderable {
 	public void setColor(Vector3f color) {
 		this.color = color;
 		vboUpdateNeeded = true;
+	}
+	
+	public void stopVboUpdating() {
+		isVboUpdating = false;
 	}
 }

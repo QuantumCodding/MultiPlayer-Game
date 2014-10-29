@@ -16,7 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.GameName.Main.GameName;
-import com.GameName.Util.Util;
+import com.GameName.Render.Effects.ShaderRegistry;
+import com.GameName.Util.BufferUtil;
 import com.GameName.Util.Vectors.Vector2f;
 
 public abstract class Render2D extends Renderable {
@@ -31,6 +32,8 @@ public abstract class Render2D extends Renderable {
 		this.pos = pos;
 		this.width = width;
 		this.height = height;
+		
+		setShader(ShaderRegistry.accessByName("BasicRender2DShader"));
 	}
 	
 	public void draw() {		
@@ -49,18 +52,10 @@ public abstract class Render2D extends Renderable {
 			glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);
 				glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);		
 			
-			if(textureVBO != -1) {
-				//Texture
-				glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
-					glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
-			}
-			
-			if(colorVBO != -1) {
-				//Color
-				glBindBuffer(GL_ARRAY_BUFFER, colorVBO);
-					glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
-			}
-			
+			//Texture
+			glBindBuffer(GL_ARRAY_BUFFER, textureVBO);
+				glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+						
 			glDrawArrays(GL_QUADS, 0, 4);
 		
 		glPopMatrix();
@@ -76,6 +71,7 @@ public abstract class Render2D extends Renderable {
 	}
 	
 	public void updateVBOs() {
+		//Vertices
 		List<Float> verties = new ArrayList<Float>();
 		
 		verties.add(pos.getX());			verties.add(pos.getY());
@@ -83,32 +79,19 @@ public abstract class Render2D extends Renderable {
 		verties.add(pos.getX() + width);	verties.add(pos.getY() + height);
 		verties.add(pos.getX());			verties.add(pos.getY() + height);
 		
-		FloatBuffer vertexBuffer = Util.createFillipedFloatBuffer(verties);
+		FloatBuffer vertexBuffer = BufferUtil.createFillipedFloatBuffer(verties);
 		GameName.getGLContext().addBufferBind(vertexBuffer, GL_ARRAY_BUFFER_BINDING, vertexVBO, GL_STATIC_DRAW, 'f');
 		
-		if(getTexture() != null) {
-			List<Float> texCoords = new ArrayList<Float>();
-			
-			texCoords.add(texCoordsTop.getX());			texCoords.add(texCoordsTop.getY());
-			texCoords.add(texCoordsBottom.getX());		texCoords.add(texCoordsTop.getY());
-			texCoords.add(texCoordsBottom.getX());		texCoords.add(texCoordsBottom.getY());
-			texCoords.add(texCoordsTop.getX());			texCoords.add(texCoordsBottom.getY());
-			
-			FloatBuffer texCoordsBuffer = Util.createFillipedFloatBuffer(texCoords);
-			GameName.getGLContext().addBufferBind(texCoordsBuffer, GL_ARRAY_BUFFER_BINDING, textureVBO, GL_STATIC_DRAW, 'f');
-		}
+		//Texture
+		List<Float> texCoords = new ArrayList<Float>();
 		
-		if(getColor() != null) {
-			List<Float> colors = new ArrayList<Float>();
-			
-			colors.add(getColor().getX());	colors.add(getColor().getY()); 	colors.add(getColor().getZ());
-			colors.add(getColor().getX());	colors.add(getColor().getY()); 	colors.add(getColor().getZ());
-			colors.add(getColor().getX());	colors.add(getColor().getY()); 	colors.add(getColor().getZ());
-			colors.add(getColor().getX());	colors.add(getColor().getY()); 	colors.add(getColor().getZ());
-			
-			FloatBuffer colorsBuffer = Util.createFillipedFloatBuffer(colors);
-			GameName.getGLContext().addBufferBind(colorsBuffer, GL_ARRAY_BUFFER_BINDING, colorVBO, GL_STATIC_DRAW, 'f');
-		}
+		texCoords.add(texCoordsTop.getX());			texCoords.add(texCoordsTop.getY());
+		texCoords.add(texCoordsBottom.getX());		texCoords.add(texCoordsTop.getY());
+		texCoords.add(texCoordsBottom.getX());		texCoords.add(texCoordsBottom.getY());
+		texCoords.add(texCoordsTop.getX());			texCoords.add(texCoordsBottom.getY());
+		
+		FloatBuffer texCoordsBuffer = BufferUtil.createFillipedFloatBuffer(texCoords);
+		GameName.getGLContext().addBufferBind(texCoordsBuffer, GL_ARRAY_BUFFER_BINDING, textureVBO, GL_STATIC_DRAW, 'f');
 	}
 	
 	protected float getX() {
@@ -125,9 +108,7 @@ public abstract class Render2D extends Renderable {
 	
 	protected float getWidth() {
 		return width;
-	}
-	
-	
+	}	
 	
 	protected void setX(float x) {
 		pos.setX(x);
@@ -138,22 +119,22 @@ public abstract class Render2D extends Renderable {
 	}
 
 	protected void setWidth(float width) {
-		forceVBOUpdate();
 		this.width = width;
+		forceVBOUpdate();
 	}
 
 	protected void setHeight(float height) {
-		forceVBOUpdate();
 		this.height = height;
+		forceVBOUpdate();
 	}
 	
-	protected void setTexCoordsTop(Vector2f texCoordsTop) {
-		forceVBOUpdate();
+	public void setTexCoordsTop(Vector2f texCoordsTop) {
 		this.texCoordsTop = texCoordsTop;
+		forceVBOUpdate();
 	}
 
-	protected void setTexCoordsBottom(Vector2f texCoordsBottom) {
-		forceVBOUpdate();
+	public void setTexCoordsBottom(Vector2f texCoordsBottom) {
 		this.texCoordsBottom = texCoordsBottom;
+		forceVBOUpdate();
 	}
 }

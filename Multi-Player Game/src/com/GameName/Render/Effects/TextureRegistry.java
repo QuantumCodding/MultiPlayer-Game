@@ -3,27 +3,45 @@ package com.GameName.Render.Effects;
 import java.util.ArrayList;
 
 import com.GameName.Util.Registry;
+import com.GameName.Util.RegistryStorage;
 
 public class TextureRegistry extends Registry<Texture> {
-private static Texture[] textures;
+	private static Texture[] textures;
+	private static RegistryStorage<Texture> regstries;
+	private static ArrayList<Texture> unregisteredTextures;
 	
-	public static void register() {
-		ArrayList<Texture> unregisteredTextures = new ArrayList<Texture>();
-		
-		for(Registry<?> reg : getRegistries()) {
-			for(Texture texture : (Texture[]) reg.toArray()) {
-				unregisteredTextures.add(texture);
-			}
-		}
-		
-		getRegistries().clear();
+	static {
+		regstries = new RegistryStorage<Texture>();
+		unregisteredTextures = new ArrayList<Texture>();
+	}
+	
+	public static Texture[] getTextures() {
+		return textures;
+	}
+	
+	public void addTexture(Texture texture) {
+		registerOBJ(texture);
+	}
+
+	public static void register() {regstries.register();}
+	
+	public static void addRegistry(TextureRegistry reg) {
+		regstries.addRegistry(reg);
+	}
+	
+	protected void register(Texture e) {
+		unregisteredTextures.add(e);
+	}
+	
+	protected void registrtionConcluded() {
 		textures = unregisteredTextures.toArray(new Texture[unregisteredTextures.size()]);
-				
-		isConcluded = true;
+		
+		unregisteredTextures.clear();
+		unregisteredTextures = null;
 	}
 	
 	public static Texture accessByName(String name) {
-		for(Texture texture : getGuis()) {
+		for(Texture texture : getTextures()) {
 			if(texture.getTextureName().equals(name)) {
 				return texture;
 			}
@@ -32,21 +50,11 @@ private static Texture[] textures;
 		return null;
 	}
 	
-	public static Texture getSound(int index) {
-		return getGuis()[index];
-	}
-	
-	public static Texture[] getGuis() {
-		return textures;
-	}
-	
 	public static void cleanUp() {
 		for(Texture texture : textures) {
-			texture.cleanUp();
+			if(texture != null) {
+				texture.cleanUp();
+			}
 		}
-	}
-	
-	public void addTexture(Texture texture) {
-		register(texture);
-	}	
+	} 
 }

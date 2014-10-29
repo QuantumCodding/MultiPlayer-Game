@@ -1,6 +1,7 @@
 package com.GameName.GUI;
 
 import com.GameName.GUI.Components.GUIComponent;
+import com.GameName.Main.GameName;
 import com.GameName.Render.Effects.Texture;
 import com.GameName.Render.Types.Render2D;
 
@@ -22,10 +23,12 @@ public abstract class GUI extends Render2D {
 	}	
 
 	public void open() {
+		GameName.render.add(this);
 		isOpen = true;
 	}
 	
 	public void close() {
+		GameName.render.remove(this);
 		isOpen = false;
 	}
 	

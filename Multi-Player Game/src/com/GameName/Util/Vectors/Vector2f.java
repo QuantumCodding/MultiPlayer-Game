@@ -44,5 +44,19 @@ public class Vector2f {
 		return y;
 	}
 	
+	public void setX(float x) {
+		this.x = x;
+	} 
 	
+	public void setY(float y) {
+		this.y = y;
+	} 
+	
+	public void addX(float x) {
+		this.x += x;
+	} 
+	
+	public void addY(float y) {
+		this.y += y;
+	} 
 }
