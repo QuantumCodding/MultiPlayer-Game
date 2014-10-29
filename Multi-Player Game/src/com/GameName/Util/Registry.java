@@ -3,34 +3,17 @@ package com.GameName.Util;
 import java.util.ArrayList;
 
 public abstract class Registry<E> {
-	private static ArrayList<Registry<?>> registries;
-	protected static boolean isConcluded;
-	
-	static {
-		registries = new ArrayList<Registry<?>>();
-	}
-	
-	public static void addRegistry(Registry<?> registry) {
-		registries.add(registry);
-	}
-		
-	protected static ArrayList<Registry<?>> getRegistries() {
-		return registries;
-	}
-	
-	public static boolean isConcluded() {
-		return isConcluded;
-	}
-	
 	private ArrayList<E> registered;
-	
+
 	protected Registry() {
 		registered = new ArrayList<E>();
 	}
 	
-	public void register(E obj) {
+	public void registerOBJ(E obj) {
 		registered.add(obj);
 	}
+	
+	//For Conclusion:
 	
 	@SuppressWarnings("unchecked")
 	public E[] toArray() {
@@ -40,4 +23,7 @@ public abstract class Registry<E> {
 	public ArrayList<E> getRegistry() {
 		return registered;
 	}
+	
+	protected abstract void register(E e);
+	protected abstract void registrtionConcluded();
 }
