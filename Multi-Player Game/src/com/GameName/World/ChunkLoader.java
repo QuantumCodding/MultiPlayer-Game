@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import com.GameName.Cube.Cube;
+import com.GameName.Main.GameName;
+import com.GameName.Main.Debugging.Logger;
+import com.GameName.Render.Effects.TextureRegistry;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
 import com.GameName.Util.Vectors.Vector3f;
@@ -63,7 +66,8 @@ public class ChunkLoader {
 			Chunk chunk = unloadedChunks.get(i);
 			
 			chunk.setIsLoaded(false);
-			chunk.deleteBuffers();
+			GameName.render.remove(chunk.getRender());
+			chunk.getRender().cleanUp();
 			unloadedChunks.remove(i);
 			
 			chunk = null;
@@ -72,6 +76,7 @@ public class ChunkLoader {
 	
 	public void loadChunks() {
 //		System.out.println("Loading Chunks");
+		Logger.println("Chunk Loader is loding chunks");
 				
 		for(int radius = 0; radius < loadRadius; radius ++) {
 			
@@ -90,8 +95,7 @@ public class ChunkLoader {
 					getLoadedChunks().add(chunk);
 				}
 				
-				if(chunk.isLoaded()) {/*System.out.println("Chunk " +  loadPos.valuesToString() + " is loaded");*/ continue;}
-//				System.out.println("Loading chunk " +  loadPos.valuesToString());
+				if(chunk.isLoaded()) {continue;}
 				
 				File loadFile = new File(fileLoc +
 						(int) (loadPos.getX()) + " x " + (int) (loadPos.getY()) + " x " + (int) (loadPos.getZ())
@@ -113,8 +117,11 @@ public class ChunkLoader {
 					}
 					
 					chunk.setIsLoaded(true);
+					chunk.getRender().setTexture(Cube.getTextureSheet());
+					
+					GameName.render.add(chunk.getRender());
 				} catch(IOException e) {
-					System.err.println("Failed to load Chunk " + loadPos.valuesToString() + " from World " + world.getName());
+					Logger.print("Failed to load Chunk " + loadPos.valuesToString() + " from World " + world.getName()).setType("ERROR").end();
 					e.printStackTrace();
 				}				
 			}}}			
@@ -139,7 +146,7 @@ public class ChunkLoader {
 	
 	public boolean checkChunksVBO() {
 		for(Chunk chunk : getLoadedChunks()) {
-			if(chunk != null && chunk.isVboUpdataRequested()) {
+			if(chunk != null && chunk.getRender().isVboUpdateNeeded()) {
 				return true;
 			}	
 		}	
@@ -151,8 +158,8 @@ public class ChunkLoader {
 		for(int i = 0; i < getLoadedChunks().size(); i ++) { //Chunk chunk : getLoadedChunks()
 			Chunk chunk = getLoadedChunks().get(i);
 			
-			if(chunk != null && chunk.isVboUpdataRequested()) {
-				chunk.updataVBO();
+			if(chunk != null && chunk.getRender().isVboUpdateNeeded()) {
+				chunk.getRender().updateVBOs();
 			}	
 		}	
 	}
@@ -162,7 +169,7 @@ public class ChunkLoader {
 			Chunk chunk = getLoadedChunks().get(i);
 			
 			if(chunk != null) {
-				chunk.updataVBO();
+				chunk.getRender().updateVBOs();
 			}	
 		}	
 	}
@@ -197,7 +204,9 @@ public class ChunkLoader {
 	
 	public void cleanUp() {
 		for(Chunk chunk : getLoadedChunks()) {
-			if(chunk != null) chunk.cleanUp();
+			if(chunk != null) {
+				chunk.getRender().cleanUp();
+			}
 		}
 	}
 

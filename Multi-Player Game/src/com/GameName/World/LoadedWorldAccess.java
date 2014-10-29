@@ -114,9 +114,9 @@ public class LoadedWorldAccess {
 			if(x > minPos.getX()) cubes[0] = getCube(x - 1, y, z); // 0 -x			1				z         
 			if(z < maxPos.getZ()) cubes[1] = getCube(x, y, z + 1); // 1 +z		0	C	2		-x	c	x     
 			if(x < maxPos.getX()) cubes[2] = getCube(x + 1, y, z); // 2 +x			3			   -z         
-			if(z > minPos.getZ()) cubes[3] = getCube(x, y, z - 1); // 3 -z					5				+y
-			if(y > minPos.getY()) cubes[4] = getCube(x, y - 1, z); // 4 -y					C				 c
-			if(y < maxPos.getY()) cubes[5] = getCube(x, y + 1, z); // 5 +y					4				-y
+			if(z > minPos.getZ()) cubes[3] = getCube(x, y, z - 1); // 3 -z					4				+y
+			if(y < maxPos.getY()) cubes[4] = getCube(x, y + 1, z); // 4 +y					C				 c
+			if(y > minPos.getY()) cubes[5] = getCube(x, y - 1, z); // 5 -y					5				-y
 		} catch(NullPointerException e) {
 			System.err.println(new Vector3f(x, y, z));
 			

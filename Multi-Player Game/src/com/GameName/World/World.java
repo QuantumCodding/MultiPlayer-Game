@@ -3,8 +3,6 @@ package com.GameName.World;
 import java.io.File;
 
 import com.GameName.Cube.Cube;
-import com.GameName.Render.RenderEngine;
-import com.GameName.Util.Time;
 import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Object.WorldObject;
 
@@ -16,6 +14,7 @@ public class World {
 	public static final int CHUNK_SIZE = 10;
 	public static final int VERTICE_SIZE = CHUNK_SIZE + 2;
 	public static final float SCALE = 2;
+	public static final float CUBE_SIZE = 0.2f;
 	
 	private int sizeX, sizeY, sizeZ;
 	private int chunkX, chunkY, chunkZ;
@@ -39,14 +38,6 @@ public class World {
 		this.id = -1;
 			
 		loadedWorld = new LoadedWorld(this, name);
-		
-		double time = Time.getTime();
-		
-		System.out.print("World " + id + " Starting Generation: ");
-//		if(!isGenerated)
-//			generate();
-		
-		System.out.println("Done In " + RenderEngine.oneDecimal(((double) Time.getTime() - time) / Time.getSECONDS()) + " Seconds");
 	}
 	
 	public void setId(int id) {
