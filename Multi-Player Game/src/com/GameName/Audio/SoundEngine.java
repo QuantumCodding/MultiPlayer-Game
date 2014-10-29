@@ -10,19 +10,21 @@ import static org.lwjgl.openal.AL10.alGenSources;
 import static org.lwjgl.openal.AL10.alGetSourcei;
 import static org.lwjgl.openal.AL10.alSource3f;
 import static org.lwjgl.openal.AL10.alSourcePause;
+import static org.lwjgl.openal.AL10.alSourcePlay;
 import static org.lwjgl.openal.AL10.alSourceStop;
+import static org.lwjgl.openal.AL10.alSourcef;
 import static org.lwjgl.openal.AL10.alSourcei;
 
 import java.util.ArrayList;
 
-import javax.management.InstanceAlreadyExistsException;
+import com.GameName.Main.GameName;
+import com.GameName.Util.IEngine;
+import com.GameName.Util.Vectors.Vector3f;
 
-public class SoundEngine {
-	private Sound[] sounds;
+public class SoundEngine implements IEngine<SoundEvent> {
 	public static int defaultSource;
-	private boolean isConcluded;
 	
-	private ArrayList<SoundRegistry> registries;
+	public ArrayList<SoundEvent> soundEvents;
 	
 	static {
 		defaultSource = alGenSources();
@@ -31,82 +33,53 @@ public class SoundEngine {
 		alSource3f(defaultSource, AL_POSITION, 0, 0, 0);
 	}
 	
-	public SoundEngine() {
-		registries = new ArrayList<SoundRegistry>();
-		
-		SoundRegistry reg = new SoundRegistry();
-		
-		reg.addSound(new Sound("01 In The End", "wav"));		
-		reg.addSound(new Sound("Awesome Music", "wav"));	
-		reg.addSound(new Sound("Can\'t Hold Us", "wav"));	
-		reg.addSound(new Sound("Come And Get It", "wav"));
-				
-		addRegister(reg);
+	public SoundEngine() {		
+		soundEvents = new ArrayList<SoundEvent>();
 	}
-	
-	public void addRegister(SoundRegistry regester) {
-		registries.add(regester);
-	}
-	
-	public void registerSounds() throws InstanceAlreadyExistsException {
-		if(isConcluded) throw new InstanceAlreadyExistsException("Sound Engine is already Concluded! Run clean-up befor Concluded");
 		
-		ArrayList<Sound> toAdd = new ArrayList<Sound>();
-		for(SoundRegistry reg : registries) {
-			for(Sound sound : reg.toArray()) {
-				toAdd.add(sound);
-			}
+	public void add(SoundEvent obj) {
+		soundEvents.add(obj);
+	}
+
+	public void remove(SoundEvent obj) {
+		soundEvents.remove(obj);
+	}
+
+	public void step(float delta) {
+		for (int i = 0; i < soundEvents.size(); i ++) {
+			playSound(soundEvents.get(i));
+			soundEvents.remove(i);
 		}
-		
-		registries.clear();
-		sounds = toAdd.toArray(new Sound[toAdd.size()]);
-		
-		isConcluded = true;
 	}
+	
+	public void playSound(SoundEvent event) {
+		alSourcef(event.getSource(), AL_GAIN, event.getGain());
+		alSourcef(event.getSource(), AL_PITCH, event.getPitch());
 		
-	public synchronized void pauseSound(final int source) {
+		Vector3f playPos = GameName.player.getAccess().getPos().subtract(event.getPos());
+		alSource3f(event.getSource(), AL_POSITION, playPos.getX(), playPos.getY(), playPos.getZ());
+		
+		alSourcei(event.getSource(), AL_BUFFER, event.getSound().getId());	
+		alSourcePlay(event.getSource());
+	}
+	
+	
+	public void pauseSound(int source) {
 		alSourcePause(source);
 	}
 	
-	public synchronized void stopSound(final int source) {
+	public void stopSound(int source) {
 		alSourceStop(source);
 	}
 	
-	public int getPlaying(int source) {
+	public int getIsPlaying(int source) {
 		return alGetSourcei(source, AL_BUFFER);
-	}
-	
-	public boolean isConcluded() {
-		return isConcluded;
-	}
-	
-	public Sound accessByName(String name) {
-		for(Sound sound : sounds) {
-			if(sound.getName().equals(name)) {
-				return sound;
-			}
-		}
-		
-		return null;
-	}
-	
-	public Sound accessById(int id) {
-		for(Sound sound : sounds) {
-			if(sound.getId() == id) {
-				return sound;
-			}
-		}
-		
-		return null;
-	}
-	
-	public Sound getSound(int index) {
-		return sounds[index];
 	}
 
 	public void cleanUp() {
-		for(int i = 0; i < sounds.length; i ++)
-			alDeleteBuffers(sounds[i].getId());
+		for(int i = 0; i < SoundRegistry.getSounds().length; i ++) {
+			alDeleteBuffers(SoundRegistry.getSounds()[i].getId());
+		}
 		
 		alDeleteSources(defaultSource);
 	}
