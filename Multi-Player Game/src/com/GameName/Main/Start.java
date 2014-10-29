@@ -17,10 +17,13 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.openal.AL;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-//import static org.lwjgl.opengl.GL15.*;
+
+import com.GameName.Audio.SoundRegistry;
+import com.GameName.Render.Effects.ShaderRegistry;
+import com.GameName.Render.Effects.TextureRegistry;
 
 /**
- * @author QuantumCodding
+ * @author QuantumCoding
  *
  */
 
@@ -33,7 +36,7 @@ public class Start {
 	public static final PrintStream defualt_err = System.err;
 	public static final PrintStream defualt_out = System.out;
 	
-	public static void main(String[] args) {
+	public static void main(String... args) {
 		Start start = new Start();
 		
 		if(args.length > 0) {
@@ -107,6 +110,10 @@ public class Start {
 		try {
 			GameName.cleanUp();
 			
+			SoundRegistry.cleanUp();
+			TextureRegistry.cleanUp();
+			ShaderRegistry.cleanUp();
+			
 			Display.destroy();
 			
 			Controllers.destroy();
@@ -118,7 +125,9 @@ public class Start {
 		} catch(NullPointerException e) {
 			e.printStackTrace();
 			
-		} finally {			
+		} finally {		
+//			Logger.saveLog(new File());
+			
 			System.exit(1);
 		}
 	}
