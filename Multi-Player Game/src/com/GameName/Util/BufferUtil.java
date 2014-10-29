@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.lwjgl.BufferUtils;
 
-public class Util {
+public class BufferUtil {
 	
 	public static FloatBuffer createFillipedFloatBuffer(List<Float> values) {
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(values.size());
