@@ -36,7 +36,7 @@ public class GameThreadTracker extends DebugPanel {
 	private int avgTPS;
 	
 	public GameThreadTracker(final GameThread gameThread) {
-		super();
+		super(gameThread.getName());
 		
 		this.gameThread = gameThread;
 		Font font = new Font("", 0, 15);
@@ -80,14 +80,16 @@ public class GameThreadTracker extends DebugPanel {
 	public void update() {
 		float tpsDiv = (float) gameThread.getTPS() / (float) gameThread.getTickRate();
 		
-		tpsLabel.setForeground(tpsDiv > 0.5 ? Color.GREEN : tpsDiv > 0.25 ? Color.YELLOW : Color.RED);
+		tpsLabel.setForeground(gameThread.isPaused() ? Color.BLUE : 
+			tpsDiv > 0.5 ? Color.GREEN : tpsDiv > 0.25 ? Color.YELLOW : Color.RED
+		);
 		
 		if(gameThread.getTickRate() != ThreadManager.UNCAPED_TICK_RATE) 
 			tpsLabel.setText(gameThread.getTPS() + " / " + gameThread.getTickRate());
 		else
 			tpsLabel.setText(gameThread.getTPS() + "");
 		
-		if(count ++ > TICK_CHECK_TIME) {
+		if(++ count > TICK_CHECK_TIME) {
 			updateChart();
 			count = 0;
 		}
@@ -125,8 +127,8 @@ public class GameThreadTracker extends DebugPanel {
 			g.fillRect(i * TICK_SIZE + CHART_OFFSET, 90, TICK_SIZE, (int) -(ratio * pastTPS[i]));
 		}
 		
-		g.setColor(Color.ORANGE);//(int) (Math.random() * 10 * 5 + 10)
-		g.drawLine(CHART_OFFSET, 90 - (int) (ratio * avgTPS), CHART_WIDTH + CHART_OFFSET, 90 - (int) (ratio * avgTPS));
+//		g.setColor(Color.ORANGE);//(int) (Math.random() * 10 * 5 + 10)
+//		g.drawLine(CHART_OFFSET, 90 - (int) (ratio * avgTPS), CHART_WIDTH + CHART_OFFSET, 90 - (int) (ratio * avgTPS));
 		
 		try {
 			Thread.sleep(10);
@@ -134,6 +136,11 @@ public class GameThreadTracker extends DebugPanel {
 			e.printStackTrace();
 		}
 		
+//		update();
 		repaint();
+	}
+
+	public int getAvgTPS() {
+		return avgTPS;
 	}
 }

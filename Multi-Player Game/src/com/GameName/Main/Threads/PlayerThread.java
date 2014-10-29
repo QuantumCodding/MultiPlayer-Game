@@ -13,7 +13,7 @@ public class PlayerThread extends GameThread {
 	}
 
 	void init() {
-		player.resetPlayer();
+//		player.resetPlayer();
 	}
 
 	void tick() {

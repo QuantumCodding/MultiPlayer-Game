@@ -16,7 +16,7 @@ public class ClassUpdataThread extends GameThread {
 	void tick() {
 		Control.tick();
 		GameName.guiManager.update();
-		GameName.debugWindow.tick();
+		GameName.debugWindow.update();
 	}
 
 }

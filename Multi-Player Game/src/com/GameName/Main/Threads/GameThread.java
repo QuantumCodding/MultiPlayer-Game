@@ -97,10 +97,7 @@ public abstract class GameThread implements Runnable {
 			if(tick) {
 				tick();				
 				frames ++;
-				
-				tracker.update();
-				
-				if(isPaused) System.out.println("How did " + name + " updata?");
+							
 			} else {				
 				try	{
 					Thread.sleep(1);

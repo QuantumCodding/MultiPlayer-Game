@@ -3,30 +3,40 @@ package com.GameName.Main.Threads;
 import java.util.ArrayList;
 
 import com.GameName.Util.Registry;
+import com.GameName.Util.RegistryStorage;
 
 public class ThreadRegistry extends Registry<GameThread> {
 	private static GameThread[] threads;
+	private static RegistryStorage<GameThread> regstries;
+	private static ArrayList<GameThread> unregisteredGameThreads;
 	
-	public static void register() {
-		ArrayList<GameThread> unregisteredThreads = new ArrayList<GameThread>();
-		
-		for(Registry<?> reg : getRegistries()) {
-			for(GameThread thread : (GameThread[]) reg.toArray()) {
-				unregisteredThreads.add(thread);
-			}
-		}
-		
-		getRegistries().clear();
-		threads = unregisteredThreads.toArray(new GameThread[unregisteredThreads.size()]);
-				
-		isConcluded = true;
+	static {
+		regstries = new RegistryStorage<GameThread>();
+		unregisteredGameThreads = new ArrayList<GameThread>();
 	}
 	
-	public static GameThread[] getSounds() {
+	public static GameThread[] getThreads() {
 		return threads;
 	}
 	
 	public void addThread(GameThread thread) {
-		register(thread);
+		registerOBJ(thread);
+	}
+
+	public static void register() {regstries.register();}
+	
+	public static void addRegistry(ThreadRegistry reg) {
+		regstries.addRegistry(reg);
+	}
+	
+	protected void register(GameThread e) {
+		unregisteredGameThreads.add(e);
+	}
+	
+	protected void registrtionConcluded() {
+		threads = unregisteredGameThreads.toArray(new GameThread[unregisteredGameThreads.size()]);
+		
+		unregisteredGameThreads.clear();
+		unregisteredGameThreads = null;
 	}
 }
