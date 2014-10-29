@@ -17,9 +17,12 @@ import com.GameName.Cube.Cubes.StoneCube;
 import com.GameName.Cube.Cubes.TestCube;
 import com.GameName.Cube.Render.DefaultCubeRender;
 import com.GameName.Cube.Render.ICubeRender;
+import com.GameName.Main.Debugging.Logger;
 import com.GameName.Physics.Coalition.BoundingArea;
 import com.GameName.Physics.Coalition.BoundingBox;
 import com.GameName.Render.Effects.Texture;
+import com.GameName.Render.Effects.TextureRegistry;
+import com.GameName.Util.Time;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
 import com.GameName.Util.Vectors.Vector2f;
@@ -28,6 +31,10 @@ import com.GameName.Util.Vectors.Vector3f;
 public class Cube {
 	private static DefaultCubeRender defaultCubeRender;
 	
+	/**
+	 * Use TextureRegistry.accessByName("Cube Texture")
+	 */
+	@Deprecated
 	private static Texture textureSheet;
 	private static int textureSheetSideLength;
 	private static int textureSheetMaxFrames;
@@ -246,10 +253,8 @@ public class Cube {
 	public static void regesterCubes() {
 		CubeRegistry regestry = new CubeRegistry();
 		
-		regestry.addCube(Air); regestry.addCube(TestCube); regestry.addCube(ColorfulTestCube); 
-		
-		regestry.addCube(StoneCube);
-		
+		regestry.addCube(Air); regestry.addCube(TestCube); regestry.addCube(ColorfulTestCube); 		
+		regestry.addCube(StoneCube);		
 		regestry.addCube(GoldCube); regestry.addCube(CopperCube);
 		
 		CubeRegistry.addRegistry(regestry);
@@ -268,6 +273,11 @@ public class Cube {
 			
 			ImageIO.write(generateTextureSheet(), "PNG", saveLoc);
 			textureSheet = new Texture(saveLoc.getAbsolutePath()); //TextureLoader.getTexture("PNG",  new FileInputStream(new File("res/textures/cubes/MapingSheet.png")));//
+			
+			TextureRegistry reg = new TextureRegistry();			
+			reg.addTexture(textureSheet);
+			TextureRegistry.addRegistry(reg);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -498,6 +508,8 @@ public class Cube {
 	 * 	Creates a BufferedImage of all cube textures laded out in a sheet that is a perfect square
 	 */	
 	private static BufferedImage generateTextureSheet() {
+		long startTime = Time.getTime(); //TODO: Remove Timer
+		
 		int totalArea = 0;
 		int maxTextureSize = 0;
 		
@@ -542,9 +554,7 @@ public class Cube {
 				added[i] = cube.frames < i;
 			}
 		}
-		
-		System.out.println("Starting Cycle");
-		
+				
 		while(cubesAdded < added.length) {
 			if(index >= added.length) {
 				index = 0;
@@ -621,6 +631,7 @@ public class Cube {
 			}
 		}
 		
+		Logger.print("Texture Sheet made in: " + ((double) (Time.getTime() - startTime) / (double) Time.getSECONDS())).setType("Setup").end(); //TODO: Remove Timer
 		return spriteSheetImage;
 	}
 	
@@ -633,7 +644,9 @@ public class Cube {
 
 	/**
 	 * 	Returns the Texture Sheet
+	 *	@see TextureRegistry.accessByName("Cube Texture")
 	 */	
+	@Deprecated
 	public static Texture getTextureSheet() {
 		return textureSheet;
 	}
@@ -657,6 +670,19 @@ public class Cube {
 	 */	
 	public static Cube getCubeByID(int id) {
 		return CubeRegistry.getCubes()[id];
+	}
+	
+	/**
+	 * 	Returns a cube array based on a set of id's
+	 */	
+	public static Cube[] getCubesByID(int... ids) {
+		Cube[] cubes = new Cube[ids.length];
+		
+		for(int i = 0; i < ids.length; i ++) {
+			cubes[i] = CubeRegistry.getCubes()[ids[i]];
+		}
+		
+		return cubes;
 	}
 
 	/**

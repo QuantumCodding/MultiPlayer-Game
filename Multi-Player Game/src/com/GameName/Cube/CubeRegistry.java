@@ -3,23 +3,16 @@ package com.GameName.Cube;
 import java.util.ArrayList;
 
 import com.GameName.Util.Registry;
+import com.GameName.Util.RegistryStorage;
 
 public class CubeRegistry extends Registry<Cube> {
 	private static Cube[] cubes;
+	private static RegistryStorage<Cube> regstries;
+	private static ArrayList<Cube> unregisteredCubes;
 	
-	public static void register() {
-		ArrayList<Cube> unregisteredCubes = new ArrayList<Cube>();
-		
-		for(Registry<?> reg : getRegistries()) {
-			for(Cube cube : (Cube[]) reg.toArray()) {				
-				unregisteredCubes.add(cube);
-			}
-		}
-		
-		getRegistries().clear();
-		cubes = unregisteredCubes.toArray(new Cube[unregisteredCubes.size()]);
-				
-		isConcluded = true;
+	static {
+		regstries = new RegistryStorage<Cube>();
+		unregisteredCubes = new ArrayList<Cube>();
 	}
 	
 	public static Cube[] getCubes() {
@@ -27,6 +20,23 @@ public class CubeRegistry extends Registry<Cube> {
 	}
 	
 	public void addCube(Cube cube) {
-		register(cube);
+		registerOBJ(cube);
+	}
+
+	public static void register() {regstries.register();}
+	
+	public static void addRegistry(CubeRegistry reg) {
+		regstries.addRegistry(reg);
+	}
+	
+	protected void register(Cube e) {
+		unregisteredCubes.add(e);
+	}
+	
+	protected void registrtionConcluded() {
+		cubes = unregisteredCubes.toArray(new Cube[unregisteredCubes.size()]);
+		
+		unregisteredCubes.clear();
+		unregisteredCubes = null;
 	}
 }

@@ -1,35 +1,13 @@
 package com.GameName.World;
 
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.GL_LIGHTING;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glDrawArrays;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glScalef;
-import static org.lwjgl.opengl.GL11.glTranslatef;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glDeleteBuffers;
-import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-
 import java.util.ArrayList;
 
 import com.GameName.Cube.Cube;
 import com.GameName.Main.GameName;
-import com.GameName.Render.RenderUtil;
-import com.GameName.Render.Effects.Shader;
-import com.GameName.Render.Effects.Texture;
 import com.GameName.Util.Tag.Tag;
 import com.GameName.Util.Tag.TagGroup;
 import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.World.Render.ChunkRender;
 
 public class Chunk {
 	private final float MINIMUM_LIGHT_DEFUTION = 0.5f;
@@ -37,10 +15,11 @@ public class Chunk {
 	private boolean isInitialized;
 	private boolean hasCubes, isLoaded;
 	private int cubeCount;
-	private int[] vboData;
 	
 	private final int worldId;
 	private final int x, y, z;
+	
+	private ChunkRender render;
 	
 	private int[] cubes;
 	private int[] cubeMetadata;
@@ -50,9 +29,9 @@ public class Chunk {
 	private float[]   lightValueMap;
 	private float 	  ambiantLight = (float) ((1d / (double) World.MAX_LIGHT) * World.AMBIANT_LIGHT);
 	
-	private boolean vboUpdataRequested, extraVBOUpdate;
+//	private boolean vboUpdataRequested, extraVBOUpdate;
 	
-	protected Chunk(int size, int worldId, int x, int y, int z) { 
+	public Chunk(int size, int worldId, int x, int y, int z) { 
 		this.worldId = worldId;
 		
 		this.x = x; this.y = y; this.z = z;
@@ -69,14 +48,19 @@ public class Chunk {
 			lightValueMap[i] = ambiantLight;
 		}
 		
+		render = new ChunkRender(this);
 		isInitialized = true;
 	}
 	
 	public void update() {
-		if(extraVBOUpdate) {
-			vboUpdataRequested = true;
-			extraVBOUpdate = false;
-		}
+//		if(extraVBOUpdate) {
+//			vboUpdataRequested = true;
+//			extraVBOUpdate = false;
+//		}
+	}
+	
+	public void randomUpdate() {
+		
 	}
 	
 	public void updateLightMap(int x, int y, int z, float[] color, float intensity) {
@@ -114,7 +98,7 @@ public class Chunk {
 		intensity -= ((1 / intensity) * Cube.getCubeByID(getCube(x, y, z)).getOpacity(getCubeMetadata(x, y, z))) + MINIMUM_LIGHT_DEFUTION;
 		
 		if(intensity <= ambiantLight){
-			vboUpdataRequested = true;	return; 
+			render.forceVBOUpdate(); return; 
 		}
 		
 		updateLightMap(x - 1, y, z, color, intensity);
@@ -124,12 +108,13 @@ public class Chunk {
 	}	
 	
 	public int getCube(int x, int y, int z) {
-		if(!isInitialized) extraVBOUpdate = true;
+//		if(!isInitialized) extraVBOUpdate = true;
+		System.out.println(new Vector3f(x, y, z).valuesToString());
 		return cubes[x + (y * size) + (z * size * size)];
 	}
 	
 	public int getCubeMetadata(int x, int y, int z) {
-		if(!isInitialized) extraVBOUpdate = true;
+//		if(!isInitialized) extraVBOUpdate = true;
 		return cubeMetadata[x + (y * size) + (z * size * size)];
 	}
 	
@@ -157,6 +142,13 @@ public class Chunk {
 		handelUpdate(x, y, z, lastCube, lastMetadata);
 	}
 	
+	/**
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param lastCube
+	 * @param lastMetadata
+	 */
 	private void handelUpdate(int x, int y, int z, Cube lastCube, int lastMetadata) {
 		Cube cube = Cube.getCubeByID(getCube(x, y, z));
 		int metadata = getCubeMetadata(x, y, z);		
@@ -190,7 +182,8 @@ public class Chunk {
 			if(z == size - 1) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y, this.z + 1); if(chunk != null && chunk.isLoaded()) chunk.forceVBOUpdate();}
 		}
 		
-		vboUpdataRequested = true;
+		render.setHasCubes(hasCubes);		
+		render.forceVBOUpdate();
 	}
 	
 	public boolean isPosOnEdge(int x, int y, int z) {
@@ -198,80 +191,39 @@ public class Chunk {
 				x == size - 1 || y == size - 1 || z == size - 1;
 	}
 	
-	public synchronized void updataVBO() {	
-		if(hasCubes) {
-			vboData = RenderUtil.generateChunk(
-					x, y, z, WorldRegistry.getWorld(worldId), vboData);
+	public Cube[] getSurroundingCubes(int x, int y, int z) {
+		int[] cubes = new int[6];
+		World world = WorldRegistry.getWorld(worldId);
+		LoadedWorldAccess access = world.getLoadedWorld().getAccess();
+		
+		Vector3f minPos = access.getCenter().subtract(LoadedWorldAccess.getRenderRadius()).capMin(0);		
+		Vector3f maxPos = access.getCenter().add(LoadedWorldAccess.getRenderRadius()).capMax(world.getSizeAsVector()).subtract(1);
+			
+		if(!isPosOnEdge(x, y, z)) {
+			cubes[0] = getCube(x - 1, y, z); // 0 -x			1				z         
+			cubes[1] = getCube(x, y, z + 1); // 1 +z		0	C	2		-x	c	x     
+			cubes[2] = getCube(x + 1, y, z); // 2 +x			3			   -z         
+			cubes[3] = getCube(x, y, z - 1); // 3 -z					4				+y
+			cubes[4] = getCube(x, y + 1, z); // 4 +y					C				 c
+			cubes[5] = getCube(x, y - 1, z); // 5 -y					5				-y
+		
+		} else {
+			try {
+			
+			if(getX() - 1 > minPos.getX()) cubes[0] = world.getChunk(getX() - 1, getY(), getZ()).getCube(getSize(), y, z);
+			if(getZ() + 1 < maxPos.getZ()) cubes[1] = world.getChunk(getX(), getY(), getZ() + 1).getCube(x, y, 0);
+			if(getX() + 1 < maxPos.getX()) cubes[2] = world.getChunk(getX() + 1, getY(), getZ()).getCube(0, y, z);
+			if(getZ() - 1 > minPos.getZ()) cubes[3] = world.getChunk(getX(), getY(), getZ() - 1).getCube(x, y, getSize());
+			if(getY() + 1 < maxPos.getY()) cubes[4] = world.getChunk(getX(), getY() + 1, getZ()).getCube(x, 0, z);
+			if(getY() - 1 > minPos.getY()) cubes[5] = world.getChunk(getX(), getY() - 1, getZ()).getCube(x, getSize(), z);
+			
+			} catch(NullPointerException e) {
+				System.err.println("\n" + new Vector3f(x, y, z).valuesToString() + "\n\tMax: " + maxPos.valuesToString() + "\n\tMin: " + minPos.valuesToString() + "\n\tPos: " + getPos().valuesToString());				
+				System.err.println(e.getStackTrace()[0]);
+			}
 		}
 		
-		vboUpdataRequested = false;
-	}
-	
-	public void render() {
-//		System.out.println("Chunk " + x + " " + y + " " + z + " in world " + worldId + " rendered");
-		if(!hasCubes || vboData == null) return;
-		
-		glPushMatrix();
-			glDisable(GL_LIGHTING);
-			
-			glEnableVertexAttribArray(0); // Position
-			glEnableVertexAttribArray(1); // Texture Data
-			glEnableVertexAttribArray(2); // Color
-			
-		    glEnable(GL_TEXTURE_2D);
-			
-		    	Cube.getTextureSheet().bind();
-		    	GameName.render.basicShader.bind();
-	
-		        glRotatef(180, 0, 1, 0);
-		    	glTranslatef(0, -(WorldRegistry.getWorld(worldId).getSizeY() * (World.SCALE * 0.1f)), 0);
-		    	glScalef(World.SCALE, World.SCALE, World.SCALE);
-		        	    		
-	    			glColor3f((float) Math.random() * 10 % 2 / 10, (float) Math.random() * 10 % 1 / 10, (float) Math.random() * 10 % 1 / 10);//3
-		        	
-		        	glBindBuffer(GL_ARRAY_BUFFER, vboData[0]);
-		        		glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);		
-		        		
-		        	glBindBuffer(GL_ARRAY_BUFFER, vboData[1]);
-		        		glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
-		        		
-		        	glBindBuffer(GL_ARRAY_BUFFER, vboData[2]);
-		        		glVertexAttribPointer(2, 3, GL_FLOAT, false, 0, 0);
-	
-		        	glDrawArrays(GL_QUADS, 0, vboData[3]);
-	    		
-	    		
-		        Shader.unbind();
-		        Texture.unbind();
-		        
-		    glDisableVertexAttribArray(0); // Position						
-		    glDisableVertexAttribArray(1); // Texture Data
-		    glDisableVertexAttribArray(2); // Color
-			
-		    glDisable(GL_TEXTURE_2D);	                
-	    glPopMatrix();
-	}
-	
-//	public void finalize() {
-//		cleanUp();
-//	}
-	
-	public void deleteBuffers() {
-		if(vboData != null) {
-			GameName.getGLContext().deleteBuffer(vboData[0]);
-			GameName.getGLContext().deleteBuffer(vboData[1]);
-			GameName.getGLContext().deleteBuffer(vboData[2]);
-			GameName.getGLContext().deleteBuffer(vboData[3]);
-		}
-	}
-	
-	public void cleanUp() {
-		if(vboData != null) {		
-			glDeleteBuffers(vboData[0]);
-			glDeleteBuffers(vboData[1]);
-			glDeleteBuffers(vboData[2]);
-			glDeleteBuffers(vboData[3]);
-		}
+		return Cube.getCubesByID(cubes);	
 	}
 	
 	public float[] getLightColor(int x, int y, int z) {
@@ -308,9 +260,9 @@ public class Chunk {
 		return isInitialized;
 	}
 	
-	public boolean isVboUpdataRequested() {
-		return vboUpdataRequested;
-	}
+//	public boolean isVboUpdataRequested() {
+//		return vboUpdataRequested;
+//	}
 	
 	public boolean isLoaded() {
 		return isLoaded;
@@ -318,14 +270,6 @@ public class Chunk {
 
 	public boolean hasCubes() {
 		return hasCubes;
-	}
-	
-	public int[] getVboData() {
-		return vboData;
-	}
-
-	public synchronized void setVboData(int[] vboData) {
-		this.vboData = vboData;
 	}
 
 	public ArrayList<TagGroup> getTagGroup() {
@@ -346,9 +290,17 @@ public class Chunk {
 		
 		return tagLines;
 	}
+
+	public ChunkRender getRender() {
+		return render;
+	}
+	
+	public int getSize() {
+		return size;
+	}
 	
 	public void forceVBOUpdate() {
-		vboUpdataRequested = true;
+		render.forceVBOUpdate();
 	}
 	
 	public void setIsLoaded(boolean isLoaded) {
