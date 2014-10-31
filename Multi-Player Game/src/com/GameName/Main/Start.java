@@ -28,7 +28,6 @@ import com.GameName.Render.Effects.TextureRegistry;
  */
 
 public class Start {
-	public static final String vertion = "0.00.4";
 	public static final int WIDTH = 800;
 	public static final int HEIGHT = 600;
 	
@@ -86,7 +85,7 @@ public class Start {
 			Keyboard.destroy();
 			
 			Display.setDisplayMode(new DisplayMode(width, height));
-			Display.setTitle("Multi-Player Game V: " + vertion);
+			Display.setTitle("Multi-Player Game V: ");
 //			Display.setResizable(true);
 			
 //			ByteBuffer[] icon = null;//			

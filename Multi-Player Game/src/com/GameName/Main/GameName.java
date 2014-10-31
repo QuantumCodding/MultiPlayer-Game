@@ -16,14 +16,11 @@ import com.GameName.Command.Commands.SetPlayerPropertyCommand;
 import com.GameName.Command.Commands.TeleportPlayerCommand;
 import com.GameName.Cube.Cube;
 import com.GameName.Cube.CubeRegistry;
-import com.GameName.Cube.Render.DefaultCubeRender;
-import com.GameName.Cube.Render.TestCubeRender;
 import com.GameName.Entity.Entity;
 import com.GameName.Entity.EntityPlayer;
 import com.GameName.GUI.GUIManager;
 import com.GameName.GUI.GuiRegistry;
 import com.GameName.Main.Debugging.DebugWindow;
-import com.GameName.Main.Debugging.Logger;
 import com.GameName.Main.Threads.ClassUpdataThread;
 import com.GameName.Main.Threads.EntityThread;
 import com.GameName.Main.Threads.GLContextThread;
@@ -40,8 +37,6 @@ import com.GameName.Physics.PhysicsEngine;
 import com.GameName.Render.RenderEngine;
 import com.GameName.Render.Effects.ShaderRegistry;
 import com.GameName.Render.Effects.TextureRegistry;
-import com.GameName.Util.Vectors.Vector3f;
-import com.GameName.World.Chunk;
 import com.GameName.World.World;
 import com.GameName.World.WorldRegistry;
 import com.GameName.World.Object.WorldObject;
@@ -276,5 +271,9 @@ public class GameName implements ISetup {
 	
 	public static GLContextThread getGLContext() {
 		return glContextThread;
+	}
+	
+	public String getVersion() {
+		return "0.00.4";
 	}
 }

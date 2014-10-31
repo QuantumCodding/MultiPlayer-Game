@@ -6,4 +6,6 @@ public interface ISetup {
 	public void init();
 	public void postInit(); 
 	
+	public String getVersion();
+	
 }
