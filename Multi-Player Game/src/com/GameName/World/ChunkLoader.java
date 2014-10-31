@@ -8,7 +8,6 @@ import java.util.HashSet;
 import com.GameName.Cube.Cube;
 import com.GameName.Main.GameName;
 import com.GameName.Main.Debugging.Logger;
-import com.GameName.Render.Effects.TextureRegistry;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
 import com.GameName.Util.Vectors.Vector3f;
@@ -118,6 +117,15 @@ public class ChunkLoader {
 					
 					chunk.setIsLoaded(true);
 					chunk.getRender().setTexture(Cube.getTextureSheet());
+					
+					for(int check_X = -1; check_X <= 1; check_X ++)	{			
+					for(int check_Y = -1; check_Y <= 1; check_Y ++)	{				
+					for(int check_Z = -1; check_Z <= 1; check_Z ++) {
+						Chunk checkingChunk = getChunk(chunk.getPos().add(new Vector3f(check_X, check_Y, check_Z)));						
+						if(checkingChunk != null && checkingChunk.isInitialized() && checkingChunk.isRenderIncompleat()) {
+							checkingChunk.reattemptRender();
+						}					
+					}}}
 					
 					GameName.render.add(chunk.getRender());
 				} catch(IOException e) {

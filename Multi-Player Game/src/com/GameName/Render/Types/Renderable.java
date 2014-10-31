@@ -56,7 +56,7 @@ public abstract class Renderable {
 		if(checkVBOs()) return;		
 		preDraw();
 		
-//		applyProperties();
+		applyProperties();
 		draw();		
 		
 		postDraw();

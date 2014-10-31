@@ -14,7 +14,7 @@ import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 
 import com.GameName.Main.Start;
-import com.GameName.Main.Debugging.Logger;
+//import com.GameName.Main.Debugging.Logger;
 import com.GameName.Util.QueuedArray;
 
 public class GLContextThread extends GameThread {
@@ -55,7 +55,7 @@ public class GLContextThread extends GameThread {
 		int i = 0;	
 		if(sizeCheck(bufferIds, targets, usages, types, buffers)) {
 			for(Integer bufferId : bufferIds.getElements()) {
-				Logger.print("Binding Buffer: " + bufferId).setType("VBO").end();
+//				Logger.print("Binding Buffer: " + bufferId).setType("VBO").end();
 				
 				int target = targets.get(i).intValue();
 				int usage = usages.get(i).intValue(); 

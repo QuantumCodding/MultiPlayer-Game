@@ -209,7 +209,7 @@ public class RenderEngine implements IEngine<Renderable> {
 		
 		glRotatef(180, 0, 1, 0);
     	glScalef(World.SCALE, World.SCALE, World.SCALE);
-        	    		
+        
 		glColor3f((float) Math.random() * 10 % 2 / 10, (float) Math.random() * 10 % 1 / 10, (float) Math.random() * 10 % 1 / 10);//3
 		
 		glEnableVertexAttribArray(0); // Position
