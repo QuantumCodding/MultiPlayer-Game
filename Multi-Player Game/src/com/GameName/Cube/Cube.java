@@ -17,12 +17,8 @@ import com.GameName.Cube.Cubes.StoneCube;
 import com.GameName.Cube.Cubes.TestCube;
 import com.GameName.Cube.Render.DefaultCubeRender;
 import com.GameName.Cube.Render.ICubeRender;
-import com.GameName.Main.Debugging.Logger;
 import com.GameName.Physics.Coalition.BoundingArea;
 import com.GameName.Physics.Coalition.BoundingBox;
-import com.GameName.Render.Effects.Texture;
-import com.GameName.Render.Effects.TextureRegistry;
-import com.GameName.Util.Time;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
 import com.GameName.Util.Vectors.Vector2f;
@@ -31,19 +27,11 @@ import com.GameName.Util.Vectors.Vector3f;
 public class Cube {
 	private static DefaultCubeRender defaultCubeRender;
 	
-	/**
-	 * Use TextureRegistry.accessByName("Cube Texture")
-	 */
-	@Deprecated
-	private static Texture textureSheet;
-	private static int textureSheetSideLength;
-	private static int textureSheetMaxFrames;
-	
 	static {
 		defaultCubeRender = new DefaultCubeRender();
 	}
 	
-	private final int TEXTURE_SIZE = 10;
+	private final int DEFAULT_TEXTURE_SIZE = 10;
 	
 	private String name;
 	private String displayName;
@@ -52,11 +40,12 @@ public class Cube {
 	private BoundingArea boundingArea;
 	private ICubeRender render;
 	
-	//Texture Colors: Frame, Face, Colors
+	/** Texture Colors: Frame, Face, Colors */
 	private int[][][] texture;
 	private int frames;
 	private Vector2f sheetPosition;
 	private Vector2f texturesPerLine, textureSpacing;
+	private int textureSize;
 	private File textureLocation;
 	
 	private boolean isLightSorce;
@@ -66,10 +55,6 @@ public class Cube {
 	private boolean isSolid;
 	private boolean isVisable;
 	private float opacity;
-	
-	private int textureSize;
-	
-	private static int[] cubeTexCoords;
 				
 	public static Cube Air = new AirCube();
 	
@@ -111,7 +96,7 @@ public class Cube {
 		textureSize = 0; textureLocation = null; textureSpacing = null; frames = 0;
 		
 		if(!extraInfo.exists()) {
-			textureSize = TEXTURE_SIZE;
+			textureSize = DEFAULT_TEXTURE_SIZE;
 			textureLocation = new File("res/textures/cubes/" + name + ".png");
 			textureSpacing = new Vector2f(1, 0);
 			texturesPerLine = new Vector2f(6, 1);
@@ -159,7 +144,7 @@ public class Cube {
 				}
 			}
 			
-			if(textureSize == 0) textureSize = TEXTURE_SIZE;
+			if(textureSize == 0) textureSize = DEFAULT_TEXTURE_SIZE;
 			
 			if(sheetPosition == null && textureLocation != null) throw new InvalidParameterException(
 					"Cube " + name + " is using a texture sheet, but was not given a sheet position"); 
@@ -266,20 +251,6 @@ public class Cube {
 	public static void concludeInit() {		
 		for(int i = 0; i < CubeRegistry.getCubes().length; i ++) {
 			CubeRegistry.getCubes()[i].setId(i);
-		}
-		
-		try {
-			File saveLoc = new File("res/textures/cubes/TextureSheet.png");
-			
-			ImageIO.write(generateTextureSheet(), "PNG", saveLoc);
-			textureSheet = new Texture(saveLoc.getAbsolutePath()); //TextureLoader.getTexture("PNG",  new FileInputStream(new File("res/textures/cubes/MapingSheet.png")));//
-			
-			TextureRegistry reg = new TextureRegistry();			
-			reg.addTexture(textureSheet);
-			TextureRegistry.addRegistry(reg);
-			
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 		
@@ -502,167 +473,6 @@ public class Cube {
 	    }
 		      
 	    return toRep;
-	}
-	
-	/**
-	 * 	Creates a BufferedImage of all cube textures laded out in a sheet that is a perfect square
-	 */	
-	private static BufferedImage generateTextureSheet() {
-		long startTime = Time.getTime(); //TODO: Remove Timer
-		
-		int totalArea = 0;
-		int maxTextureSize = 0;
-		
-		Cube[] cubes = CubeRegistry.getCubes();
-		
-		for(Cube cube : cubes) {			
-			totalArea += Math.pow(cube.getTextureSize(), 2) * 6 * cube.getFrames();
-			
-			if(textureSheetMaxFrames < cube.getTextureSize()) textureSheetMaxFrames = cube.getFrames();
-			if(maxTextureSize < cube.getTextureSize()) maxTextureSize = cube.getTextureSize();
-		}
-		
-		int sideLength = (int) Math.ceil(Math.sqrt(totalArea));
-		sideLength = sideLength < maxTextureSize * 6 ? maxTextureSize * 6 : sideLength;
-		
-		while((sideLength & -sideLength) != sideLength) {
-			sideLength ++;
-		}
-		
-		BufferedImage spriteSheetImage = new BufferedImage(sideLength, sideLength, BufferedImage.TYPE_INT_RGB);
-		int[][] spriteSheet = new int[sideLength][sideLength];
-		textureSheetSideLength = sideLength;
-		
-		int emptyColor = new Color(15, 4, 15).getRGB();
-		
-		for(int x = 0; x < sideLength; x ++) {
-			for(int y = 0; y < sideLength; y ++) {
-				spriteSheet[x][y] = emptyColor;
-			}
-		}
-		
-		cubeTexCoords = new int[cubes.length * textureSheetMaxFrames * 2];
-		
-		int cubesAdded = 0;
-		int index = 0;		
-		boolean[] added = new boolean[cubes.length * textureSheetMaxFrames];
-		int x = 0, y = 0;
-		boolean hitEnd = false;
-		
-		for(Cube cube : cubes) {
-			for(int i = 0; i < textureSheetMaxFrames; i ++) {
-				added[i] = cube.frames < i;
-			}
-		}
-				
-		while(cubesAdded < added.length) {
-			if(index >= added.length) {
-				index = 0;
-				
-				while(added[index]) {
-					index ++;
-				}
-				
-				do {
-					if(x < sideLength - 1) {
-						x ++;
-						
-					} else if(y < sideLength - 1) {
-						y ++;
-						x = 0;
-						
-					} else {
-						if(hitEnd) {
-							throw new IndexOutOfBoundsException("Failed to Creat Sprite Sheet");
-						}
-						
-						y = 0;
-						x = 0;
-						
-						hitEnd = true;
-					}
-				} while(spriteSheet[x][y] != emptyColor);
-				
-				hitEnd = false;
-			}
-			
-			while(added[index]) {
-				index ++;
-			}
-			
-			Cube cube = cubes[index / textureSheetMaxFrames];
-			
-			if(cube.getTextureSize() + y >= sideLength) {
-				index ++;
-				continue;
-			}
-			
-			if(cube.getTextureSize() * 6 + x < sideLength) {
-				for(int i = 0; i < 6; i ++) {
-					for(int j = 0; j < cube.getTextureSize(); j ++) {
-						for(int k = 0; k < cube.getTextureSize(); k ++) {
-							spriteSheet[(i * cube.getTextureSize()) + (x + j)][y + k]
-								= cube.getTextures()
-								[index % textureSheetMaxFrames]
-										[i]
-												[j + (k * cube.getTextureSize())];
-						}						
-					}
-				}
-				
-				cubeTexCoords[index * 2] = x;
-				cubeTexCoords[(index * 2) + 1] = y;
-				
-				x += cube.getTextureSize() * 6;
-				added[index] = true;
-				
-				index ++;
-				cubesAdded ++;
-				
-				continue;
-			}
-			
-			index ++;
-		}
-		
-		for(x = 0; x < sideLength; x ++) {
-			for(y = 0; y < sideLength; y ++) {
-				spriteSheetImage.setRGB(x, y, spriteSheet[x][y]);
-			}
-		}
-		
-		Logger.print("Texture Sheet made in: " + ((double) (Time.getTime() - startTime) / (double) Time.getSECONDS())).setType("Setup").end(); //TODO: Remove Timer
-		return spriteSheetImage;
-	}
-	
-	/**
-	 * 	Returns an array of all the texture coordinates for each cube
-	 */	
-	public static int[] getCubeTexCoords() {
-		return cubeTexCoords;
-	}
-
-	/**
-	 * 	Returns the Texture Sheet
-	 *	@see TextureRegistry.accessByName("Cube Texture")
-	 */	
-	@Deprecated
-	public static Texture getTextureSheet() {
-		return textureSheet;
-	}
-
-	/**
-	 * 	Returns the size of the side of the Texture sheet
-	 */	
-	public static int getTextureSheetSideLength() {
-		return textureSheetSideLength;
-	}
-
-	/**
-	 * 	Returns the maximum number of frames a cube can has
-	 */	
-	public static int getTextureSheetMaxFrames() {
-		return textureSheetMaxFrames;
 	}
 
 	/**

@@ -1,8 +1,11 @@
 package com.GameName.World;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import com.GameName.Cube.Cube;
+import com.GameName.Cube.Render.CubeRenderUtil;
+import com.GameName.Cube.Render.CubeTextureMap;
 import com.GameName.Main.GameName;
 import com.GameName.Util.Tag.Tag;
 import com.GameName.Util.Tag.TagGroup;
@@ -21,6 +24,8 @@ public class Chunk {
 	
 	private boolean incompleteRender;
 	private ChunkRender render;
+	
+	private HashSet<Cube> typesOfCubes;
 	
 	private int[] cubes;
 	private int[] cubeMetadata;
@@ -46,6 +51,8 @@ public class Chunk {
 			lightColorMap[i] = new float[] {1.0f, 1.0f, 1.0f};
 			lightValueMap[i] = ambiantLight;
 		}
+		
+		typesOfCubes = new HashSet<Cube>();
 		
 		incompleteRender = true;
 		render = new ChunkRender(this);
@@ -87,7 +94,7 @@ public class Chunk {
 		lightColorMap[x + (y * size) + (z * size * size)] = newColor;
 		lightValueMap[x + (y * size) + (z * size * size)] = newIntensity;
 		
-		intensity -= ((1 / intensity) * Cube.getCubeByID(getCube(x, y, z)).getOpacity(getCubeMetadata(x, y, z))) + MINIMUM_LIGHT_DEFUTION;
+		intensity -= ((1 / intensity) * Cube.getCubeByID(getCube(x, y, z)).getOpacity(getMetadata(x, y, z))) + MINIMUM_LIGHT_DEFUTION;
 		
 		if(intensity <= ambiantLight){
 			render.forceVBOUpdate(); return; 
@@ -103,7 +110,7 @@ public class Chunk {
 		return cubes[x + (y * size) + (z * size * size)];
 	}
 	
-	public int getCubeMetadata(int x, int y, int z) {
+	public int getMetadata(int x, int y, int z) {
 		return cubeMetadata[x + (y * size) + (z * size * size)];
 	}
 	
@@ -111,7 +118,7 @@ public class Chunk {
 		cubes[x + (y * size) + (z * size * size)] = cube.getId();
 	}
 	
-	public void setCubeMetadataWithoutUpdate(int x, int y, int z, int metadata) {
+	public void setMetadataWithoutUpdate(int x, int y, int z, int metadata) {
 		cubeMetadata[x + (y * size) + (z * size * size)] = metadata;
 	}
 	
@@ -119,11 +126,11 @@ public class Chunk {
 		Cube lastCube = Cube.getCubeByID(getCube(x, y, z));
 		cubes[x + (y * size) + (z * size * size)] = cube.getId();
 		
-		handelUpdate(x, y, z, lastCube, getCubeMetadata(x, y, z));
+		handelUpdate(x, y, z, lastCube, getMetadata(x, y, z));
 	}
 	
 	public void setCubeMetadata(int x, int y, int z, int metadata) {
-		int lastMetadata = getCubeMetadata(x, y, z);
+		int lastMetadata = getMetadata(x, y, z);
 		cubeMetadata[x + (y * size) + (z * size * size)] = metadata;
 		
 		handelUpdate(x, y, z, Cube.getCubeByID(getCube(x, y, z)), lastMetadata);
@@ -131,7 +138,7 @@ public class Chunk {
 	
 	public void setCubeWithMetadata(int x, int y, int z, Cube cube, int metadata) {
 		Cube lastCube = Cube.getCubeByID(getCube(x, y, z));
-		int lastMetadata = getCubeMetadata(x, y, z);
+		int lastMetadata = getMetadata(x, y, z);
 
 		cubes[x + (y * size) + (z * size * size)] = cube.getId();
 		cubeMetadata[x + (y * size) + (z * size * size)] = metadata;
@@ -148,7 +155,19 @@ public class Chunk {
 	 */
 	private void handelUpdate(int x, int y, int z, Cube lastCube, int lastMetadata) {
 		Cube cube = Cube.getCubeByID(getCube(x, y, z));
-		int metadata = getCubeMetadata(x, y, z);		
+		int metadata = getMetadata(x, y, z);		
+		
+		if(cube != lastCube) {
+			if(!doesChunkContainCube(lastCube.getId())) {
+				updateTextureMap();
+				typesOfCubes.remove(lastCube);
+			}
+					
+			if(!doesSetContainCube(cube)) {
+				updateTextureMap();
+				typesOfCubes.add(cube);
+			}
+		}
 		
 		if(cube.isSolid(metadata)) {
 			hasCubes = true;			
@@ -181,6 +200,30 @@ public class Chunk {
 		
 		render.setHasCubes(hasCubes);		
 		render.forceVBOUpdate();
+	}
+	
+	/**
+	 * Updates the whole chunk this includes:
+	 * 		- Lighting Updates
+	 * 		- Adding Cube types to set
+	 * 		- Updating render's CubeTextureMap
+	 * 		- Updates render's VBO
+	 */
+	public void handelMassUpdate() {
+		for(int x = 0; x < size; x ++) {
+		for(int y = 0; y < size; y ++) {
+		for(int z = 0; z < size; z ++) {
+			Cube cube = Cube.getCubeByID(getCube(x, y, z));
+			int metadata = getMetadata(x, y, z);
+			
+			if(cube.isLightSorce(metadata)) {
+				updateLightMap(x, y, z, cube.getLightColor(metadata), cube.getLightValue(metadata));
+			}
+			
+			typesOfCubes.add(cube);
+		}}}
+		
+		updateTextureMap();
 	}
 	
 	public boolean isPosOnEdge(int x, int y, int z) {
@@ -260,6 +303,13 @@ public class Chunk {
 		return false;
 	}
 	
+	/**
+	 * Regenerates the CubeTextureMap for this chunk
+	 */
+	private void updateTextureMap() {
+		render.setTextureMap(CubeRenderUtil.generateTexturMap(typesOfCubes));
+	}
+	
 	public float[] getLightColor(int x, int y, int z) {
 		if(!isInitialized) return new float[] {1.0f, 1.0f, 1.0f};
 		return lightColorMap[x + (y * size) + (z * size * size)];
@@ -331,6 +381,24 @@ public class Chunk {
 	
 	public boolean isRenderIncompleat() {
 		return incompleteRender;
+	}
+	
+	public boolean doesSetContainCube(Cube cube) {
+		return typesOfCubes.add(cube);
+	}
+	
+	public boolean doesChunkContainCube(int cube) {
+		for(int cubeId : cubes) {
+			if(cubeId == cube) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public CubeTextureMap getTextureMap() {
+		return render.getTextureMap();
 	}
 	
 	public void forceVBOUpdate() {

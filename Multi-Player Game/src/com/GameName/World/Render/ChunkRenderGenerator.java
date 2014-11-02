@@ -39,13 +39,13 @@ public class ChunkRenderGenerator {
 					zPos = z + (c.getZ() * World.CHUNK_SIZE);
 					
 					Cube cube = Cube.getCubeByID(c.getCube(x, y, z));					
-					int metadata = c.getCubeMetadata(x, y, z);			
+					int metadata = c.getMetadata(x, y, z);			
 					boolean[] visableFaces = getVisableFaces(x, y, z, c);
 						
 					if(cube == Cube.Air) continue;		
 					
 					chunkVertices.addAll(cube.getRender(metadata).getVertices(xPos, yPos, zPos, visableFaces));
-					chunkTexData.addAll(cube.getRender(metadata).getTextureCoords(cube.getId(), metadata, visableFaces));
+					chunkTexData.addAll(cube.getRender(metadata).getTextureCoords(cube.getId(), metadata, c.getTextureMap(), visableFaces));
 					chunkNormals.addAll(cube.getRender(metadata).getNormals(cube.getId(), metadata, visableFaces));				
 					chunklightValues.addAll(getLightValue(x, y, z, cube, metadata, visableFaces, c));
 					
@@ -91,7 +91,7 @@ public class ChunkRenderGenerator {
 
 	private static boolean[] getVisableFaces(int x, int y, int z, Chunk c) {
 		boolean[] visableFaces = new boolean[6];		
-		int metadata = c.getCubeMetadata(x, y, z);
+		int metadata = c.getMetadata(x, y, z);
 		
 		if(!Cube.getCubeByID(c.getCube(x, y, z)).isVisable(metadata)) {
 			return visableFaces;

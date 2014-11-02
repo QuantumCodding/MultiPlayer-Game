@@ -3,20 +3,27 @@ package com.GameName.Render.Effects;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_NEAREST_MIPMAP_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_REPEAT;
+import static org.lwjgl.opengl.GL11.GL_RGBA;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glGenTextures;
+import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
 import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
+import org.lwjgl.BufferUtils;
 import org.newdawn.slick.opengl.TextureLoader;
 
 public class Texture {
@@ -69,6 +76,42 @@ public class Texture {
 			System.err.println("Texture " + location + " failed to load");			
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Takes a BufferedImage and converts it into a Texture in RGBA format
+	 * 
+	 * @param image The BufferedImage to convert into a texture
+	 * @param useMipmap
+	 */
+	public Texture(BufferedImage image, boolean useMipmap) {	
+		int[] pixels = new int[image.getWidth() * image.getHeight()];
+        image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());		
+		ByteBuffer buffer = BufferUtils.createByteBuffer(image.getWidth() * image.getHeight() * 4); // 4 Because of RGBA
+		
+		 for(int y = 0; y < image.getHeight(); y ++) {
+            for(int x = 0; x < image.getWidth(); x ++) {	            	
+                int pixel = pixels[y * image.getWidth() + x];
+                
+                buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red component
+                buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green component
+                buffer.put((byte) (pixel & 0xFF));               // Blue component
+                buffer.put((byte) ((pixel >> 24) & 0xFF));    // Alpha component. Only for RGBA
+            }
+        }
+
+	    buffer.flip();		
+	    textureId = glGenTextures();	    		
+	    		
+	    bind();
+	    	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.getWidth(), image.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+		unbind();
+	    
+		width = image.getWidth();
+		height = image.getHeight();
+		
+		setToDefaultProperties();
+		if(useMipmap) setupMipMaping();
 	}
 	
 	private org.newdawn.slick.opengl.Texture getTexture(String fileLocation, String fileType) throws IOException {

@@ -2,6 +2,7 @@ package com.GameName.World.Render;
 
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
+import com.GameName.Cube.Render.CubeTextureMap;
 import com.GameName.Main.GameName;
 import com.GameName.Render.Types.Render3D;
 import com.GameName.World.Chunk;
@@ -11,6 +12,8 @@ import com.GameName.World.WorldRegistry;
 public class ChunkRender extends Render3D {
 	private Chunk chunk;
 	private boolean hasCubes;
+	
+	private CubeTextureMap textureMap;
 	
 	public ChunkRender(Chunk chunk) {
 		super();
@@ -56,6 +59,15 @@ public class ChunkRender extends Render3D {
 
 	}
 	
+	public CubeTextureMap getTextureMap() {
+		return textureMap;
+	}
+
+	public void setTextureMap(CubeTextureMap textureMap) {
+		this.textureMap = textureMap;
+		setTexture(textureMap.getTexture());
+	}
+
 	public void setHasCubes(boolean hasCubes) {
 		this.hasCubes = hasCubes;
 	}

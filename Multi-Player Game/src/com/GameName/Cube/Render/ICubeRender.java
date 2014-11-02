@@ -15,7 +15,7 @@ public interface ICubeRender {
 	};
 	
 	public ArrayList<Float> getVertices(float x, float y, float z, boolean[] visableFaces);	
-	public ArrayList<Float> getTextureCoords(int cubeId, int metadata, boolean[] visableFaces);
+	public ArrayList<Float> getTextureCoords(int cubeId, int metadata, CubeTextureMap textureMap, boolean[] visableFaces);
 	public ArrayList<Float> getColors(int cubeId, int metadata, boolean[] visableFaces);
 	public ArrayList<Float> getNormals(int cubeId, int metadata, boolean[] visableFaces);
 	

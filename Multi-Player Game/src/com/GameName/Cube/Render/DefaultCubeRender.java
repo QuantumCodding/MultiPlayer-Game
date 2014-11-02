@@ -25,14 +25,14 @@ public class DefaultCubeRender implements ICubeRender {
 		return vertices;
 	}
 	
-	public ArrayList<Float> getTextureCoords(int cubeId, int metadata, boolean[] visableFaces) {
+	public ArrayList<Float> getTextureCoords(int cubeId, int metadata, CubeTextureMap textureMap, boolean[] visableFaces) {
 		ArrayList<Float> texCoords = new ArrayList<Float>();
 		Cube cube = Cube.getCubeByID(cubeId);
 		
-		int startX = Cube.getCubeTexCoords()[(cube.getId() * 2) + cube.getFrameFromMetadata(metadata)], 
-			startY = Cube.getCubeTexCoords()[(cube.getId() * 2) + 1 + cube.getFrameFromMetadata(metadata)];
+		int startX = (int) textureMap.get(cubeId + ":" + cube.getFrameFromMetadata(metadata)).getX(), 
+			startY = (int) textureMap.get(cubeId + ":" + cube.getFrameFromMetadata(metadata)).getY();
 		
-		double ratio = (1d / (double) Cube.getTextureSheetSideLength());
+		double ratio = (1d / (double) textureMap.getTextureSheetSideLength());
 		double x = ratio * startX, y = ratio * startY;
 		double textureSideLength = ratio * cube.getTextureSize();
 		

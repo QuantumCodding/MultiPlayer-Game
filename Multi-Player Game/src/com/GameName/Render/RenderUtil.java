@@ -15,7 +15,10 @@ import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.World;
 
 public class RenderUtil {
-	
+	/**
+	 * @see ChunkRenderGerator
+	 */
+	@Deprecated
 	public static int[] generateChunk(int startX, int startY, int startZ, World w, int[] chunkData) {
 		
 		List<Float> chunkVertices = new ArrayList<Float>();		
@@ -44,7 +47,7 @@ public class RenderUtil {
 					boolean[] visableFaces = getVisableFaces(xPos, yPos, zPos, w);
 									
 					chunkVertices.addAll(cube.getRender(metadata).getVertices(xPos, yPos, zPos, visableFaces));
-					chunkTexData.addAll(cube.getRender(metadata).getTextureCoords(cube.getId(), metadata, visableFaces));
+//					chunkTexData.addAll(cube.getRender(metadata).getTextureCoords(cube.getId(), metadata, visableFaces));
 					chunkNormals.addAll(cube.getRender(metadata).getNormals(cube.getId(), metadata, visableFaces));				
 					chunklightValues.addAll(getLightValue(xPos, yPos, zPos, cube, metadata, visableFaces, w));
 					
