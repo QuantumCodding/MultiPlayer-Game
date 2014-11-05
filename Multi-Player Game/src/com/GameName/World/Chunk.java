@@ -306,7 +306,7 @@ public class Chunk {
 	/**
 	 * Regenerates the CubeTextureMap for this chunk
 	 */
-	private void updateTextureMap() {
+	public void updateTextureMap() {
 		render.setTextureMap(CubeRenderUtil.generateTexturMap(typesOfCubes));
 	}
 	

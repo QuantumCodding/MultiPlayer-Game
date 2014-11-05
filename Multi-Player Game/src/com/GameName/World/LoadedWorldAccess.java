@@ -30,7 +30,7 @@ public class LoadedWorldAccess {
 		int iz = (int) z, chunkCoordZ = iz / World.CHUNK_SIZE, indexZ = iz % World.CHUNK_SIZE;
 				
 		Chunk chunk = getChunk(chunkCoordX, chunkCoordY, chunkCoordZ); if(chunk == null) return 0; //TODO: Temporary?
-		return chunk.getCubeMetadata(indexX, indexY, indexZ);
+		return chunk.getMetadata(indexX, indexY, indexZ);
 	}
 	
 	public int getCubeMetadata(Vector3f pos) {

@@ -116,7 +116,7 @@ public class ChunkLoader {
 					}
 					
 					chunk.setIsLoaded(true);
-					chunk.getRender().setTexture(Cube.getTextureSheet());
+					chunk.updateTextureMap();
 					
 					for(int check_X = -1; check_X <= 1; check_X ++)	{			
 					for(int check_Y = -1; check_Y <= 1; check_Y ++)	{				
