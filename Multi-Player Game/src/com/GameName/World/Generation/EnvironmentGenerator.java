@@ -9,13 +9,13 @@ public class EnvironmentGenerator {
 
 	int seed;
 	World world;
-	private SineTestGenerator test;
+	private DensityGeneration test;
 	
 	
 	public EnvironmentGenerator(int seedI, World worldI) {
 		seed = seedI;
 		world = worldI;
-		test = new SineTestGenerator(seed, world);
+		test = new DensityGeneration(seed, (int)World.SCALE, world);
 	}
 	
 //	public Chunk generate(int scale, World world, int x, int y, int z, int seed) {
@@ -35,7 +35,7 @@ public class EnvironmentGenerator {
 //	}
 	
 	public Chunk generate(int scale, World world, int x, int y, int z, int seed) {
-		return test.generate(scale, world, x, y, z, seed);
+		return test.generate(scale, x, y, z);
 	}
 	
 	
