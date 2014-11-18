@@ -6,14 +6,20 @@ import static org.lwjgl.opengl.GL15.glBufferData;
 import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
 
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.nio.Buffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.opengl.Display;
 
 import com.GameName.Main.Start;
+import com.GameName.Main.Debugging.Logger;
+import com.GameName.Render.Effects.Texture;
 //import com.GameName.Main.Debugging.Logger;
 import com.GameName.Util.QueuedArray;
 
@@ -26,6 +32,14 @@ public class GLContextThread extends GameThread {
 	private QueuedArray<Integer> bufferIds;
 	private QueuedArray<Integer> usages;
 	private QueuedArray<Character> types;
+	
+	private BufferedImage image;
+	private String textureLocation;
+	private String imageType;
+	private Texture texture;
+	private String textureName;
+	private boolean useMipmap;
+	private boolean generatingTexture;
 	
 	private boolean generatingBufferIds;
 	private int requestAmount;
@@ -85,6 +99,17 @@ public class GLContextThread extends GameThread {
 			generatingBufferIds = false;
 		}
 		
+		if(generatingTexture) {
+			
+			if(image != null) {
+				texture = new Texture(image, textureName, useMipmap);
+			} else {
+				texture = new Texture(textureLocation, useMipmap, imageType);
+			}
+			
+			generatingTexture = false;
+		}
+		
 		for(Integer buffer : buffersToDelete.getElements()) {
 			glDeleteBuffers(buffer.intValue());
 		}
@@ -132,6 +157,16 @@ public class GLContextThread extends GameThread {
 	}	
 
 	public synchronized int[] genBufferIds(int requestAmount) {
+		try {
+			if(Display.isCurrent()) {
+				this.requestAmount = requestAmount; 
+				generatingBufferIds = true;
+				
+				genBuffers();
+				return generatedBufferIds;
+			}
+		} catch (LWJGLException e) {}
+		
 		while(prossessing) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
 	
 		this.requestAmount = requestAmount; generatingBufferIds = true;
@@ -139,8 +174,67 @@ public class GLContextThread extends GameThread {
 
 		return generatedBufferIds;
 	}
+	
+	public synchronized Texture genTexture(BufferedImage image, String textureName, boolean useMipmap) {
+		try {
+			if(Display.isCurrent()) {
+				return new Texture(image, textureName, useMipmap);
+			}
+		} catch (LWJGLException e) {}
 		
+		while(generatingTexture) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
+		while(prossessing) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
+		
+		this.image = image; this.textureName = textureName; 
+		this.textureLocation = null; this.imageType = null;
+		this.useMipmap = useMipmap; generatingTexture = true;
+		
+		while(generatingTexture) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
+		Logger.print("Have some Texture!").setColor(Color.CYAN).end();
+		return texture;
+	}
+	
+	public synchronized Texture genTexture(String textureLocation, String imageType, boolean useMipmap) {
+		try {
+			if(Display.isCurrent()) {
+				return new Texture(textureLocation, useMipmap, imageType);
+			}
+		} catch (LWJGLException e) {}
+		
+		while(generatingTexture) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
+		while(prossessing) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
+		
+		this.image = null; this.textureName = null;  
+		this.textureLocation = textureLocation; this.imageType = imageType;
+		this.useMipmap = useMipmap; generatingTexture = true;
+		
+		while(generatingTexture) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
+		Logger.print("Have some Texture!").setColor(Color.CYAN).end();
+		return texture;
+	}
+
 	public synchronized void addBufferBind(Buffer buffer, int target, int bufferId, int usage, char type) {
+		try {
+			if(Display.isCurrent()) {
+				glBindBuffer(target, bufferId);
+				
+				if(type == 'f') {
+					FloatBuffer buffer2 = ((FloatBuffer) buffer);
+				    glBufferData(target, buffer2, usage);	
+				    
+				} else if(type == 'd') {
+					DoubleBuffer buffer2 = ((DoubleBuffer) buffer);
+				    glBufferData(target, buffer2, usage);	
+				    
+				} else {
+					IntBuffer buffer2 = ((IntBuffer) buffer);
+				    glBufferData(target, buffer2, usage);					    
+				}
+				
+				return;
+			}
+		} catch (LWJGLException e) {}
+		
 		while(prossessing) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
 		
 		buffers.addToQueue(buffer);

@@ -51,6 +51,8 @@ public class TextureRegistry extends Registry<Texture> {
 	}
 	
 	public static void cleanUp() {
+		if(textures == null) return;
+		
 		for(Texture texture : textures) {
 			if(texture != null) {
 				texture.cleanUp();

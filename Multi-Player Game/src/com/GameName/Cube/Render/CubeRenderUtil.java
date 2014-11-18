@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import com.GameName.Cube.Cube;
-import com.GameName.Render.Effects.Texture;
+import com.GameName.Main.GameName;
 import com.GameName.Util.Vectors.Vector2f;
 
 public class CubeRenderUtil {
@@ -129,7 +129,7 @@ public class CubeRenderUtil {
 			}
 		}
 		
-		textureMap.setTexture(new Texture(textureSheetImage, false));		
+		textureMap.setTexture(GameName.getGLContext().genTexture(textureSheetImage, "ChunkTextureSheet", false));		
 		return textureMap;
 	}
 }

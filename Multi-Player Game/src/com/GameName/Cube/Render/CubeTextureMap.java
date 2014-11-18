@@ -7,6 +7,11 @@ import com.GameName.Util.Vectors.Vector2f;
 
 public class CubeTextureMap {
 	private Texture texture;
+	
+	/**
+	 * 	Strings format is "cubeId:frame"
+	 * 	@see Cube.texture
+	 */
 	private HashMap<String, Vector2f> textCordMap;
 	
 	private int textureSheetSideLength;

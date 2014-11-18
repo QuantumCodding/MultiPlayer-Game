@@ -477,8 +477,10 @@ public class Cube {
 
 	/**
 	 * 	Returns a cube based on its ID
+	 * 	If the ID is -1 it returns NULL
 	 */	
 	public static Cube getCubeByID(int id) {
+		if(id == -1) return null;
 		return CubeRegistry.getCubes()[id];
 	}
 	
@@ -489,7 +491,7 @@ public class Cube {
 		Cube[] cubes = new Cube[ids.length];
 		
 		for(int i = 0; i < ids.length; i ++) {
-			cubes[i] = CubeRegistry.getCubes()[ids[i]];
+			cubes[i] = getCubeByID(ids[i]); //CubeRegistry.getCubes()[ids[i]];
 		}
 		
 		return cubes;
