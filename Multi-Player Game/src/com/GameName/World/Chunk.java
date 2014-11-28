@@ -22,7 +22,6 @@ public class Chunk {
 	private final int worldId;
 	private final int x, y, z;
 	
-	private boolean incompleteRender;
 	private ChunkRender render;
 	
 	private HashSet<Cube> typesOfCubes;
@@ -54,7 +53,6 @@ public class Chunk {
 		
 		typesOfCubes = new HashSet<Cube>();
 		
-		incompleteRender = true;
 		render = new ChunkRender(this);
 		isInitialized = true;
 	}
@@ -129,7 +127,7 @@ public class Chunk {
 		handelUpdate(x, y, z, lastCube, getMetadata(x, y, z));
 	}
 	
-	public void setCubeMetadata(int x, int y, int z, int metadata) {
+	public void setMetadata(int x, int y, int z, int metadata) {
 		int lastMetadata = getMetadata(x, y, z);
 		cubeMetadata[x + (y * size) + (z * size * size)] = metadata;
 		
@@ -210,6 +208,8 @@ public class Chunk {
 	 * 		- Updates render's VBO
 	 */
 	public void handelMassUpdate() {
+		typesOfCubes.clear();
+		
 		for(int x = 0; x < size; x ++) {
 		for(int y = 0; y < size; y ++) {
 		for(int z = 0; z < size; z ++) {
@@ -220,10 +220,16 @@ public class Chunk {
 				updateLightMap(x, y, z, cube.getLightColor(metadata), cube.getLightValue(metadata));
 			}
 			
+			if(cube.isVisable(metadata) && !hasCubes) {
+				hasCubes = true;
+			}
+			
 			typesOfCubes.add(cube);
 		}}}
 		
 		updateTextureMap();
+		render.setHasCubes(hasCubes);		
+		render.forceVBOUpdate();
 	}
 	
 	public boolean isPosOnEdge(int x, int y, int z) {
@@ -248,59 +254,50 @@ public class Chunk {
 			cubes[5] = getCube(x, y - 1, z); // 5 -y					5				-y
 		
 		} else {
-//			try { //TODO: Remove Try / Catch
+			Chunk chunk = world.getChunk(getX() - 1, getY(), getZ());								// -X
+			if(chunk != null && !chunk.isInitialized()) { 
+				if(getX() - 1 > minPos.getX()) {
+					cubes[0] = world.getChunk(getX() - 1, getY(), getZ()).getCube(getSize(), y, z);		
+				}
+			} else { cubes[0] = -1; }
 			
-			if(world.getChunk(getX() - 1, getY(), getZ()) != null && !world.getChunk(getX() - 1, getY(), getZ()).isInitialized()) {
-				if(getX() - 1 > minPos.getX()) cubes[0] = world.getChunk(getX() - 1, getY(), getZ()).getCube(getSize(), y, z);		
-			} else incompleteRender = true;
+			chunk = world.getChunk(getX(), getY(), getZ() + 1);										// +Z
+			if(chunk != null && !chunk.isInitialized()) { 
+				if(getZ() + 1 < maxPos.getZ()) {
+					cubes[1] = world.getChunk(getX(), getY(), getZ() + 1).getCube(x, y, 0);	
+				}
+			} else { cubes[1] = -1; }
 			
-			if(world.getChunk(getX(), getY(), getZ() + 1) != null && !world.getChunk(getX(), getY(), getZ() + 1).isInitialized()) {
-				if(getZ() + 1 < maxPos.getZ()) cubes[1] = world.getChunk(getX(), getY(), getZ() + 1).getCube(x, y, 0);		
-			} else incompleteRender = true;
+			chunk = world.getChunk(getX() + 1, getY(), getZ());										// +X
+			if(chunk != null && !chunk.isInitialized()) {
+				if(getX() + 1 < maxPos.getX()) {
+					cubes[2] = world.getChunk(getX() + 1, getY(), getZ()).getCube(0, y, z);		
+				}
+			} else { cubes[2] = -1; }
 			
-			if(world.getChunk(getX() + 1, getY(), getZ()) != null && !world.getChunk(getX() + 1, getY(), getZ()).isInitialized()) {
-				if(getX() + 1 < maxPos.getX()) cubes[2] = world.getChunk(getX() + 1, getY(), getZ()).getCube(0, y, z);		
-			} else incompleteRender = true;
+			chunk = world.getChunk(getX(), getY(), getZ() - 1);										// -Z
+			if(chunk != null && !chunk.isInitialized()) {
+				if(getZ() - 1 > minPos.getZ()) {
+					cubes[3] = world.getChunk(getX(), getY(), getZ() - 1).getCube(x, y, getSize());		
+				}
+			} else { cubes[3] = -1; }
 			
-			if(world.getChunk(getX(), getY(), getZ() - 1) != null && !world.getChunk(getX(), getY(), getZ() - 1).isInitialized()) {
-				if(getZ() - 1 > minPos.getZ()) cubes[3] = world.getChunk(getX(), getY(), getZ() - 1).getCube(x, y, getSize());		
-			} else incompleteRender = true;
+			chunk = world.getChunk(getX(), getY() + 1, getZ());										// +Y
+			if(chunk != null && !chunk.isInitialized()) {
+				if(getY() + 1 < maxPos.getY()) {
+					cubes[4] = world.getChunk(getX(), getY() + 1, getZ()).getCube(x, 0, z);			
+				}
+			} else { cubes[4] = -1; }
 			
-			if(world.getChunk(getX(), getY() + 1, getZ()) != null && !world.getChunk(getX(), getY() + 1, getZ()).isInitialized()) {
-				if(getY() + 1 < maxPos.getY()) cubes[4] = world.getChunk(getX(), getY() + 1, getZ()).getCube(x, 0, z);			
-			} else incompleteRender = true;
-			
-			if(world.getChunk(getX(), getY() - 1, getZ()) != null && !world.getChunk(getX(), getY() - 1, getZ()).isInitialized()) {
-				if(getY() - 1 > minPos.getY()) cubes[5] = world.getChunk(getX(), getY() - 1, getZ()).getCube(x, getSize(), z);
-			} else incompleteRender = true;
-//			
-//			} catch(NullPointerException e) {
-//				System.err.println("\n" + new Vector3f(x, y, z).valuesToString() + "\n\tMax: " + maxPos.valuesToString() + "\n\tMin: " + minPos.valuesToString() + "\n\tPos: " + getPos().valuesToString());				
-//				System.err.println(e.getStackTrace()[0]);
-//			}
+			chunk = world.getChunk(getX(), getY() - 1, getZ());										// -Y
+			if(chunk != null && !chunk.isInitialized()) {
+				if(getY() - 1 > minPos.getY()) {
+					cubes[5] = world.getChunk(getX(), getY() - 1, getZ()).getCube(x, getSize(), z);
+				}
+			} else { cubes[5] = -1; }
 		}
 		
 		return Cube.getCubesByID(cubes);	
-	}
-	
-	public boolean shouldLoadRender() {
-		World world = WorldRegistry.getWorld(worldId);
-		LoadedWorldAccess access = world.getLoadedWorld().getAccess();
-		
-		Vector3f minPos = access.getCenter().subtract(LoadedWorldAccess.getRenderRadius()).capMin(0);		
-		Vector3f maxPos = access.getCenter().add(LoadedWorldAccess.getRenderRadius()).capMax(world.getSizeAsVector()).subtract(1);
-		
-		if( (x == maxPos.getX() || (world.getChunk(x + 1, y, z) != null && world.getChunk(x + 1, y, z).isLoaded())) && 
-			(x == minPos.getX() || (world.getChunk(x - 1, y, z) != null && world.getChunk(x - 1, y, z).isLoaded())) &&	
-			
-			(y == maxPos.getY() || (world.getChunk(x, y + 1, z) != null && world.getChunk(x, y + 1, z).isLoaded())) && 
-			(y == minPos.getY() || (world.getChunk(x, y - 1, z) != null && world.getChunk(x, y - 1, z).isLoaded())) &&
-			
-			(z == maxPos.getZ() || (world.getChunk(x, y, z + 1) != null && world.getChunk(x, y, z + 1).isLoaded())) && 
-			(z == minPos.getZ() || (world.getChunk(x, y, z - 1) != null && world.getChunk(x, y, z - 1).isLoaded()))			
-		) return true;
-		
-		return false;
 	}
 	
 	/**
@@ -379,10 +376,6 @@ public class Chunk {
 		return size;
 	}
 	
-	public boolean isRenderIncompleat() {
-		return incompleteRender;
-	}
-	
 	public boolean doesSetContainCube(Cube cube) {
 		return typesOfCubes.add(cube);
 	}
@@ -403,12 +396,6 @@ public class Chunk {
 	
 	public void forceVBOUpdate() {
 		render.forceVBOUpdate();
-	}
-	
-	public void reattemptRender() {
-		if(incompleteRender) {
-			forceVBOUpdate();
-		}
 	}
 	
 	public void setIsLoaded(boolean isLoaded) {

@@ -1,10 +1,11 @@
 package com.GameName.Render;
 
+import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_CCW;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_COLOR_MATERIAL;
 import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
-import static org.lwjgl.opengl.GL11.GL_CW;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_DIFFUSE;
@@ -37,7 +38,6 @@ import static org.lwjgl.opengl.GL11.glOrtho;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glRotatef;
-import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glShadeModel;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex2f;
@@ -65,7 +65,6 @@ import com.GameName.Render.Types.Render2D;
 import com.GameName.Render.Types.Render3D;
 import com.GameName.Render.Types.Renderable;
 import com.GameName.Util.IEngine;
-import com.GameName.World.World;
 //import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
 //import static org.lwjgl.opengl.GL11.GL_LINE;
 //import static org.lwjgl.opengl.GL11.glPolygonMode;
@@ -100,17 +99,15 @@ public class RenderEngine implements IEngine<Renderable> {
 		glShadeModel(GL_SMOOTH);
 //		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);   
 		
-        glEnable(GL_RESCALE_NORMAL);
-        
+        glEnable(GL_RESCALE_NORMAL);        
         glEnable(GL_DEPTH_TEST);
-//        glDepthFunc(GL_LEQUAL);//QUAL;
 		
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
         glEnable(GL_CULL_FACE);
-        glFrontFace(GL_CW);
-        glCullFace(GL_FRONT);
+        glFrontFace(GL_CCW);
+        glCullFace(GL_BACK);
 
         glEnable(GL_COLOR_MATERIAL);
         glColorMaterial(GL_FRONT, GL_DIFFUSE);        
@@ -159,6 +156,7 @@ public class RenderEngine implements IEngine<Renderable> {
 			
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
+        glEnable(GL_TEXTURE_2D);
 			
 		GameName.player.getAccess().getCamera().useView();		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -176,7 +174,7 @@ public class RenderEngine implements IEngine<Renderable> {
 					glPopMatrix();
 					
 					glTranslatef(0, 0, -20);
-				}// glScalef(0.9f, 0.9f, 0.9f);}
+				}
 				
 				glDisableVertexAttribArray(0); // Position						
 			    glDisableVertexAttribArray(1); // Texture Data
@@ -188,6 +186,7 @@ public class RenderEngine implements IEngine<Renderable> {
 	public void render3D() {
 		glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
+        glEnable(GL_TEXTURE_2D);
 		
 		glMatrixMode(GL_PROJECTION);
 			glLoadMatrix(perspectiveProjectionMatrix);
@@ -199,35 +198,33 @@ public class RenderEngine implements IEngine<Renderable> {
 		
 		glPushMatrix();
 		
-//		glBegin(GL_QUADS);
-//			for(Vector3f vec : ICubeRender.DEFAULT_CUBE) {
-//				glColor3f((float) Math.random() * 10 % 2 / 10, (float) Math.random() * 10 % 1 / 10, (float) Math.random() * 10 % 1 / 10);
-//				glVertex3f(vec.getX(), vec.getY(), vec.getZ());
-//			}
-//		
-//		glEnd();
+//			glBegin(GL_QUADS);
+//				for(Vector3f vec : ICubeRender.DEFAULT_CUBE) {
+//					glColor3f((float) Math.random() * 10 % 10 / 10, (float) Math.random() * 10 % 10 / 10, (float) Math.random() * 10 % 10 / 10);
+//					glVertex3f(vec.getX() * 100, vec.getY() * 100, vec.getZ() * 100);
+//				}			
+//			glEnd();
 		
-		glRotatef(180, 0, 1, 0);
-    	glScalef(World.SCALE, World.SCALE, World.SCALE);
-        
-		glColor3f((float) Math.random() * 10 % 2 / 10, (float) Math.random() * 10 % 1 / 10, (float) Math.random() * 10 % 1 / 10);//3
-		
-		glEnableVertexAttribArray(0); // Position
-		glEnableVertexAttribArray(1); // Texture Data
-		glEnableVertexAttribArray(2); // Color
-		glEnableVertexAttribArray(3); // Normal
-		
-		for(int i = 0; i < render3D.size(); i ++) {
-			glPushMatrix();
-				render3D.get(i).render();
-//				Logger.println(render3D.get(i).getName());
-			glPopMatrix();
-		}
-        
-	    glDisableVertexAttribArray(0); // Position						
-	    glDisableVertexAttribArray(1); // Texture Data
-	    glDisableVertexAttribArray(2); // Color
-	    glDisableVertexAttribArray(3); // Normal
+			
+			
+			glRotatef(180, 0, 1, 0);
+//	    	glScalef(World.SCALE, World.SCALE, World.SCALE);
+	    	
+//			glEnableVertexAttribArray(0); // Position
+//			glEnableVertexAttribArray(1); // Texture Data
+//			glEnableVertexAttribArray(2); // Color
+//			glEnableVertexAttribArray(3); // Normal
+			
+			for(int i = 0; i < render3D.size(); i ++) {
+				glPushMatrix();
+					render3D.get(i).render();
+				glPopMatrix();
+			}
+	        
+//		    glDisableVertexAttribArray(0); // Position						
+//		    glDisableVertexAttribArray(1); // Texture Data
+//		    glDisableVertexAttribArray(2); // Color
+//		    glDisableVertexAttribArray(3); // Normal
 	    
 		glPopMatrix();
 	}
@@ -235,6 +232,8 @@ public class RenderEngine implements IEngine<Renderable> {
 	public void render2D() {		
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
+		
+		glEnable(GL_TEXTURE_2D);
 		
 		glMatrixMode(GL_PROJECTION);
 			glLoadMatrix(orthographicProjectionMatrix);
@@ -252,7 +251,6 @@ public class RenderEngine implements IEngine<Renderable> {
 			
 			glEnableVertexAttribArray(0); // Position
 			glEnableVertexAttribArray(1); // Texture Data
-			
 			
 			//TODO: Remove Test Code
 			float x = oneDecimal(GameName.player.getAccess().getPos().getX());

@@ -24,7 +24,7 @@ public class LoadedWorldAccess {
 		return getCube(cord.getX(), cord.getY(), cord.getZ());
 	}
 	
-	public int getCubeMetadata(float x, float y, float z) {
+	public int getMetadata(float x, float y, float z) {
 		int ix = (int) x, chunkCoordX = ix / World.CHUNK_SIZE, indexX = ix % World.CHUNK_SIZE;
 		int iy = (int) y, chunkCoordY = iy / World.CHUNK_SIZE, indexY = iy % World.CHUNK_SIZE;
 		int iz = (int) z, chunkCoordZ = iz / World.CHUNK_SIZE, indexZ = iz % World.CHUNK_SIZE;
@@ -33,8 +33,8 @@ public class LoadedWorldAccess {
 		return chunk.getMetadata(indexX, indexY, indexZ);
 	}
 	
-	public int getCubeMetadata(Vector3f pos) {
-		return getCubeMetadata(pos.getX(), pos.getY(), pos.getZ());
+	public int getMetadata(Vector3f pos) {
+		return getMetadata(pos.getX(), pos.getY(), pos.getZ());
 	}
 	
 	public Chunk getChunk(int x, int y, int z) {
@@ -56,7 +56,7 @@ public class LoadedWorldAccess {
 	public float getGroundHeight(float x, float y, float z) {
 		int groundHeight = Math.min(Math.round(y), world.world.getSizeY() - 1);
 		
-		while(groundHeight > 0 && !getCube(x, groundHeight, z).isSolid(getCubeMetadata((int) x, groundHeight, (int) z))) {
+		while(groundHeight > 0 && !getCube(x, groundHeight, z).isSolid(getMetadata((int) x, groundHeight, (int) z))) {
 			groundHeight --; 
 		}
 		
@@ -159,16 +159,16 @@ public class LoadedWorldAccess {
 		setCube(pos.getX(), pos.getY(), pos.getZ(), cubeId);
 	}
 	
-	public void setCubeMetadata(float x, float y, float z, int metadata) {
+	public void setMetadata(float x, float y, float z, int metadata) {
 		int ix = (int) x, chunkCoordX = ix / World.CHUNK_SIZE, indexX = ix % World.CHUNK_SIZE;
 		int iy = (int) y, chunkCoordY = iy / World.CHUNK_SIZE, indexY = iy % World.CHUNK_SIZE;
 		int iz = (int) z, chunkCoordZ = iz / World.CHUNK_SIZE, indexZ = iz % World.CHUNK_SIZE;
 
-		getChunk(chunkCoordX, chunkCoordY, chunkCoordZ).setCubeMetadata(indexX, indexY, indexZ, metadata);
+		getChunk(chunkCoordX, chunkCoordY, chunkCoordZ).setMetadata(indexX, indexY, indexZ, metadata);
 	}
 	
-	public void setCubeMetadata(Vector3f pos, int metadata) {
-		setCube(pos.getX(), pos.getY(), pos.getZ(), metadata);
+	public void setMetadata(Vector3f pos, int metadata) {
+		setMetadata(pos.getX(), pos.getY(), pos.getZ(), metadata);
 	}
 	
 	public void setCubeWithMetadata(float x, float y, float z, int cube, int metadata) {

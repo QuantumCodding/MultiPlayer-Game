@@ -71,7 +71,7 @@ public class EntityPlayer extends Entity {
 	}
 	
 	public void resetCam() {//                                                       0.3f
-		cam = new Camera(70, (float)Display.getWidth() / (float)Display.getHeight(), 1f, renderDistance);
+		cam = new Camera(70, (float)Display.getWidth() / (float)Display.getHeight(), 0.5f, renderDistance);
 		if(GameName.render != null) {
 			GameName.render.setUpPerspectives();
 		}

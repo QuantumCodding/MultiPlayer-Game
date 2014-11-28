@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.GameName.Cube.Cube;
 import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.World.Generation.EnvironmentGenerator;
 import com.GameName.World.Object.WorldObject;
 
 public class World {
@@ -21,11 +22,13 @@ public class World {
 	
 	private String name;
 	private LoadedWorld loadedWorld;
+	private EnvironmentGenerator environmentGen;
 	private int id;
 		
 	private boolean isGenerated = false;
 	
-	public World(int x, int y, int z, String name) {
+	public World(int x, int y, int z, String name) {this(x, y, z, name, (int) (System.currentTimeMillis() % Integer.MAX_VALUE));}
+	public World(int x, int y, int z, String name, int seed) {
 		sizeX = x * CHUNK_SIZE;
 		sizeY = y * CHUNK_SIZE;
 		sizeZ = z * CHUNK_SIZE;
@@ -37,6 +40,7 @@ public class World {
 		this.name = name;
 		this.id = -1;
 			
+		environmentGen = new EnvironmentGenerator(seed, this);
 		loadedWorld = new LoadedWorld(this, name);
 	}
 	
@@ -129,8 +133,8 @@ public class World {
 	public Cube getCube(float x, float y, float z)  {return loadedWorld.getAccess().getCube(x, y, z);}
 	public Cube getCube(Vector3f pos) 				{return loadedWorld.getAccess().getCube(pos);}
 	
-	public int getCubeMetadata(float x, float y, float z)   {return loadedWorld.getAccess().getCubeMetadata(x, y, z);}
-	public int getCubeMetadata(Vector3f pos) 				{return loadedWorld.getAccess().getCubeMetadata(pos);}
+	public int getCubeMetadata(float x, float y, float z)   {return loadedWorld.getAccess().getMetadata(x, y, z);}
+	public int getCubeMetadata(Vector3f pos) 				{return loadedWorld.getAccess().getMetadata(pos);}
 	
 	private void setCube(int x, int y, int z, Cube cubeId, Chunk[] chunks) {	//TODO: Remove Test Code	
 		int ix = (int) x, chunkCoordX = ix / CHUNK_SIZE, indexX = ix % CHUNK_SIZE;
@@ -150,8 +154,8 @@ public class World {
 	public void setCube(int x, int y, int z, int cubeId)  {loadedWorld.getAccess().setCube(x, y, z, cubeId);}
 	public void setCube(Vector3f pos, int cubeId) 		  {loadedWorld.getAccess().setCube(pos, cubeId);}
 	
-	public void setCubeMetadata(int x, int y, int z, int metadata)  {loadedWorld.getAccess().setCubeMetadata(x, y, z, metadata);}
-	public void setCubeMetadata(Vector3f pos, int metadata) 		  {loadedWorld.getAccess().setCubeMetadata(pos, metadata);}
+	public void setCubeMetadata(int x, int y, int z, int metadata)  {loadedWorld.getAccess().setMetadata(x, y, z, metadata);}
+	public void setCubeMetadata(Vector3f pos, int metadata) 		  {loadedWorld.getAccess().setMetadata(pos, metadata);}
 	
 	public void setCubWitheMetadata(int x, int y, int z, int cubeId, int metadata)  {loadedWorld.getAccess().setCubeWithMetadata(x, y, z, cubeId, metadata);}
 	public void setCubeWithMetadata(Vector3f pos, int cubeId, int metadata) 		{loadedWorld.getAccess().setCubeWithMetadata(pos, cubeId, metadata);}
@@ -218,6 +222,10 @@ public class World {
 	public String toString() {
 		return name  + "[ID=" + id + "]";
 	}	
+	
+	public EnvironmentGenerator getEnvironmentGen() {
+		return environmentGen;
+	}
 	
 	public LoadedWorld getLoadedWorld() {
 		return loadedWorld;

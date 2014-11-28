@@ -44,9 +44,9 @@ public abstract class Render2D extends Renderable {
 	protected abstract void renderForground();
 	
 	private void renderBackground() {		
-		glPushMatrix();
-		
 		if(getTexture() == null && getColor() == null) return;
+		
+		glPushMatrix();
 		
 			//Position
 			glBindBuffer(GL_ARRAY_BUFFER, vertexVBO);

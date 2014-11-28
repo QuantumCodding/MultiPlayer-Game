@@ -22,7 +22,7 @@ public class ChunkRender extends Render3D {
 	
 	public void draw() {
 		if(!hasCubes) return;
-		
+			
 		glTranslatef(0, -(WorldRegistry.getWorld(chunk.getWorldId()).getSizeY() * (World.SCALE * 0.1f)), 0);
 		super.draw();			
 	}

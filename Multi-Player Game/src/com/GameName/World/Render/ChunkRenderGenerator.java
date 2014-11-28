@@ -19,10 +19,10 @@ public class ChunkRenderGenerator {
 	
 	public static int[] generateChunk(Chunk c, int[] chunkData) {
 		
-		List<Float> chunkVertices = new ArrayList<Float>();		
-		List<Float> chunkTexData = new ArrayList<Float>();
-		List<Float> chunklightValues = new ArrayList<Float>();
-		List<Float> chunkNormals = new ArrayList<Float>();		
+		ArrayList<Float> chunkVertices = new ArrayList<>();		
+		ArrayList<Float> chunkTexData = new ArrayList<>();
+		ArrayList<Float> chunklightValues = new ArrayList<>();
+		ArrayList<Float> chunkNormals = new ArrayList<>();			
 				
 		int vertexCount = 0;
 		int xPos, yPos, zPos;		
@@ -40,9 +40,9 @@ public class ChunkRenderGenerator {
 					
 					Cube cube = Cube.getCubeByID(c.getCube(x, y, z));					
 					int metadata = c.getMetadata(x, y, z);			
-					boolean[] visableFaces = getVisableFaces(x, y, z, c);
+					boolean[] visableFaces = getVisableFaces(x, y, z, c); //new boolean[] {true, true, true, true, true, true}; //
 						
-					if(cube == Cube.Air) continue;		
+					if(cube == Cube.Air) continue;	
 					
 					chunkVertices.addAll(cube.getRender(metadata).getVertices(xPos, yPos, zPos, visableFaces));
 					chunkTexData.addAll(cube.getRender(metadata).getTextureCoords(cube.getId(), metadata, c.getTextureMap(), visableFaces));
@@ -70,7 +70,8 @@ public class ChunkRenderGenerator {
 			chunkData = chunkData2.clone();
 		}
 		
-		Logger.println("Generating Chunk at: " + new Vector3f(c.getX(), c.getY(), c.getZ()).valuesToString());
+		//TODO: Remove
+		Logger.println("Generating Chunk Render For: " + new Vector3f(c.getX(), c.getY(), c.getZ()).valuesToString());
 		
 		GameName.getGLContext()
 			.addBufferBind(verticeBuffer, GL_ARRAY_BUFFER, chunkData[0], GL_DYNAMIC_DRAW, 'f');

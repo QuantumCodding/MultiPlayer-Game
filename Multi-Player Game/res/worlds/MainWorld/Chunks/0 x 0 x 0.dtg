@@ -1,5 +1,4 @@
 type="cube" [cubeId=2i pos=<0.0f,0.0f,0.0f> ]
-type="cube" [cubeId=3i pos=<1.0f,0.0f,0.0f> ]
 type="cube" [cubeId=3i pos=<2.0f,0.0f,0.0f> ]
 type="cube" [cubeId=3i pos=<3.0f,0.0f,0.0f> ]
 type="cube" [cubeId=3i pos=<4.0f,0.0f,0.0f> ]

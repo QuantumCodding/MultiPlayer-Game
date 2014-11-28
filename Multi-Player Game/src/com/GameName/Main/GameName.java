@@ -30,7 +30,6 @@ import com.GameName.Main.Threads.PlayerThread;
 import com.GameName.Main.Threads.ThreadManager;
 import com.GameName.Main.Threads.ThreadRegistry;
 import com.GameName.Main.Threads.VBOUpdateThread;
-import com.GameName.Main.Threads.WorldLoadThread;
 import com.GameName.Networking.Client;
 import com.GameName.Networking.Server;
 import com.GameName.Physics.PhysicsEngine;
@@ -128,7 +127,7 @@ public class GameName implements ISetup {
 		}
 		
 		((VBOUpdateThread) threadManager.accessByName("VBO Thread")).setWorld(player.getAccess().getCurrentWorld());		
-		((WorldLoadThread) threadManager.accessByName("World Thread")).setWorld(player.getAccess().getCurrentWorld());
+//		((WorldLoadThread) threadManager.accessByName("World Thread")).setWorld(player.getAccess().getCurrentWorld());
 		
 		//GUI
 		GuiRegistry.register();
@@ -181,7 +180,7 @@ public class GameName implements ISetup {
 		ThreadRegistry reg = new ThreadRegistry();		
 		
 		reg.addThread(new PhysicsThread	 (ThreadManager.DEFAULT_TICK_RATE, GameName.physics));                             
-		reg.addThread(new WorldLoadThread(ThreadManager.DEFAULT_TICK_RATE, GameName.player.getAccess().getCurrentWorld())); 
+//		reg.addThread(new WorldLoadThread(ThreadManager.DEFAULT_TICK_RATE, GameName.player.getAccess().getCurrentWorld())); 
 		reg.addThread(new VBOUpdateThread(ThreadManager.DEFAULT_TICK_RATE, GameName.player.getAccess().getCurrentWorld())); 
 			
 		reg.addThread(new EntityThread	 (ThreadManager.DEFAULT_TICK_RATE));                     
@@ -237,6 +236,7 @@ public class GameName implements ISetup {
 		FPS_Thread.start();
 		
 		threadManager.startAll();
+		WorldRegistry.accessByName("MainWorld").getLoadedWorld().getAccess().getChunkLoaded().update();
 		
 		while(isRunning && !Display.isCloseRequested()) {
 			getGLContext().tick();
