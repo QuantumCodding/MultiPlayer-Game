@@ -182,17 +182,11 @@ public class Cube {
 					int xOffset = (x * textureSize) + (x * (int) textureSpacing.getX());
 					int yOffset = (y * textureSize) + (y * (int) textureSpacing.getY());
 					
-					if(getName().equals("ColorfulTestCube")) {
-						System.out.println("X: " + (xOffset + xStart) + " Y: " + (yStart + yOffset));
-					}
-					
 					for(int posX = 0; posX < textureSize; posX ++) {
 					for(int posY = 0; posY < textureSize; posY ++) {
 						textures[frame][i][posX + (posY * textureSize)] =
 							fullTexture.getRGB(xStart + xOffset + posX, yStart + yOffset + posY);
-					}}
-					
-					if(getName().equals("ColorfulTestCube")) System.out.println(new Color(textures[frame][i][0]));
+					}}					
 				}
 			}
 			
