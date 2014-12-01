@@ -4,7 +4,7 @@ import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Object.WorldObject;
 
 public class LoadedWorld {
-	protected static int loadRadius = 3;//5;
+	protected static int loadRadius = 10;//3;//5;
 	
 	private LoadedWorldAccess access;
 	protected World world;

@@ -98,7 +98,7 @@ public class Cube {
 		if(!extraInfo.exists()) {
 			textureSize = DEFAULT_TEXTURE_SIZE;
 			textureLocation = new File("res/textures/cubes/" + name + ".png");
-			textureSpacing = new Vector2f(1, 0);
+			textureSpacing = new Vector2f(1, 1);
 			texturesPerLine = new Vector2f(6, 1);
 			sheetPosition = new Vector2f(0, 0);
 			frames = 1;
@@ -150,7 +150,7 @@ public class Cube {
 					"Cube " + name + " is using a texture sheet, but was not given a sheet position"); 
 			if(textureLocation == null) textureLocation = new File("res/textures/cubes/" + name + ".png");
 			
-			if(textureSpacing == null) textureSpacing = new Vector2f(1, 0);
+			if(textureSpacing == null) textureSpacing = new Vector2f(1, 1);
 			if(texturesPerLine == null) texturesPerLine = new Vector2f(6, 1);
 			
 			if(frames == 0) frames = 1;
@@ -165,30 +165,34 @@ public class Cube {
 	 * 	@param frames How many different frames the cube has
 	 */	
 	private int[][][] loadTextures(int frames) {
-		int[][][] textures = new int[frames][6][];
+		int[][][] textures = new int[frames][6][textureSize * textureSize];
 		
 		try {						
 			BufferedImage fullTexture = ImageIO.read(textureLocation);
 			
 			if(fullTexture == null) throw new IOException("Texture == NULL");
+
+			int xStart = (int) ((sheetPosition.getX() * textureSize) + (sheetPosition.getX() * textureSpacing.getX()));
+			int yStart = (int) ((sheetPosition.getY() * textureSize) + (sheetPosition.getY() * textureSpacing.getY()));	
 			
 			for(int frame = 0; frame < frames; frame ++) {
-				for(int i = 0; i < textures[frame].length; i ++) {
+				for(int i = 0; i < textures[frame].length; i ++) {					
 					
-					int xStart = (int) ((sheetPosition.getX() * textureSize) + (sheetPosition.getX() * textureSpacing.getX()));
-					int yStart = (int) ((sheetPosition.getY() * textureSize) + (sheetPosition.getY() * textureSpacing.getY()));
+					int x = i % (int) texturesPerLine.getX(), y = (int) (i / texturesPerLine.getX());					
+					int xOffset = (x * textureSize) + (x * (int) textureSpacing.getX());
+					int yOffset = (y * textureSize) + (y * (int) textureSpacing.getY());
 					
-					for(int x = 0; x < texturesPerLine.getX(); x ++) {
-					for(int y = 0; y < texturesPerLine.getY(); y ++) {		
+					if(getName().equals("ColorfulTestCube")) {
+						System.out.println("X: " + (xOffset + xStart) + " Y: " + (yStart + yOffset));
+					}
 					
-						int xOffset = (x * textureSize) + (x * (int) textureSpacing.getX());
-						int yOffset = (y * textureSize) + (y * (int) textureSpacing.getY());
-						
-						textures[frame][i] = getImageAsColors(fullTexture.getSubimage(
-							xStart + xOffset, 	yStart + yOffset, 						
-							textureSize, 		textureSize)
-						);
+					for(int posX = 0; posX < textureSize; posX ++) {
+					for(int posY = 0; posY < textureSize; posY ++) {
+						textures[frame][i][posX + (posY * textureSize)] =
+							fullTexture.getRGB(xStart + xOffset + posX, yStart + yOffset + posY);
 					}}
+					
+					if(getName().equals("ColorfulTestCube")) System.out.println(new Color(textures[frame][i][0]));
 				}
 			}
 			
@@ -285,7 +289,8 @@ public class Cube {
 	}
 
 	/**
-	 * Returns all the possible textures of this cube
+	 * Returns all the possible textures of this cube <br>
+	 * 			Frame, Face, Colors
 	 */
 	public int[][][] getTextures() {
 		return texture;
@@ -454,25 +459,6 @@ public class Cube {
 	 */	
 	private void setId(int id) {
 		this.id = id;
-	}
-
-	
-	/**
-	 * 	Returns an int[] of all the colors in a BufferedImage
-	 */
-	private static int[] getImageAsColors(BufferedImage image) {
-	    int width = image.getWidth();
-	    int height = image.getHeight();
-	    	    
-	    int[] toRep = new int[width * height];
-	    
-	    for(int x = 0; x < width; x ++) {
-	    	for(int y = 0; y < height; y ++) {
-	    		toRep[x + (y * width)] = image.getRGB(x, y);
-	    	}
-	    }
-		      
-	    return toRep;
 	}
 
 	/**

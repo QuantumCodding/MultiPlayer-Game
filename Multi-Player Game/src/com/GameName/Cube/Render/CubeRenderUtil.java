@@ -2,8 +2,12 @@ package com.GameName.Cube.Render;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+
+import javax.imageio.ImageIO;
 
 import com.GameName.Cube.Cube;
 import com.GameName.Main.GameName;
@@ -98,9 +102,9 @@ public class CubeRenderUtil {
 			}
 			
 			if(cube.getTextureSize() * 6 + x < sideLength) {
-				for(int face = 0; face < 6; face ++) {
+				for(int face = 0; face < 6; face ++) {		
 				for(int xPos = 0; xPos < cube.getTextureSize(); xPos ++) {
-				for(int yPos = 0; yPos < cube.getTextureSize(); yPos ++) {
+				for(int yPos = 0; yPos < cube.getTextureSize(); yPos ++) {					
 					textureSheet[(face * cube.getTextureSize()) + (x + xPos)][y + yPos] 
 						= cube.getTextures()
 							[index % textureSheetMaxFrames]	[face]
@@ -128,6 +132,8 @@ public class CubeRenderUtil {
 				textureSheetImage.setRGB(x, y, textureSheet[x][y]);
 			}
 		}
+		
+		if(typesOfCubes.contains(Cube.ColorfulTestCube))try{ImageIO.write(textureSheetImage, "PNG", new File("C:\\Users\\User\\Desktop\\" + (int)(Math.random() * 100000) + ".png"));}catch(IOException e) {}
 		
 		textureMap.setTexture(GameName.getGLContext().genTexture(textureSheetImage, "ChunkTextureSheet", false));		
 		return textureMap;
