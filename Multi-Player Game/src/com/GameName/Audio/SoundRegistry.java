@@ -55,8 +55,12 @@ public class SoundRegistry extends Registry<Sound> {
 	}
 	
 	public static void cleanUp() {
+		if(sounds == null) return;
+		
 		for(Sound sound : sounds) {
-			sound.cleanUp();
+			if(sound != null) {
+				sound.cleanUp();
+			}
 		}
 	} 
 }

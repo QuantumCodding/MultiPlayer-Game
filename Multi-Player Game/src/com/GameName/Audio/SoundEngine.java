@@ -77,8 +77,12 @@ public class SoundEngine implements IEngine<SoundEvent> {
 	}
 
 	public void cleanUp() {
+		if(SoundRegistry.getSounds() == null) return;
+		
 		for(int i = 0; i < SoundRegistry.getSounds().length; i ++) {
-			alDeleteBuffers(SoundRegistry.getSounds()[i].getId());
+			if(SoundRegistry.getSounds()[i] != null) {
+				alDeleteBuffers(SoundRegistry.getSounds()[i].getId());
+			}
 		}
 		
 		alDeleteSources(defaultSource);

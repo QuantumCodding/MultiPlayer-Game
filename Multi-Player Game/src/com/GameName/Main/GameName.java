@@ -151,7 +151,7 @@ public class GameName implements ISetup {
 		FPS_Thread.setName("FPS Thread");
 		
 		setupGuis();
-		setupSounds();
+//		setupSounds();
 		setupThreads();
 		setupWorlds();
 		setupCommands();

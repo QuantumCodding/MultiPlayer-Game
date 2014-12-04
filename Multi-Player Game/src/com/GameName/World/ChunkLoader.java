@@ -77,11 +77,11 @@ public class ChunkLoader {
 				
 		for(int radius = 0; radius < loadRadius; radius ++) {
 			
-			for(int x = -radius; x < radius; x ++) {
-			for(int y = -radius; y < radius; y ++) {
-			for(int z = -radius; z < radius; z ++) {
+			for(int x = -radius; x < radius + 1; x ++) {
+			for(int y = -radius; y < radius + 1; y ++) {
+			for(int z = -radius; z < radius + 1; z ++) {
 				
-				Vector3f loadPos = new Vector3f(x, y, z).add(center).capMax(world.getChunkSizeAsVector().subtract(1)).capMin(0);
+				Vector3f loadPos = new Vector3f(x, y, z).add(center).capMax(world.getChunkSizeAsVector()).capMin(0);
 				Chunk chunk = getChunk(loadPos);
 				
 				if(chunk == null) {

@@ -100,12 +100,12 @@ public class ChunkRenderGenerator {
 		
 		Cube[] surroundingCubes = c.getSurroundingCubes(x, y, z);
 			
-		visableFaces[0] = surroundingCubes[0] != null ? !surroundingCubes[0].isVisable(metadata) : true; // 0 -x			1				z
-		visableFaces[1] = surroundingCubes[1] != null ? !surroundingCubes[1].isVisable(metadata) : true; // 1 +z		0	C	2		-x	c	x
-		visableFaces[2] = surroundingCubes[2] != null ? !surroundingCubes[2].isVisable(metadata) : true; // 2 +x			3			   -z
-		visableFaces[3] = surroundingCubes[3] != null ? !surroundingCubes[3].isVisable(metadata) : true; // 3 -z					4			+y
-		visableFaces[4] = surroundingCubes[4] != null ? !surroundingCubes[4].isVisable(metadata) : true; // 4 +y					C			 c
-		visableFaces[5] = surroundingCubes[5] != null ? !surroundingCubes[5].isVisable(metadata) : true; // 5 -y					5			-y
+		visableFaces[0] = surroundingCubes[2] != null ? !surroundingCubes[2].isVisable(metadata) : true; // 0 -x			1				z
+		visableFaces[1] = surroundingCubes[3] != null ? !surroundingCubes[3].isVisable(metadata) : true; // 1 +z		0	C	2		-x	c	x
+		visableFaces[2] = surroundingCubes[0] != null ? !surroundingCubes[0].isVisable(metadata) : true; // 2 +x			3			   -z
+		visableFaces[3] = surroundingCubes[1] != null ? !surroundingCubes[1].isVisable(metadata) : true; // 3 -z					4			+y
+		visableFaces[4] = surroundingCubes[5] != null ? !surroundingCubes[5].isVisable(metadata) : true; // 4 +y					C			 c
+		visableFaces[5] = surroundingCubes[4] != null ? !surroundingCubes[4].isVisable(metadata) : true; // 5 -y					5			-y
 				
 		return visableFaces;
 	}

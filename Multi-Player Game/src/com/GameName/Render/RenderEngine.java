@@ -185,7 +185,7 @@ public class RenderEngine implements IEngine<Renderable> {
 	
 	public void render3D() {
 		glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
+        glEnable(GL_CULL_FACE); 
         glEnable(GL_TEXTURE_2D);
 		
 		glMatrixMode(GL_PROJECTION);

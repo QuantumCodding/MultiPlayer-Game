@@ -238,64 +238,51 @@ public class Chunk {
 	}
 	
 	public Cube[] getSurroundingCubes(int x, int y, int z) {
-		int[] cubes = new int[6];
+		int[] cubes = {-2, -2, -2, -2, -2, -2};
 		World world = WorldRegistry.getWorld(worldId);
 		LoadedWorldAccess access = world.getLoadedWorld().getAccess();
 		
 		Vector3f minPos = access.getCenter().subtract(LoadedWorldAccess.getRenderRadius()).capMin(0);		
 		Vector3f maxPos = access.getCenter().add(LoadedWorldAccess.getRenderRadius()).capMax(world.getSizeAsVector()).subtract(1);
 		
-		if(!isPosOnEdge(x, y, z)) {
-			cubes[0] = getCube(x - 1, y, z); // 0 -x			1				z         
-			cubes[1] = getCube(x, y, z + 1); // 1 +z		0	C	2		-x	c	x     
-			cubes[2] = getCube(x + 1, y, z); // 2 +x			3			   -z         
-			cubes[3] = getCube(x, y, z - 1); // 3 -z					4				+y
-			cubes[4] = getCube(x, y + 1, z); // 4 +y					C				 c
-			cubes[5] = getCube(x, y - 1, z); // 5 -y					5				-y
-		
-		} else {
-			Chunk chunk = world.getChunk(getX() - 1, getY(), getZ());								// -X
-			if(chunk != null && !chunk.isInitialized()) { 
-				if(getX() - 1 > minPos.getX()) {
-					cubes[0] = world.getChunk(getX() - 1, getY(), getZ()).getCube(getSize(), y, z);		
-				}
-			} else { cubes[0] = -1; }
+		if(isPosOnEdge(x, y, z)) {
+			if(x == 0) {
+				if(this.x == minPos.getX())	cubes[0] = -1;
+				else cubes[0] = world.getChunk(this.x - 1, this.y, this.z).getCube(size - 1, y, z);
+			}  
 			
-			chunk = world.getChunk(getX(), getY(), getZ() + 1);										// +Z
-			if(chunk != null && !chunk.isInitialized()) { 
-				if(getZ() + 1 < maxPos.getZ()) {
-					cubes[1] = world.getChunk(getX(), getY(), getZ() + 1).getCube(x, y, 0);	
-				}
-			} else { cubes[1] = -1; }
+			if(y == 0) {
+				if(this.y == minPos.getY())	cubes[5] = -1;
+				else cubes[5] = world.getChunk(this.x, this.y - 1, this.z).getCube(x, size - 1, z);
+			}  
 			
-			chunk = world.getChunk(getX() + 1, getY(), getZ());										// +X
-			if(chunk != null && !chunk.isInitialized()) {
-				if(getX() + 1 < maxPos.getX()) {
-					cubes[2] = world.getChunk(getX() + 1, getY(), getZ()).getCube(0, y, z);		
-				}
-			} else { cubes[2] = -1; }
+			if(z == 0) {
+				if(this.z == minPos.getZ())	cubes[3] = -1;
+				else cubes[3] = world.getChunk(this.x, this.y, this.z - 1).getCube(x, y, size - 1);
+			}  
 			
-			chunk = world.getChunk(getX(), getY(), getZ() - 1);										// -Z
-			if(chunk != null && !chunk.isInitialized()) {
-				if(getZ() - 1 > minPos.getZ()) {
-					cubes[3] = world.getChunk(getX(), getY(), getZ() - 1).getCube(x, y, getSize());		
-				}
-			} else { cubes[3] = -1; }
-			
-			chunk = world.getChunk(getX(), getY() + 1, getZ());										// +Y
-			if(chunk != null && !chunk.isInitialized()) {
-				if(getY() + 1 < maxPos.getY()) {
-					cubes[4] = world.getChunk(getX(), getY() + 1, getZ()).getCube(x, 0, z);			
-				}
-			} else { cubes[4] = -1; }
-			
-			chunk = world.getChunk(getX(), getY() - 1, getZ());										// -Y
-			if(chunk != null && !chunk.isInitialized()) {
-				if(getY() - 1 > minPos.getY()) {
-					cubes[5] = world.getChunk(getX(), getY() - 1, getZ()).getCube(x, getSize(), z);
-				}
-			} else { cubes[5] = -1; }
+			if(x == size - 1) {
+				if(this.x == maxPos.getX())	cubes[2] = -1;
+				else cubes[2] = world.getChunk(this.x + 1, this.y, this.z).getCube(0, y, z);
+			}  
+
+			if(y == size - 1) {
+				if(this.y == maxPos.getZ())	cubes[4] = -1;
+				else cubes[4] = world.getChunk(this.x, this.y + 1, this.z).getCube(x, 0, z);
+			} 
+
+			if(z == size - 1) {
+				if(this.z == maxPos.getZ())	cubes[1] = -1;
+				else cubes[1] = world.getChunk(this.x, this.y, this.z + 1).getCube(x, y, 0);
+			} 
 		}
+		
+		if(cubes[0] == -2) cubes[0] = getCube(x - 1, y, z); // 0 -x			1				z         
+		if(cubes[1] == -2) cubes[1] = getCube(x, y, z + 1); // 1 +z		0	C	2		-x	c	x     
+		if(cubes[2] == -2) cubes[2] = getCube(x + 1, y, z); // 2 +x			3			   -z         
+		if(cubes[3] == -2) cubes[3] = getCube(x, y, z - 1); // 3 -z					4				+y
+		if(cubes[4] == -2) cubes[4] = getCube(x, y + 1, z); // 4 +y					C				 c
+		if(cubes[5] == -2) cubes[5] = getCube(x, y - 1, z); // 5 -y					5				-y
 		
 		return Cube.getCubesByID(cubes);	
 	}
