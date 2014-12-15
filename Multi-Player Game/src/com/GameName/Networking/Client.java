@@ -5,10 +5,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+import com.GameName.Engine.GameEngine;
 import com.GameName.Networking.Packets.ClientPacketProcesor;
 import com.GameName.Networking.Packets.Packet;
 
 public class Client implements Runnable {
+	private final GameEngine ENGINE;
 	private Socket serverPort;
 
 	private DataInputStream in;
@@ -19,11 +21,14 @@ public class Client implements Runnable {
 	
 	private NetworkPlayer[] users;
 	
-	public Client() {
+	public Client(GameEngine eng) {
+		ENGINE = eng;
 		onServer = false;
 	}
 	
-	private Client(DataInputStream in) {
+	private Client(GameEngine eng, DataInputStream in) {
+		ENGINE = eng;
+		
 		onServer = false;
 		this.in = in;
 	}
@@ -48,15 +53,15 @@ public class Client implements Runnable {
 		return users[id]; 
 	}
 
-	public static Client joinServer(String ip, int port) {		
+	public static Client joinServer(GameEngine eng, String ip, int port) {		
 		try {
-			Client input = new Client();
+			Client input = new Client(eng);
 			
 			input.serverPort = new Socket(ip, port);
 			
 			input.out = new DataOutputStream(input.serverPort.getOutputStream());	
 			
-			input = new Client(new DataInputStream(input.serverPort.getInputStream()));
+			input = new Client(eng, new DataInputStream(input.serverPort.getInputStream()));
 			input.onServer = true;
 			
 			Thread t = new Thread(input);
@@ -69,7 +74,7 @@ public class Client implements Runnable {
 			e.printStackTrace();
 		}		
 		
-		return new Client();
+		return new Client(eng);
 	}
 	
 	public boolean sendPacket(Packet p) {
@@ -90,7 +95,7 @@ public class Client implements Runnable {
 		while(onServer) {
 			try {
 				int packetId = in.readInt();				
-				ClientPacketProcesor.readData(packetId, in);
+				ClientPacketProcesor.readData(ENGINE, packetId, in);
 				
 			} catch (IOException e) {
 				System.err.println();

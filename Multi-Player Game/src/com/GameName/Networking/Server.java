@@ -8,11 +8,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 
+import com.GameName.Engine.GameEngine;
 import com.GameName.Networking.Packets.PacketConnectResponse;
 import com.GameName.World.ServerWorld;
 
 public class Server {
 	public static final int DEFAULT_PORT = 4263;
+	private final GameEngine ENGINE;
 	
 	private ServerSocket server;
 	private Socket connecter;
@@ -29,7 +31,8 @@ public class Server {
 	
 	private List<ServerWorld> world;
 	
-	public Server() {
+	public Server(GameEngine eng) {
+		ENGINE = eng;
 		reset();
 	}
 	
@@ -77,7 +80,7 @@ public class Server {
 								for(int i = 0; i < users.length; i ++) {
 									if(users[i] == null) {
 										
-										users[i] = new NetworkPlayer(
+										users[i] = new NetworkPlayer(ENGINE,
 												new DataInputStream(connecter.getInputStream()), 
 												new DataOutputStream(connecter.getOutputStream()), 
 												users, i

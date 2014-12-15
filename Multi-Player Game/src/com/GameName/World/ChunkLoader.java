@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.HashSet;
 
 import com.GameName.Cube.Cube;
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
 import com.GameName.Main.Debugging.Logger;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
@@ -21,8 +21,11 @@ public class ChunkLoader {
 	private int loadRadius;
 	
 	private World world;
+	private final GameEngine ENGINE;
 	
-	public ChunkLoader(World world, int loadRadius) {
+	public ChunkLoader(GameEngine eng, World world, int loadRadius) {
+		ENGINE = eng;
+		
 		this.world = world;
 		this.loadRadius = loadRadius;
 		
@@ -64,7 +67,7 @@ public class ChunkLoader {
 //			Chunk chunk = unloadedChunks.get(i);
 			
 			chunk.setIsLoaded(false);
-			GameName.render.remove(chunk.getRender());
+			ENGINE.getRender().remove(chunk.getRender());
 			chunk.getRender().cleanUp();
 			unloadedChunks.remove(chunk);//.remove(i);
 			
@@ -80,12 +83,13 @@ public class ChunkLoader {
 			for(int x = -radius; x < radius + 1; x ++) {
 			for(int y = -radius; y < radius + 1; y ++) {
 			for(int z = -radius; z < radius + 1; z ++) {
+				if(x < 0 || y < 0 || z < 0) continue;
 				
 				Vector3f loadPos = new Vector3f(x, y, z).add(center).capMax(world.getChunkSizeAsVector()).capMin(0);
 				Chunk chunk = getChunk(loadPos);
 				
 				if(chunk == null) {
-					chunk = new Chunk(World.CHUNK_SIZE, world.getId(), 
+					chunk = new Chunk(ENGINE, World.CHUNK_SIZE, world.getId(), 
 							(int) loadPos.getX(), (int) loadPos.getY(), (int) loadPos.getZ()
 						);
 				}
@@ -112,8 +116,8 @@ public class ChunkLoader {
 					}
 					
 				} catch(IOException e) {
-					System.out.println("Generateing");
-					Chunk read = world.getEnvironmentGen().generate(World.CHUNK_SIZE, world, x, y, z, 10);
+					System.out.println("Generateing: [" + x + ", " + y + ", " + z + "]");
+					Chunk read = world.getEnvironmentGen().generate(ENGINE, World.CHUNK_SIZE, world, x, y, z, 10);
 					
 					for(int x_ = 0; x_ < read.getSize(); x_ ++) {
 					for(int y_ = 0; y_ < read.getSize(); y_ ++) {
@@ -130,7 +134,7 @@ public class ChunkLoader {
 				chunk.setIsLoaded(true);
 				chunk.updateTextureMap();
 				
-				GameName.render.add(chunk.getRender()); getLoadedChunks().add(chunk); chunk.forceVBOUpdate();
+				ENGINE.getRender().add(chunk.getRender()); getLoadedChunks().add(chunk); chunk.forceVBOUpdate();
 				Logger.print("Chunk: " + chunk.getPos().valuesToString() + " is loaded").end();
 			}}}			
 		}

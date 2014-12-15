@@ -1,7 +1,7 @@
 package com.GameName.GUI;
 
+import com.GameName.Engine.GameEngine;
 import com.GameName.GUI.Components.GUIComponent;
-import com.GameName.Main.GameName;
 import com.GameName.Render.Effects.Texture;
 import com.GameName.Render.Types.Render2D;
 
@@ -13,8 +13,8 @@ public abstract class GUI extends Render2D {
 	private boolean isOpen;
 	private String name;
 	
-	protected GUI(String name, int textureCount, float x, float y, float width, float height, String textureType) {
-		super(x, y, width, height);
+	protected GUI(GameEngine eng, String name, int textureCount, float x, float y, float width, float height, String textureType) {
+		super(eng, x, y, width, height);
 		
 		this.name = name;
 		
@@ -23,12 +23,12 @@ public abstract class GUI extends Render2D {
 	}	
 
 	public void open() {
-		GameName.render.add(this);
+		ENGINE.getRender().add(this);
 		isOpen = true;
 	}
 	
 	public void close() {
-		GameName.render.remove(this);
+		ENGINE.getRender().remove(this);
 		isOpen = false;
 	}
 	

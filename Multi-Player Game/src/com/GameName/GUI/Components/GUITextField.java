@@ -5,7 +5,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.UnicodeFont;
 import org.newdawn.slick.font.effects.ColorEffect;
 
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class GUITextField extends GUIComponent {
@@ -23,8 +23,8 @@ public class GUITextField extends GUIComponent {
 	
 	private boolean uppercase;
 	
-	protected GUITextField(int id, float x, float y, float width, float height, int viewSize, String startText) {
-		super(id, x, y, width, height);
+	protected GUITextField(GameEngine eng, int id, float x, float y, float width, float height, int viewSize, String startText) {
+		super(eng, id, x, y, width, height);
 		
 		this.viewSize = viewSize;
 		store = new char[MAX_SIZE];
@@ -44,15 +44,15 @@ public class GUITextField extends GUIComponent {
 	public void update() {
 		boolean pre = hasFocus;
 		
-		if(isSelected() && GameName.player.getAccess().isPointerDown()) {
+		if(isSelected() && ENGINE.getPlayer().getAccess().isPointerDown()) {
 			hasFocus = true;
-			GameName.lockMovement = true;
-		} else if(GameName.player.getAccess().isPointerDown()) {
+			ENGINE.getPlayer().getAccess().setCanMove(false);
+		} else if(ENGINE.getPlayer().getAccess().isPointerDown()) {
 			hasFocus = false;
 		}
 		
 		if(hasFocus != pre) {
-			GameName.lockMovement = false;
+			ENGINE.getPlayer().getAccess().setCanMove(true);
 		}
 		
 		if(hasFocus) {

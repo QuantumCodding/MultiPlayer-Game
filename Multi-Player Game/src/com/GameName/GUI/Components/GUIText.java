@@ -1,17 +1,19 @@
 package com.GameName.GUI.Components;
 
-import com.GameName.Util.Vectors.Vector3f;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.UnicodeFont;
 import org.newdawn.slick.font.effects.ColorEffect;
+
+import com.GameName.Engine.GameEngine;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class GUIText extends GUIComponent {
 	
 	private UnicodeFont font;
 	private String text;
 	
-	protected GUIText(int id, float x, float y, String text) {
-		super(id, x, y, 1, 1);
+	protected GUIText(GameEngine eng, int id, float x, float y, String text) {
+		super(eng, id, x, y, 1, 1);
 		
 		this.text = text;
 	}

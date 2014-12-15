@@ -1,5 +1,6 @@
 package com.GameName.Entity;
 
+import com.GameName.Engine.GameEngine;
 import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Object.WorldObject;
 import com.GameName.World.Object.WorldObjectAccess;
@@ -7,8 +8,8 @@ import com.GameName.World.Object.WorldObjectAccess;
 public class EntityAccess extends WorldObjectAccess {
 	Entity entity;
 		
-	protected EntityAccess(WorldObject object) {
-		super(object);
+	protected EntityAccess(GameEngine eng, WorldObject object) {
+		super(eng, object);
 		
 		entity = (Entity) object;
 	}
@@ -40,7 +41,7 @@ public class EntityAccess extends WorldObjectAccess {
 	public int getHunger() {
 		return entity.hunger;
 	}
-
+	
 	public void setMaxHealth(int maxHealth) {
 		entity.maxHealth = maxHealth;
 	}
@@ -66,22 +67,17 @@ public class EntityAccess extends WorldObjectAccess {
 	}
 	
 	public void moveX(float amount) {
-		getPos().addAndSet(new Vector3f(				
-			(float) (amount * Math.cos(Math.toRadians(getRot().getY())) * -1), 0.0f,
-			(float) (amount * Math.sin(Math.toRadians(getRot().getY())) * -1)
-		));
-				
+		getForce().setX(getForce().getX() + (float) (amount * Math.cos(Math.toRadians(getRot().getY())) * -1));
+		getForce().setZ(getForce().getZ() + (float) (amount * Math.sin(Math.toRadians(getRot().getY())) * -1));
 	}
 	
 	public void moveY(float amount) {
-		setPos(getPos().add(new Vector3f(0.0f, amount, 0.0f)));
+		getForce().setY(getForce().getY() + amount);
 	}
 	
 	public void moveZ(float amount) {
-		getPos().addAndSet(new Vector3f(				
-				(float) (amount * Math.cos(Math.toRadians(getRot().getY() + 90)) * -1), 0.0f,
-				(float) (amount * Math.sin(Math.toRadians(getRot().getY() + 90)) * -1)
-			));
+		getForce().setX(getForce().getX() + (float) (amount * Math.cos(Math.toRadians(getRot().getY() + 90)) * -1));
+		getForce().setZ(getForce().getZ() + (float) (amount * Math.sin(Math.toRadians(getRot().getY() + 90)) * -1));
 	}
 	
 	public void rotateX(float amount) {

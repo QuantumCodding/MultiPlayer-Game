@@ -1,5 +1,6 @@
 package com.GameName.Entity;
 
+import com.GameName.Engine.GameEngine;
 import com.GameName.World.Object.WorldObject;
 
 public abstract class Entity extends WorldObject {
@@ -11,7 +12,7 @@ public abstract class Entity extends WorldObject {
 	
 	protected int maxHunger;
 	protected int hunger;	
-
+	
 	EntityAccess access;
 	
 	/**
@@ -21,20 +22,20 @@ public abstract class Entity extends WorldObject {
 	 *    Sets max health and max mana to 10 
 	 *    Sets max hunger to 100
 	 */
-	public Entity() {
-		super();
+	public Entity(GameEngine eng) {
+		super(eng);
 		
 		maxHealth = 10;        health = maxHealth;
 		maxMana = 10;          mana = maxMana;    
 		maxHunger = 100;       hunger = maxHunger;
-				
+		
 		init();
 	}
 	
 	protected abstract void init();
 	
-	public void updata() {
-		super.updata();
+	public void update() {		
+		super.update();
 		
 //		applyGravity(currentWorld);
 	}

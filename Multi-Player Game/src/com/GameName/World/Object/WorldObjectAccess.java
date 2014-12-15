@@ -1,5 +1,6 @@
 package com.GameName.World.Object;
 
+import com.GameName.Engine.GameEngine;
 import com.GameName.Physics.Object.PhysicsAccess;
 import com.GameName.Physics.Object.PhysicsObject;
 import com.GameName.Util.Vectors.Vector3f;
@@ -8,8 +9,8 @@ import com.GameName.World.World;
 public class WorldObjectAccess extends PhysicsAccess {
 	WorldObject wObject;
 	
-	public WorldObjectAccess(PhysicsObject object) {
-		super(object);
+	public WorldObjectAccess(GameEngine eng, PhysicsObject object) {
+		super(eng, object);
 		
 		wObject = (WorldObject) object;
 	}

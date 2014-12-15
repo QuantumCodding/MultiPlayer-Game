@@ -1,14 +1,14 @@
 package com.GameName.GUI.Components;
 
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
 
 public class GUIRadioButton extends GUIComponent {
 
 	private boolean state;
 	private boolean prvClickStart;
 	
-	public GUIRadioButton(int id, float x, float y, float width, float height) {
-		super(id, x, y, width, height);
+	public GUIRadioButton(GameEngine eng, int id, float x, float y, float width, float height) {
+		super(eng, id, x, y, width, height);
 	}
 	
 	public void activate() {
@@ -17,8 +17,8 @@ public class GUIRadioButton extends GUIComponent {
 	}
 	
 	public void update() {
-		if(GameName.player.getAccess().isPointerDown() != prvClickStart) {
-			prvClickStart = GameName.player.getAccess().isPointerDown();
+		if(ENGINE.getPlayer().getAccess().isPointerDown() != prvClickStart) {
+			prvClickStart = ENGINE.getPlayer().getAccess().isPointerDown();
 			super.update();
 		}
 	}

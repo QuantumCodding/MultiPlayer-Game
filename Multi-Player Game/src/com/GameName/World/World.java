@@ -3,13 +3,16 @@ package com.GameName.World;
 import java.io.File;
 
 import com.GameName.Cube.Cube;
+import com.GameName.Engine.GameEngine;
+import com.GameName.Engine.ResourceManager.Cubes;
 import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Generation.EnvironmentGenerator;
 import com.GameName.World.Object.WorldObject;
 
 public class World {
 	private static String defaultWorldRootDir = "res/worlds/";
-		
+	private GameEngine ENGINE;	
+	
 	public static final float AMBIANT_LIGHT = 10;
 	public static final float MAX_LIGHT = 10;
 	public static final int CHUNK_SIZE = 10;
@@ -41,7 +44,6 @@ public class World {
 		this.id = -1;
 			
 		environmentGen = new EnvironmentGenerator(seed, this);
-		loadedWorld = new LoadedWorld(this, name);
 	}
 	
 	public void setId(int id) {
@@ -58,13 +60,13 @@ public class World {
 		for(int cy = 0; cy < chunkY; cy ++) {
 		for(int cx = 0; cx < chunkX; cx ++) {
 		
-			chunks[cx + (cy * chunkX) + (cz * chunkX * chunkY)] = new Chunk(CHUNK_SIZE, id, cx, cy, cz);
+//			chunks[cx + (cy * chunkX) + (cz * chunkX * chunkY)] = new Chunk(CHUNK_SIZE, id, cx, cy, cz);
 			
 			for(int x = 0; x < CHUNK_SIZE; x ++) {
 				for(int y = 0; y < CHUNK_SIZE; y ++) {
 					for(int z = 0; z < CHUNK_SIZE; z ++) {// % 2
 						chunks[cx + (cy * chunkX) + (cz * chunkX * chunkY)].setCube(x, y, z, 
-								Math.random() > 0.9 ? Cube.GoldCube : Cube.StoneCube); // : Math.random() > 0.7 ? Cube.CopperCube//(int)(Math.random() * 10) > 6 ? Cube.Air : (int)(Math.random() * 10) > 6 ? Cube.ColorfulTestCube : Cube.TestCube); // 
+								Math.random() > 0.9 ? Cubes.GoldCube : Cubes.StoneCube); // : Math.random() > 0.7 ? Cube.CopperCube//(int)(Math.random() * 10) > 6 ? Cube.Air : (int)(Math.random() * 10) > 6 ? Cube.ColorfulTestCube : Cube.TestCube); // 
 					}
 				}				
 			}
@@ -73,7 +75,7 @@ public class World {
 		for(int x = 0; x < sizeX / 2; x ++) {
 			for(int y = 0; y < sizeY/2; y ++) {
 				for(int z = 0; z < sizeZ; z ++) {
-					setCube(x + sizeX/4, y + sizeY/4, z, Cube.Air, chunks);
+					setCube(x + sizeX/4, y + sizeY/4, z, Cubes.Air, chunks);
 				}
 			}
 		}
@@ -81,7 +83,7 @@ public class World {
 		for(int z = 0; z < sizeZ / 2; z ++) {
 			for(int y = 0; y < sizeY/2; y ++) {
 				for(int x = 0; x < sizeX; x ++) {
-					setCube(x, y + sizeY/4, z + sizeZ/4, Cube.Air, chunks);
+					setCube(x, y + sizeY/4, z + sizeZ/4, Cubes.Air, chunks);
 				}
 			}
 		}
@@ -89,7 +91,7 @@ public class World {
 		for(int z = 0; z < sizeZ / 2; z ++) {
 			for(int x = 0; x < sizeX/2; x ++) {
 				for(int y = 0; y < sizeY - (sizeY / 3); y ++) {
-					setCube(x + sizeX/4, y, z + sizeZ/4, Cube.Air, chunks);
+					setCube(x + sizeX/4, y, z + sizeZ/4, Cubes.Air, chunks);
 				}
 			}
 		}
@@ -120,7 +122,7 @@ public class World {
 			setCube((int) loadPos.getX(), (int) loadPos.getY(), (int) loadPos.getZ(), Cube.getCubeByID(cubeID), chunks);//(float) Math.sin(z) * 5
 		}}}
 		
-		setCube(0, 0, 0, Cube.ColorfulTestCube, chunks);
+		setCube(0, 0, 0, Cubes.ColorfulTestCube, chunks);
 		
 //		loadedWorld.getAccess().setCunks(chunks);
 		isGenerated = true;
@@ -229,6 +231,11 @@ public class World {
 	
 	public LoadedWorld getLoadedWorld() {
 		return loadedWorld;
+	}
+	
+	public void setEngine(GameEngine eng) {
+		ENGINE = eng;
+		loadedWorld = new LoadedWorld(ENGINE, this, name);
 	}
 	
 	public void cleanUp() {

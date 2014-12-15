@@ -2,12 +2,13 @@ package com.GameName.World.Render;
 
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
+import com.GameName.Cube.Render.CubeRenderUtil;
 import com.GameName.Cube.Render.CubeTextureMap;
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
+import com.GameName.Engine.Registries.WorldRegistry;
 import com.GameName.Render.Types.Render3D;
 import com.GameName.World.Chunk;
 import com.GameName.World.World;
-import com.GameName.World.WorldRegistry;
 
 public class ChunkRender extends Render3D {
 	private Chunk chunk;
@@ -15,8 +16,8 @@ public class ChunkRender extends Render3D {
 	
 	private CubeTextureMap textureMap;
 	
-	public ChunkRender(Chunk chunk) {
-		super();
+	public ChunkRender(GameEngine eng, Chunk chunk) {
+		super(eng);
 		this.chunk = chunk;
 	}
 	
@@ -32,7 +33,8 @@ public class ChunkRender extends Render3D {
 			genVBOids();
 		}
 		
-		int[] ids = ChunkRenderGenerator.generateChunk(chunk, new int[] {vertexVBO, textureVBO, colorVBO, normalVBO, 0});
+		textureMap = CubeRenderUtil.generateTexturMap(ENGINE, chunk.getTypesOfCubes());
+		int[] ids = ChunkRenderGenerator.generateChunk(ENGINE, chunk, new int[] {vertexVBO, textureVBO, colorVBO, normalVBO, 0});
 		
 		vertexVBO = ids[0];
 		textureVBO = ids[1];
@@ -45,7 +47,7 @@ public class ChunkRender extends Render3D {
 	}
 
 	public void genVBOids() {
-		int[] ids = GameName.getGLContext().genBufferIds(4);
+		int[] ids = ENGINE.getGLContext().genBufferIds(4);
 
 		this.vertexVBO = ids[0];
 		this.textureVBO = ids[1];

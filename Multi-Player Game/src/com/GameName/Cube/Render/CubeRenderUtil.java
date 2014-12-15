@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import com.GameName.Cube.Cube;
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
 import com.GameName.Util.Vectors.Vector2f;
 
 public class CubeRenderUtil {
-	public static CubeTextureMap generateTexturMap(HashSet<Cube> typesOfCubes) {
+	public static CubeTextureMap generateTexturMap(GameEngine eng, HashSet<Cube> typesOfCubes) {
 		Cube[] cubes = typesOfCubes.toArray(new Cube[typesOfCubes.size()]);
 		
 		int textureSheetMaxFrames = 0;
@@ -129,7 +129,7 @@ public class CubeRenderUtil {
 			}
 		}
 		
-		textureMap.setTexture(GameName.getGLContext().genTexture(textureSheetImage, "ChunkTextureSheet", false));		
+		textureMap.setTexture(eng.getGLContext().genTexture(textureSheetImage, "ChunkTextureSheet", false));		
 		return textureMap;
 	}
 }

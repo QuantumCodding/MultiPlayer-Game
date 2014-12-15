@@ -15,7 +15,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
 import com.GameName.Render.Effects.ShaderRegistry;
 import com.GameName.Util.BufferUtil;
 import com.GameName.Util.Vectors.Vector2f;
@@ -24,11 +24,13 @@ public abstract class Render2D extends Renderable {
 	private Vector2f pos;
 	private float width, height;
 	
-	public Render2D(float x, float y, float width, float height) {
-		this(new Vector2f(x, y), width, height);
+	public Render2D(GameEngine eng, float x, float y, float width, float height) {
+		this(eng, new Vector2f(x, y), width, height);
 	}
 	
-	public Render2D(Vector2f pos, float width, float height) {
+	public Render2D(GameEngine eng, Vector2f pos, float width, float height) {
+		super(eng);
+		
 		this.pos = pos;
 		this.width = width;
 		this.height = height;
@@ -62,7 +64,7 @@ public abstract class Render2D extends Renderable {
 	}
 
 	public void genVBOids() {
-		int[] ids = GameName.getGLContext().genBufferIds(3);
+		int[] ids = ENGINE.getGLContext().genBufferIds(3);
 		
 		vertexVBO = ids[0];
 		textureVBO = ids[1];
@@ -80,7 +82,7 @@ public abstract class Render2D extends Renderable {
 		verties.add(pos.getX());			verties.add(pos.getY() + height);
 		
 		FloatBuffer vertexBuffer = BufferUtil.createFillipedFloatBuffer(verties);
-		GameName.getGLContext().addBufferBind(vertexBuffer, GL_ARRAY_BUFFER_BINDING, vertexVBO, GL_STATIC_DRAW, 'f');
+		ENGINE.getGLContext().addBufferBind(vertexBuffer, GL_ARRAY_BUFFER_BINDING, vertexVBO, GL_STATIC_DRAW, 'f');
 		
 		//Texture
 		List<Float> texCoords = new ArrayList<Float>();
@@ -91,7 +93,7 @@ public abstract class Render2D extends Renderable {
 		texCoords.add(texCoordsTop.getX());			texCoords.add(texCoordsBottom.getY());
 		
 		FloatBuffer texCoordsBuffer = BufferUtil.createFillipedFloatBuffer(texCoords);
-		GameName.getGLContext().addBufferBind(texCoordsBuffer, GL_ARRAY_BUFFER_BINDING, textureVBO, GL_STATIC_DRAW, 'f');
+		ENGINE.getGLContext().addBufferBind(texCoordsBuffer, GL_ARRAY_BUFFER_BINDING, textureVBO, GL_STATIC_DRAW, 'f');
 	}
 	
 	protected float getX() {

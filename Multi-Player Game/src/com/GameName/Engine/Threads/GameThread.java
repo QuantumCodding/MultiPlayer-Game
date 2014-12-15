@@ -1,20 +1,26 @@
-package com.GameName.Main.Threads;
+package com.GameName.Engine.Threads;
 
+import com.GameName.Engine.GameEngine;
 import com.GameName.Util.Time;
 
 public abstract class GameThread implements Runnable {
+	GameEngine ENGINE;	
 	private GameThreadTracker tracker;
 	
 	private double tickTime;
 	private boolean isRunning, isStopRequested, isPaused;
 	private int TPS;
 	
+	private long lastTick;
+	protected float timeSinceLastTick;
+	
 	private int tickRate;
 	private String name;
+	private int id;
 	
 	private Thread thread;
 	
-	public GameThread(int tickRate, String name) {
+	public GameThread(int tickRate, String name) {	
 		tickTime = 1.0 / (double) tickRate;	
 		
 		this.name = name;
@@ -60,7 +66,7 @@ public abstract class GameThread implements Runnable {
 		}
 	}
 	
-	public void run() {		
+	public void run() {	
 		init();
 
 		long lastTime = Time.getTime();
@@ -95,7 +101,10 @@ public abstract class GameThread implements Runnable {
 			}
 			
 			if(tick) {
-				tick();				
+				timeSinceLastTick = (float) (((double) Time.getTime() - (double) lastTick) / Time.getSECONDS());
+				lastTick = Time.getTime();
+				
+				tick();		
 				frames ++;
 							
 			} else {				
@@ -139,9 +148,20 @@ public abstract class GameThread implements Runnable {
 	public GameThreadTracker getTracker() {
 		return tracker;
 	}
-
 	
 	public boolean isLive() {
 		return thread.isAlive();
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	public void setEngine(GameEngine eng) {
+		ENGINE = eng;
 	}
 }

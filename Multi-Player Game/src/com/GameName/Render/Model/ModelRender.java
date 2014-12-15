@@ -1,9 +1,5 @@
 package com.GameName.Render.Model;
 
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.glDrawArrays;
@@ -12,12 +8,16 @@ import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
 import com.GameName.Render.Types.Renderable;
 import com.GameName.Util.BufferUtil;
 import com.GameName.Util.Vectors.Vector2f;
@@ -36,7 +36,9 @@ public class ModelRender extends Renderable {
 	private int[] textureVBOs;
 	private int[] normalVBOs;
 	
-	public ModelRender(ModelData modelData, String name) {
+	public ModelRender(GameEngine eng, ModelData modelData, String name) {
+		super(eng);
+		
 		this.modelData = modelData;
 		animations = new ArrayList<Animation>();
 		this.name = name;
@@ -135,13 +137,13 @@ public class ModelRender extends Renderable {
 		FloatBuffer textureBuffer = BufferUtil.createFillipedFloatBuffer(textureCoords);
 		FloatBuffer normalBuffer = BufferUtil.createFillipedFloatBuffer(normals);
 		
-		GameName.getGLContext()
+		ENGINE.getGLContext()
 			.addBufferBind(vertexBuffer, GL_ARRAY_BUFFER, vertexVBOs[i], GL_DYNAMIC_DRAW, 'f');
 		
-		GameName.getGLContext()
+		ENGINE.getGLContext()
 			.addBufferBind(textureBuffer, GL_ARRAY_BUFFER, textureVBOs[i], GL_DYNAMIC_DRAW, 'f');
 		
-		GameName.getGLContext()
+		ENGINE.getGLContext()
 			.addBufferBind(normalBuffer, GL_ARRAY_BUFFER, normalVBOs[i], GL_DYNAMIC_DRAW, 'f');
 	}
 	
@@ -182,9 +184,9 @@ public class ModelRender extends Renderable {
 	}
 	
 	public void genVBOids() {
-		vertexVBOs = GameName.getGLContext().genBufferIds(modelData.getFaces().size());
-		textureVBOs = GameName.getGLContext().genBufferIds(modelData.getFaces().size());
-		normalVBOs = GameName.getGLContext().genBufferIds(modelData.getFaces().size());
+		vertexVBOs = ENGINE.getGLContext().genBufferIds(modelData.getFaces().size());
+		textureVBOs = ENGINE.getGLContext().genBufferIds(modelData.getFaces().size());
+		normalVBOs = ENGINE.getGLContext().genBufferIds(modelData.getFaces().size());
 	}
 	
 	public String getName() {

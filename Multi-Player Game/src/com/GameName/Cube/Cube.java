@@ -9,16 +9,13 @@ import java.util.HashSet;
 
 import javax.imageio.ImageIO;
 
-import com.GameName.Cube.Cubes.AirCube;
-import com.GameName.Cube.Cubes.ColorfulTestCube;
-import com.GameName.Cube.Cubes.CopperCube;
-import com.GameName.Cube.Cubes.GoldCube;
-import com.GameName.Cube.Cubes.StoneCube;
-import com.GameName.Cube.Cubes.TestCube;
 import com.GameName.Cube.Render.DefaultCubeRender;
 import com.GameName.Cube.Render.ICubeRender;
-import com.GameName.Physics.Coalition.BoundingArea;
-import com.GameName.Physics.Coalition.BoundingBox;
+import com.GameName.Engine.ResourceManager.Materials;
+import com.GameName.Engine.Registries.CubeRegistry;
+import com.GameName.Physics.Collision.BoundingArea;
+import com.GameName.Physics.Collision.BoundingBox;
+import com.GameName.Physics.Object.Material;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
 import com.GameName.Util.Vectors.Vector2f;
@@ -26,18 +23,19 @@ import com.GameName.Util.Vectors.Vector3f;
 
 public class Cube {
 	private static DefaultCubeRender defaultCubeRender;
+	private final int DEFAULT_TEXTURE_SIZE = 10;
+	private static int nextId;
 	
 	static {
 		defaultCubeRender = new DefaultCubeRender();
 	}
-	
-	private final int DEFAULT_TEXTURE_SIZE = 10;
 	
 	private String name;
 	private String displayName;
 	private int id;
 	
 	private BoundingArea boundingArea;
+	private Material material;
 	private ICubeRender render;
 	
 	/** Texture Colors: Frame, Face, Colors */
@@ -56,15 +54,15 @@ public class Cube {
 	private boolean isVisable;
 	private float opacity;
 				
-	public static Cube Air = new AirCube();
-	
-	public static Cube TestCube = new TestCube();
-	public static Cube ColorfulTestCube = new ColorfulTestCube();
-	
-	public static Cube StoneCube = new StoneCube();
-	
-	public static Cube GoldCube = new GoldCube();
-	public static Cube CopperCube = new CopperCube();
+//	public static Cube Air = new AirCube();
+//	
+//	public static Cube TestCube = new TestCube();
+//	public static Cube ColorfulTestCube = new ColorfulTestCube();
+//	
+//	public static Cube StoneCube = new StoneCube();
+//	
+//	public static Cube GoldCube = new GoldCube();
+//	public static Cube CopperCube = new CopperCube();
 	
 	protected Cube(String name) {
 		this.name = name;
@@ -78,6 +76,7 @@ public class Cube {
 		setLightValue(0f);
 		
 		setBoundingArea(getDefaultBoundingArea());
+		setMaterial(Materials.Stone);
 		setRender(getDefaultRender());
 		
 		loadExtraInfo();
@@ -231,25 +230,10 @@ public class Cube {
 	}
 	
 	/**
-	 * 	Registers all default cubes
+	 * 	Registers the cube with a unique ID
 	 */	
-	public static void regesterCubes() {
-		CubeRegistry regestry = new CubeRegistry();
-		
-		regestry.addCube(Air); regestry.addCube(TestCube); regestry.addCube(ColorfulTestCube); 		
-		regestry.addCube(StoneCube);		
-		regestry.addCube(GoldCube); regestry.addCube(CopperCube);
-		
-		CubeRegistry.addRegistry(regestry);
-	}
-	
-	/**
-	 * 	Registers all cubes and generates the texture sheet
-	 */	
-	public static void concludeInit() {		
-		for(int i = 0; i < CubeRegistry.getCubes().length; i ++) {
-			CubeRegistry.getCubes()[i].setId(i);
-		}
+	public void concludeInit() {		
+		setId(nextId ++);
 	}
 		
 	
@@ -379,6 +363,14 @@ public class Cube {
 	}
 	
 	/**
+	 * Returns the Material for this cube
+	 * @param metadata The metadata of the cube
+	 */
+	public Material getMaterial(int metadata) {
+		return material;
+	}
+	
+	/**
 	 * 	Sets whether or not this cube emits light
 	 */	
 	protected void setLightSorce(boolean isLightSorce) {
@@ -446,6 +438,13 @@ public class Cube {
 	 */
 	protected void setRender(ICubeRender render) {
 		this.render = render;
+	}
+	
+	/**
+	 *  Sets the Material for this cube
+	 */
+	protected void setMaterial(Material material) {
+		this.material = material;
 	}
 	
 	/**

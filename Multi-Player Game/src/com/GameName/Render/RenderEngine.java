@@ -56,8 +56,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.UnicodeFont;
 import org.newdawn.slick.font.effects.ColorEffect;
 
-import com.GameName.Main.GameName;
-import com.GameName.Main.Start;
+import com.GameName.Engine.GameEngine;
 import com.GameName.Main.Debugging.Logger;
 import com.GameName.Render.Effects.Shader;
 import com.GameName.Render.Effects.ShaderRegistry;
@@ -78,12 +77,14 @@ public class RenderEngine implements IEngine<Renderable> {
 	private FloatBuffer perspectiveProjectionMatrix;
 	private FloatBuffer orthographicProjectionMatrix;
 
-	public RenderEngine() {	
+	private GameEngine ENGINE;
+	
+	public RenderEngine(GameEngine eng) {	
+		ENGINE = eng;
+		
 		render2D = new ArrayList<Render2D>();
 		render3D = new ArrayList<Render3D>();
 		
-		setUpOpenGL();  
-		setUpShaders();
 	}
 	
 	public void setUpOpenGL() {
@@ -119,7 +120,7 @@ public class RenderEngine implements IEngine<Renderable> {
 		
 		glViewport(0, 0, Display.getWidth(), Display.getHeight());		
 			
-		GameName.player.getAccess().getCamera().applyPerspectiveMatrix();
+		ENGINE.getPlayer().getAccess().getCamera().applyPerspectiveMatrix();
 		glGetFloat(GL_PROJECTION_MATRIX, perspectiveProjectionMatrix);		
 		
 	    glMatrixMode(GL_PROJECTION);
@@ -144,7 +145,7 @@ public class RenderEngine implements IEngine<Renderable> {
             font.loadGlyphs();
         } catch (SlickException e) {
             e.printStackTrace();
-            Start.cleanUp();
+//            Start.cleanUp();
         }
     }
 	
@@ -158,7 +159,7 @@ public class RenderEngine implements IEngine<Renderable> {
 		glEnable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
 			
-		GameName.player.getAccess().getCamera().useView();		
+        ENGINE.getPlayer().getAccess().getCamera().useView();		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 //			glScalef(100, 100, 100);
@@ -193,7 +194,7 @@ public class RenderEngine implements IEngine<Renderable> {
         glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
 			
-		GameName.player.getAccess().getCamera().useView();		
+			ENGINE.getPlayer().getAccess().getCamera().useView();		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		glPushMatrix();
@@ -253,17 +254,17 @@ public class RenderEngine implements IEngine<Renderable> {
 			glEnableVertexAttribArray(1); // Texture Data
 			
 			//TODO: Remove Test Code
-			float x = oneDecimal(GameName.player.getAccess().getPos().getX());
-			float y = oneDecimal(GameName.player.getAccess().getPos().getY());
-			float z = oneDecimal(GameName.player.getAccess().getPos().getZ());
+			float x = oneDecimal(ENGINE.getPlayer().getAccess().getPos().getX());
+			float y = oneDecimal(ENGINE.getPlayer().getAccess().getPos().getY());
+			float z = oneDecimal(ENGINE.getPlayer().getAccess().getPos().getZ());
 			
 			glTranslatef(0, 540, 0);
 			
 			org.newdawn.slick.Color col = new org.newdawn.slick.Color(Color.BLUE.getRGB());	        
 			
-	        font.drawString(0, 0, "FPS: " + GameName.getFPS() + ", " + GameName.player.getAccess().getSelectedCube().getX() + " " + GameName.player.getAccess().getSelectedCube().getY() + " " + GameName.player.getAccess().getSelectedCube().getZ(), col); // 
+	        font.drawString(0, 0, "FPS: " + ENGINE.getGameName().getFPS() + ", " + ENGINE.getPlayer().getAccess().getSelectedCube().getX() + " " + ENGINE.getPlayer().getAccess().getSelectedCube().getY() + " " + ENGINE.getPlayer().getAccess().getSelectedCube().getZ(), col); // 
 	        font.drawString(0, 20, x + "," + y + "," + z, col);
-	        font.drawString(0, 40, oneDecimal(GameName.player.getAccess().getRot().getX()) + "," + oneDecimal(GameName.player.getAccess().getRot().getY()) + "," + oneDecimal(GameName.player.getAccess().getRot().getZ()), col);
+	        font.drawString(0, 40, oneDecimal(ENGINE.getPlayer().getAccess().getRot().getX()) + "," + oneDecimal(ENGINE.getPlayer().getAccess().getRot().getY()) + "," + oneDecimal(ENGINE.getPlayer().getAccess().getRot().getZ()), col);
 
 		glPopMatrix();
 
@@ -288,7 +289,7 @@ public class RenderEngine implements IEngine<Renderable> {
 		glPopMatrix();
 	}
 
-	private void setUpShaders() {	
+	public void setUpShaders() {	
 		ShaderRegistry reg = new ShaderRegistry();
 		
 		reg.addShader(new Shader("BasicRender3DShader", false));

@@ -1,6 +1,7 @@
 package com.GameName.World.Object;
 
-import com.GameName.Physics.Coalition.BoundingBox;
+import com.GameName.Engine.GameEngine;
+import com.GameName.Physics.Collision.BoundingBox;
 import com.GameName.Physics.Object.PhysicsObject;
 import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.World;
@@ -14,15 +15,15 @@ public abstract class WorldObject extends PhysicsObject {
 	
 	WorldObjectAccess access;
 	
-	public WorldObject() {
-		super();
+	public WorldObject(GameEngine eng) {
+		super(eng);
 		
 		height = 1;	width = 1; length = 1;		
 		renderPos = new Vector3f(0, 0, 0);
 	}
 	
-	public void updata() {
-		super.updata();
+	public void update() {
+		super.update();
 		
 		renderPos = pos.multiply(adjust);
 		
@@ -40,8 +41,9 @@ public abstract class WorldObject extends PhysicsObject {
 	
 	public void addBounding() {
 		bounding.add(new BoundingBox(
-				new Vector3f(pos.getX() - (width / 2f), pos.getY() - (height / 2f), pos.getZ() - (length / 2f)), 
-				new Vector3f(pos.getX() + (width / 2f), pos.getY() + (height / 2f), pos.getZ() + (length / 2f))
+				new Vector3f(0, 0, 0), new Vector3f(1, 1, 1)
+//				new Vector3f(pos.getX() - (width / 2f), pos.getY() - (height / 2f), pos.getZ() - (length / 2f)), 
+//				new Vector3f(pos.getX() + (width / 2f), pos.getY() + (height / 2f), pos.getZ() + (length / 2f))
 			));
 	}
 

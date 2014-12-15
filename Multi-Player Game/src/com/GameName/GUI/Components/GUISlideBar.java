@@ -1,6 +1,6 @@
 package com.GameName.GUI.Components;
 
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
 
 public class GUISlideBar extends GUIComponent {
 	private float run;
@@ -24,8 +24,8 @@ public class GUISlideBar extends GUIComponent {
 	 * @param Min	 The minimum value the slider can have
 	 * @param Vertical Is the slider vertical (true) or horizontal (false)
 	 */
-	public GUISlideBar(int id, float x, float y, float width, float height, float run, int max, int min, boolean vertical) {
-		super(id, x, y, width, height);
+	public GUISlideBar(GameEngine eng, int id, float x, float y, float width, float height, float run, int max, int min, boolean vertical) {
+		super(eng, id, x, y, width, height);
 		
 		this.max = max;
 		this.min = min;
@@ -34,34 +34,34 @@ public class GUISlideBar extends GUIComponent {
 	}
 	
 	public void update() {		
-		if(isSelected() && GameName.player.getAccess().isPointerDown()) { 
-			if(!hasFocus) last = (int) GameName.player.getAccess().getPointer().getY(); hasFocus = true; 
+		if(isSelected() && ENGINE.getPlayer().getAccess().isPointerDown()) { 
+			if(!hasFocus) last = (int) ENGINE.getPlayer().getAccess().getPointer().getY(); hasFocus = true; 
 		}
 		
-		if(hasFocus && !GameName.player.getAccess().isPointerDown()) hasFocus = false;
+		if(hasFocus && !ENGINE.getPlayer().getAccess().isPointerDown()) hasFocus = false;
 		
 		if(hasFocus) {
 //			System.out.println(getId() + ": " + last + ", " + GameName.pointer.y + " / " + value);
 			if(vertical) {
-				if(last == (int) GameName.player.getAccess().getPointer().getY()) {
+				if(last == (int) ENGINE.getPlayer().getAccess().getPointer().getY()) {
 					return;
 				} else {
-					int change = (last - (int) GameName.player.getAccess().getPointer().getY());
+					int change = (last - (int) ENGINE.getPlayer().getAccess().getPointer().getY());
 
 					setValue(getValue() + ((((float)(max - min)) / run) * (float) change));
 				}
 				
-				last = (int) GameName.player.getAccess().getPointer().getY();
+				last = (int) ENGINE.getPlayer().getAccess().getPointer().getY();
 				
 			} else {
-				if(last == (int) GameName.player.getAccess().getPointer().getX()) {
+				if(last == (int) ENGINE.getPlayer().getAccess().getPointer().getX()) {
 					return;
 				} else {
-					int change = (int) GameName.player.getAccess().getPointer().getX() - last;
+					int change = (int) ENGINE.getPlayer().getAccess().getPointer().getX() - last;
 					setValue((float)(run / (float)(max - min)) * (float)change);
 				}
 				
-				last = (int) GameName.player.getAccess().getPointer().getX();
+				last = (int) ENGINE.getPlayer().getAccess().getPointer().getX();
 			}
 			
 			activate();

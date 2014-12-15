@@ -3,13 +3,13 @@ package com.GameName.Networking.Packets;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+import com.GameName.Engine.GameEngine;
+import com.GameName.Engine.Registries.WorldRegistry;
 import com.GameName.Entity.EntityNPC;
-import com.GameName.Main.GameName;
 import com.GameName.Networking.NetworkPlayer;
-import com.GameName.World.WorldRegistry;
 
 public class ClientPacketProcesor {
-	public static void readData(int id, DataInputStream in) {
+	public static void readData(GameEngine ENGINE, int id, DataInputStream in) {
 		try {
 			if(id == PacketMessage.id) {
 				PacketMessage packet = new PacketMessage();
@@ -21,7 +21,7 @@ public class ClientPacketProcesor {
 				PacketPlayerLocation packet = new PacketPlayerLocation();
 				packet.readInfo(in);
 				
-				NetworkPlayer player = GameName.client.getNetworkPlayer(packet.getPlayerID());
+				NetworkPlayer player = ENGINE.getClient().getNetworkPlayer(packet.getPlayerID());
 				
 				player.getAccess().setX(packet.getX());
 				player.getAccess().setY(packet.getY());
@@ -31,14 +31,14 @@ public class ClientPacketProcesor {
 				PacketConnectResponse packet = new PacketConnectResponse();
 				packet.readInfo(in);
 				
-				GameName.client.setID(packet.getUserID());
-				GameName.client.setUsers(new NetworkPlayer[packet.getMaxUsers()]);
+				ENGINE.getClient().setID(packet.getUserID());
+				ENGINE.getClient().setUsers(new NetworkPlayer[packet.getMaxUsers()]);
 				
 			} else if(id == PacketPlayerStats.id) {
 				PacketPlayerStats packet = new PacketPlayerStats();
 				packet.readInfo(in);
 				
-				NetworkPlayer player = GameName.client.getNetworkPlayer(packet.getPlayerID());
+				NetworkPlayer player = ENGINE.getClient().getNetworkPlayer(packet.getPlayerID());
 				
 				player.getAccess().setHealth(packet.getHealth(), false);
 				player.getAccess().setHunger(packet.getHunger(), false);
@@ -51,14 +51,14 @@ public class ClientPacketProcesor {
 				PacketPlayerInventorySize packet = new PacketPlayerInventorySize();
 				packet.readInfo(in);
 				
-				NetworkPlayer player = GameName.client.getNetworkPlayer(packet.getPlayerID());
+				NetworkPlayer player = ENGINE.getClient().getNetworkPlayer(packet.getPlayerID());
 				player.getAccess().setInvSize(packet.getInvSize(), false);
 				
 			} else if(id == PacketPlayerInventorySlot.id) {
 				PacketPlayerInventorySlot packet = new PacketPlayerInventorySlot();
 				packet.readInfo(in);
 				
-				NetworkPlayer player = GameName.client.getNetworkPlayer(packet.getPlayerID());
+				NetworkPlayer player = ENGINE.getClient().getNetworkPlayer(packet.getPlayerID());
 				player.getAccess().setInvSlot(packet.getSlot(), packet.getInvSlot(), false);
 				
 			}  else if(id == PacketNPCLocation.id) {

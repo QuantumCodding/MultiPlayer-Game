@@ -1,12 +1,12 @@
 package com.GameName.Command.Commands;
 
 import com.GameName.Command.Command;
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
 
 public class SetPlayerPropertyCommand extends Command {
 
-	public SetPlayerPropertyCommand() {
-		super("set");
+	public SetPlayerPropertyCommand(GameEngine eng) {
+		super(eng, "set");
 	}
 
 	public boolean action(String... parm) {
@@ -16,15 +16,15 @@ public class SetPlayerPropertyCommand extends Command {
 		int value = Integer.parseInt(parm[1]);
 
 		switch(affect) {
-			case "health": GameName.player.getAccess().setHealth(value); return true;
-			case "mana": GameName.player.getAccess().setMana(value); return true;
-			case "hunger": GameName.player.getAccess().setHunger(value); return true;
+			case "health": ENGINE.getPlayer().getAccess().setHealth(value); return true;
+			case "mana": ENGINE.getPlayer().getAccess().setMana(value); return true;
+			case "hunger": ENGINE.getPlayer().getAccess().setHunger(value); return true;
 			
-			case "maxHealth": GameName.player.getAccess().setMaxHealth(value); return true;
-			case "maxMana": GameName.player.getAccess().setMaxMana(value); return true;
-			case "maxHunger": GameName.player.getAccess().setMaxHunger(value); return true;
+			case "maxHealth": ENGINE.getPlayer().getAccess().setMaxHealth(value); return true;
+			case "maxMana": ENGINE.getPlayer().getAccess().setMaxMana(value); return true;
+			case "maxHunger": ENGINE.getPlayer().getAccess().setMaxHunger(value); return true;
 			
-			case "reset": GameName.player.resetPlayer(); return true;
+			case "reset": ENGINE.getPlayer().resetPlayer(); return true;
 			
 			default: return false;
 		}

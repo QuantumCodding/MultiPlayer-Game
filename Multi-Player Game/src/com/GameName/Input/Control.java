@@ -5,7 +5,6 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
-import com.GameName.Main.GameName;
 import com.GameName.Util.Tag.Tag;
 import com.GameName.Util.Tag.TagGroup;
 
@@ -170,7 +169,7 @@ public class Control {
 		control.isAxis = (Integer) group.getTagByName("isAxis").getTagInfo() == 1;
 		control.onlyOnce = (Integer) group.getTagByName("onlyOnce").getTagInfo() == 1;
 		control.type = (Integer) group.getTagByName("type").getTagInfo();
-		control.c = GameName.c;
+//		control.c = GameName.c;
 		
 		return control;		
 	}

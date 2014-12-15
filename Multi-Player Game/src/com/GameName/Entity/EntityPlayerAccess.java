@@ -2,9 +2,9 @@ package com.GameName.Entity;
 
 import java.util.List;
 
+import com.GameName.Engine.GameEngine;
 import com.GameName.Input.Control;
 import com.GameName.Items.ItemStack;
-import com.GameName.Main.GameName;
 import com.GameName.Networking.Client;
 import com.GameName.Networking.Packets.PacketPlayerInventorySize;
 import com.GameName.Networking.Packets.PacketPlayerInventorySlot;
@@ -16,8 +16,8 @@ public class EntityPlayerAccess extends EntityAccess {
 	
 	EntityPlayer player;
 	
-	protected EntityPlayerAccess(Entity entity) {
-		super(entity);
+	protected EntityPlayerAccess(GameEngine eng, Entity entity) {
+		super(eng, entity);
 		
 		if(!(entity instanceof EntityPlayer)) 
 			throw new IllegalArgumentException("EntityPlayerAccess must be instantiated with a instance of EntityPlayer");
@@ -55,6 +55,10 @@ public class EntityPlayerAccess extends EntityAccess {
 
 	public int getJumpsLeft() {
 		return player.jumpsLeft;
+	}
+	
+	public boolean canPlayerMove() {
+		return !player.lockMovement;
 	}
 
 	public boolean isGravityOn() {
@@ -117,6 +121,10 @@ public class EntityPlayerAccess extends EntityAccess {
 		player.jumpsLeft = jumpsLeft;
 	}
 
+	public void setCanMove(boolean canMove) {
+		player.lockMovement = !canMove;
+	}
+	
 	public void setGravityOn(boolean gravityOn) {
 		player.gravityOn = gravityOn;
 	}
@@ -154,7 +162,7 @@ public class EntityPlayerAccess extends EntityAccess {
 		
 		if(!send) return;
 		
-		Client clt = GameName.client;		
+		Client clt = ENGINE.getClient();		
 		if(clt != null && clt.isOnServer()) {
 			clt.sendPacket(new PacketPlayerInventorySize(clt.getID(), invSize));
 		}
@@ -165,7 +173,7 @@ public class EntityPlayerAccess extends EntityAccess {
 		
 		if(!send) return;
 		
-		Client clt = GameName.client;		
+		Client clt = ENGINE.getClient();	
 		if(clt != null && clt.isOnServer()) {
 			clt.sendPacket(new PacketPlayerInventorySlot(clt.getID(), slotID, slot));
 		}
@@ -176,7 +184,7 @@ public class EntityPlayerAccess extends EntityAccess {
 		
 		if(!send) return;
 		
-		Client clt = GameName.client;		
+		Client clt = ENGINE.getClient();		
 		if(clt != null && clt.isOnServer()) {
 			clt.sendPacket(new PacketPlayerStats(clt.getID(), getHunger(), getHealth(), getMana(), getPower(), getMoney()));
 		}
@@ -187,7 +195,7 @@ public class EntityPlayerAccess extends EntityAccess {
 		
 		if(!send) return;
 		
-		Client clt = GameName.client;		
+		Client clt = ENGINE.getClient();		
 		if(clt != null && clt.isOnServer()) {
 			clt.sendPacket(new PacketPlayerStats(clt.getID(), getHunger(), getHealth(), getMana(), getPower(), getMoney()));
 		}
@@ -198,7 +206,7 @@ public class EntityPlayerAccess extends EntityAccess {
 		
 		if(!send) return;
 		
-		Client clt = GameName.client;		
+		Client clt = ENGINE.getClient();		
 		if(clt != null && clt.isOnServer()) {
 			clt.sendPacket(new PacketPlayerStats(clt.getID(), getHunger(), getHealth(), getMana(), getPower(), getMoney()));
 		}
@@ -209,7 +217,7 @@ public class EntityPlayerAccess extends EntityAccess {
 		
 		if(!send) return;
 		
-		Client clt = GameName.client;		
+		Client clt = ENGINE.getClient();	
 		if(clt != null && clt.isOnServer()) {
 			clt.sendPacket(new PacketPlayerStats(clt.getID(), getHunger(), getHealth(), getMana(), getPower(), getMoney()));
 		}
@@ -220,7 +228,7 @@ public class EntityPlayerAccess extends EntityAccess {
 		
 		if(!send) return;
 		
-		Client clt = GameName.client;		
+		Client clt = ENGINE.getClient();		
 		if(clt != null && clt.isOnServer()) {
 			clt.sendPacket(new PacketPlayerStats(clt.getID(), getHunger(), getHealth(), getMana(), getPower(), getMoney()));
 		}

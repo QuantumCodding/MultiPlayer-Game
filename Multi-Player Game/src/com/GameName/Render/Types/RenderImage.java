@@ -10,21 +10,21 @@ import static org.lwjgl.opengl.GL11.glTexCoord2f;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex2f;
 
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
 import com.GameName.Render.Effects.Texture;
 import com.GameName.Util.Vectors.Vector2f;
 
 public class RenderImage extends Render2D {
 	private Texture image;
 	
-	public RenderImage(float x, float y, float width, float height, String location, String imageType) {
-		this(x, y, width, height, 
-				GameName.getGLContext().genTexture(location, imageType, false)
+	public RenderImage(GameEngine eng, float x, float y, float width, float height, String location, String imageType) {
+		this(eng, x, y, width, height, 
+				eng.getGLContext().genTexture(location, imageType, false)
 			);
 	}
 	
-	public RenderImage(float x, float y, float width, float height, Texture image) {
-		super(x, y, width, height);
+	public RenderImage(GameEngine eng, float x, float y, float width, float height, Texture image) {
+		super(eng, x, y, width, height);
 		this.image = image;
 		
 		setColor(null);

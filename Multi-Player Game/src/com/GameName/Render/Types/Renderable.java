@@ -7,14 +7,16 @@ import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
-import com.GameName.Main.GameName;
-import com.GameName.Main.Threads.VBOUpdateThread;
+import com.GameName.Engine.GameEngine;
+import com.GameName.Engine.ResourceManager.Threads;
 import com.GameName.Render.Effects.Shader;
 import com.GameName.Render.Effects.Texture;
 import com.GameName.Util.Vectors.Vector2f;
 import com.GameName.Util.Vectors.Vector3f;
 
 public abstract class Renderable {
+	protected final GameEngine ENGINE;
+	
 	private Shader shader;	
 	private Texture texture;	
 	private Vector3f color;	
@@ -36,7 +38,9 @@ public abstract class Renderable {
 	
 	protected String name;
 	
-	public Renderable() {
+	public Renderable(GameEngine eng) {
+		ENGINE = eng;
+		
 		vertexVBO = -1;
 		textureVBO = -1;
 		colorVBO = -1;
@@ -75,7 +79,7 @@ public abstract class Renderable {
 		if(vboUpdateNeeded && !isVboUpdating) {
 			isVboUpdating = true;
 //			Logger.println(name + " is getting buffers");
-			((VBOUpdateThread) GameName.threadManager.accessByName("VBO Thread")).addRenderable(this);
+			Threads.VBOThread.addRenderable(this);
 		}
 		
 		return isVboUpdating;
@@ -112,9 +116,9 @@ public abstract class Renderable {
 	public void cleanUp() {
 		cleanUp_Renderable();
 		
-		if(vertexVBO != -1)  {GameName.getGLContext().deleteBuffer(vertexVBO);}
-		if(textureVBO != -1) {GameName.getGLContext().deleteBuffer(textureVBO);}
-		if(colorVBO != -1) 	 {GameName.getGLContext().deleteBuffer(colorVBO);}
+		if(vertexVBO != -1)  {ENGINE.getGLContext().deleteBuffer(vertexVBO);}
+		if(textureVBO != -1) {ENGINE.getGLContext().deleteBuffer(textureVBO);}
+		if(colorVBO != -1) 	 {ENGINE.getGLContext().deleteBuffer(colorVBO);}
 	}
 	
 	public Shader 	getShader()  {return shader;}	

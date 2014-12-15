@@ -35,12 +35,13 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 
 import com.GameName.Command.Command;
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
 import com.GameName.Util.StringEffect;
 import com.GameName.Util.StringEffectFormater;
 
 public class DebugWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
+	private final GameEngine ENGINE;
 	
 	private int lastLog = 0;
 	private String lastEntry = "";
@@ -75,7 +76,8 @@ public class DebugWindow extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public DebugWindow() {
+	public DebugWindow(GameEngine eng) {
+		ENGINE = eng;
 		
 		setTitle("Debug Window");
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -254,7 +256,7 @@ public class DebugWindow extends JFrame {
 			
 			case "toggletime": Logger.toggleTime(); return true;
 			case "ping": Logger.println("PONG!"); return true;
-			case "exit": case "quit": case "stop": GameName.isRunning = false; return true;
+			case "exit": case "quit": case "stop": ENGINE.getGameName().stop(); return true;
 				
 			default: return false;
 		}

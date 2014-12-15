@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import com.GameName.Engine.GameEngine;
 import com.GameName.Entity.EntityPlayer;
 import com.GameName.Networking.Packets.Packet;
 import com.GameName.Networking.Packets.ServerPacketProcesor;
@@ -16,7 +17,9 @@ public class NetworkPlayer extends EntityPlayer implements Runnable {
 	private int id;
 	private boolean online;
 	
-	public NetworkPlayer(DataInputStream in, DataOutputStream out, NetworkPlayer[] users, int id) {
+	public NetworkPlayer(GameEngine eng, DataInputStream in, DataOutputStream out, NetworkPlayer[] users, int id) {
+		super(eng);
+		
 		this.in = in;
 		this.out = out;
 		
@@ -44,7 +47,7 @@ public class NetworkPlayer extends EntityPlayer implements Runnable {
 		while(online) {
 			try {
 				int packetId = in.readInt();				
-				ServerPacketProcesor.readData(packetId, in);
+				ServerPacketProcesor.readData(ENGINE, packetId, in);
 				
 			} catch (IOException e) {				
 				in = null;

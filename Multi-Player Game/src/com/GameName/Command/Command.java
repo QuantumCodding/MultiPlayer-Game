@@ -1,10 +1,15 @@
 package com.GameName.Command;
 
+import com.GameName.Engine.GameEngine;
+import com.GameName.Engine.Registries.CommandRegistry;
+
 public abstract class Command {
+	protected final GameEngine ENGINE;
 	private String name;
 	
-	public Command(String name) {
+	public Command(GameEngine eng, String name) {
 		this.name = name;
+		ENGINE = eng;
 	}
 	
 	public abstract boolean action(String... parm);

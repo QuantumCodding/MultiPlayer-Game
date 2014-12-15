@@ -1,4 +1,4 @@
-package com.GameName.Main.Threads;
+package com.GameName.Render;
 
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
@@ -17,13 +17,12 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 
-import com.GameName.Main.Start;
 import com.GameName.Main.Debugging.Logger;
 import com.GameName.Render.Effects.Texture;
 //import com.GameName.Main.Debugging.Logger;
 import com.GameName.Util.QueuedArray;
 
-public class GLContextThread extends GameThread {
+public class GLContextThread {
 
 	private boolean prossessing;
 	
@@ -47,9 +46,7 @@ public class GLContextThread extends GameThread {
 	
 	private QueuedArray<Integer> buffersToDelete;
 	
-	public GLContextThread(int tickRate) {
-		super(tickRate, "GLContext Thread");
-		
+	public GLContextThread() {		
 		buffers = new QueuedArray<Buffer>();
 		targets = new QueuedArray<Integer>();
 		bufferIds = new QueuedArray<Integer>();
@@ -59,8 +56,8 @@ public class GLContextThread extends GameThread {
 		buffersToDelete = new QueuedArray<Integer>();
 	}
 
-	void init() {
-		Start.initDisplay(Start.WIDTH, Start.HEIGHT);
+	public GLContextThread init() {
+		return this;
 	}
 
 	public void tick() {

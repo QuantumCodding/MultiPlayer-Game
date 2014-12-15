@@ -1,14 +1,14 @@
 package com.GameName.GUI.Components;
 
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
 
 public class GUIButton extends GUIComponent {
 
 	private boolean onlyOnce;
 	private boolean isDown;
 	
-	protected GUIButton(int id, float x, float y, float width, float height, boolean onlyOnce) {
-		super(id, x, y, width, height);
+	protected GUIButton(GameEngine eng, int id, float x, float y, float width, float height, boolean onlyOnce) {
+		super(eng, id, x, y, width, height);
 		this.onlyOnce = onlyOnce;
 	}
 	
@@ -18,10 +18,10 @@ public class GUIButton extends GUIComponent {
 			return;
 		}
 		
-		if(isDown != GameName.player.getAccess().isPointerDown()) {
+		if(isDown != ENGINE.getPlayer().getAccess().isPointerDown()) {
 			super.update();
 		}
 		
-		isDown = GameName.player.getAccess().isPointerDown();
+		isDown = ENGINE.getPlayer().getAccess().isPointerDown();
 	}
 }

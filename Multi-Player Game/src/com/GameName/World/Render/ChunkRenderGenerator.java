@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.GameName.Cube.Cube;
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
+import com.GameName.Engine.ResourceManager.Cubes;
 import com.GameName.Main.Debugging.Logger;
 import com.GameName.Util.BufferUtil;
 import com.GameName.Util.Vectors.Vector3f;
@@ -17,7 +18,7 @@ import com.GameName.World.World;
 
 public class ChunkRenderGenerator {
 	
-	public static int[] generateChunk(Chunk c, int[] chunkData) {
+	public static int[] generateChunk(GameEngine ENGINE, Chunk c, int[] chunkData) {
 		
 		ArrayList<Float> chunkVertices = new ArrayList<>();		
 		ArrayList<Float> chunkTexData = new ArrayList<>();
@@ -42,7 +43,7 @@ public class ChunkRenderGenerator {
 					int metadata = c.getMetadata(x, y, z);			
 					boolean[] visableFaces = getVisableFaces(x, y, z, c); //new boolean[] {true, true, true, true, true, true}; //
 						
-					if(cube == Cube.Air) continue;	
+					if(cube == Cubes.Air) continue;	
 					
 					chunkVertices.addAll(cube.getRender(metadata).getVertices(xPos, yPos, zPos, visableFaces));
 					chunkTexData.addAll(cube.getRender(metadata).getTextureCoords(cube.getId(), metadata, c.getTextureMap(), visableFaces));
@@ -73,16 +74,16 @@ public class ChunkRenderGenerator {
 		//TODO: Remove
 		Logger.println("Generating Chunk Render For: " + new Vector3f(c.getX(), c.getY(), c.getZ()).valuesToString());
 		
-		GameName.getGLContext()
+		ENGINE.getGLContext()
 			.addBufferBind(verticeBuffer, GL_ARRAY_BUFFER, chunkData[0], GL_DYNAMIC_DRAW, 'f');
 		
-		GameName.getGLContext()
+		ENGINE.getGLContext()
 			.addBufferBind(texDataBuffer, GL_ARRAY_BUFFER, chunkData[1], GL_DYNAMIC_DRAW, 'f');
 
-		GameName.getGLContext()
+		ENGINE.getGLContext()
 			.addBufferBind(lightBuffer, GL_ARRAY_BUFFER, chunkData[2], GL_DYNAMIC_DRAW, 'f');
 		
-		GameName.getGLContext()
+		ENGINE.getGLContext()
 			.addBufferBind(normalBuffer, GL_ARRAY_BUFFER, chunkData[3], GL_DYNAMIC_DRAW, 'f');
 	    
 	    chunkData[4] = vertexCount;

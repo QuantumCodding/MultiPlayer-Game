@@ -1,13 +1,14 @@
 package com.GameName.Command.Commands;
 
 import com.GameName.Command.Command;
-import com.GameName.Command.CommandRegistry;
+import com.GameName.Engine.GameEngine;
+import com.GameName.Engine.Registries.CommandRegistry;
 import com.GameName.Main.Debugging.Logger;
 
 public class HelpCommand extends Command {
 
-	public HelpCommand() {
-		super("help");
+	public HelpCommand(GameEngine eng) {
+		super(eng, "help");
 	}
 
 	public boolean action(String... parm) {

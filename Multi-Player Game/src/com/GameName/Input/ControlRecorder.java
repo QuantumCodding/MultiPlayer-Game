@@ -9,8 +9,6 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 
-import com.GameName.Main.GameName;
-
 public class ControlRecorder {
 	
 	public static int AXIS = 0;
@@ -49,7 +47,7 @@ public class ControlRecorder {
 			default: lookingAt = null; break;
 		}
 		
-		while(GameName.player.getAccess().isPointerDown()) {try{Thread.sleep(10);}catch(InterruptedException e){}}
+//		while(GameName.player.getAccess().isPointerDown()) {try{Thread.sleep(10);}catch(InterruptedException e){}}
 		
 		switch(type) {
 			case Control.CONTROLLER: 

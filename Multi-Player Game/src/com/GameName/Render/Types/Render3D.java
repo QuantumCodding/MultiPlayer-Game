@@ -7,15 +7,15 @@ import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
 import com.GameName.Render.Effects.ShaderRegistry;
 
 public abstract class Render3D extends Renderable {
 	protected int normalVBO;
 	protected int vertexCount;
 	
-	public Render3D() {
-		super();
+	public Render3D(GameEngine eng) {
+		super(eng);
 		
 		normalVBO = -1;
 		setShader(ShaderRegistry.accessByName("BasicRender3DShader"));
@@ -42,7 +42,7 @@ public abstract class Render3D extends Renderable {
 		cleanUp_Render3D();
 		
 		if(normalVBO != -1) {
-			GameName.getGLContext().deleteBuffer(normalVBO);
+			ENGINE.getGLContext().deleteBuffer(normalVBO);
 		}
 	}
 	

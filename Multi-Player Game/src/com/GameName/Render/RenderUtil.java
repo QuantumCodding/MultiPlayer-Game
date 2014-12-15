@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.GameName.Cube.Cube;
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
 import com.GameName.Main.Debugging.Logger;
 import com.GameName.Util.BufferUtil;
 import com.GameName.Util.Vectors.Vector3f;
@@ -19,7 +19,7 @@ public class RenderUtil {
 	 * @see ChunkRenderGerator
 	 */
 	@Deprecated
-	public static int[] generateChunk(int startX, int startY, int startZ, World w, int[] chunkData) {
+	public static int[] generateChunk(GameEngine ENGINE, int startX, int startY, int startZ, World w, int[] chunkData) {
 		
 		List<Float> chunkVertices = new ArrayList<Float>();		
 		List<Float> chunkTexData = new ArrayList<Float>();
@@ -62,7 +62,7 @@ public class RenderUtil {
 		FloatBuffer normalBuffer = BufferUtil.createFillipedFloatBuffer(chunkNormals);
 		
 		if(chunkData == null) {
-			int[] ids = GameName.getGLContext().genBufferIds(4);	
+			int[] ids = ENGINE.getGLContext().genBufferIds(4);	
 			chunkData = new int[] {
 					ids[0], ids[1], // 0: Vertices  	1: TexCoords							
 					ids[2], ids[3],	// 2: Light Values  3: Normals
@@ -83,16 +83,16 @@ public class RenderUtil {
 		
 		Logger.println(chunkData.length + " " + new Vector3f(startX, startY, startZ).valuesToString());
 		
-		GameName.getGLContext()
+		ENGINE.getGLContext()
 			.addBufferBind(verticeBuffer, GL_ARRAY_BUFFER, chunkData[0], GL_DYNAMIC_DRAW, 'f');
 		
-		GameName.getGLContext()
+		ENGINE.getGLContext()
 			.addBufferBind(texDataBuffer, GL_ARRAY_BUFFER, chunkData[1], GL_DYNAMIC_DRAW, 'f');
 
-		GameName.getGLContext()
+		ENGINE.getGLContext()
 			.addBufferBind(lightBuffer, GL_ARRAY_BUFFER, chunkData[2], GL_DYNAMIC_DRAW, 'f');
 		
-		GameName.getGLContext()
+		ENGINE.getGLContext()
 			.addBufferBind(normalBuffer, GL_ARRAY_BUFFER, chunkData[3], GL_DYNAMIC_DRAW, 'f');
 	    
 	    chunkData[4] = vertexCount;

@@ -13,18 +13,15 @@ import java.util.List;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
-import com.GameName.Cube.Cube;
+import com.GameName.Engine.GameEngine;
 import com.GameName.Input.Control;
 import com.GameName.Items.ItemStack;
-import com.GameName.Main.GameName;
 import com.GameName.Main.Debugging.Logger;
-import com.GameName.Main.Threads.VBOUpdateThread;
 import com.GameName.Networking.Client;
 import com.GameName.Networking.Packets.PacketPlayerInventorySize;
 import com.GameName.Networking.Packets.PacketPlayerInventorySlot;
 import com.GameName.Networking.Packets.PacketPlayerLocation;
 import com.GameName.Networking.Packets.PacketPlayerStats;
-import com.GameName.Physics.PhysicsUtil;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
 import com.GameName.Util.Vectors.Vector2f;
@@ -47,6 +44,7 @@ public class EntityPlayer extends Entity {
 	protected int jumpsLeft = 0;
 	
 	protected boolean gravityOn;
+	protected boolean lockMovement;
 	
 	protected float lookSpeed;
 	protected float lookSpeedUp;
@@ -60,8 +58,12 @@ public class EntityPlayer extends Entity {
 		
 	protected PlayerMonitor monitor;
 	
+	public EntityPlayer(GameEngine eng) {
+		super(eng);
+	}
+	
 	protected void init() {
-		access = new EntityPlayerAccess(this);
+		access = new EntityPlayerAccess(ENGINE, this);
 		monitor = new PlayerMonitor();
 		
 		resetCam();
@@ -72,12 +74,13 @@ public class EntityPlayer extends Entity {
 	
 	public void resetCam() {//                                                       0.3f
 		cam = new Camera(70, (float)Display.getWidth() / (float)Display.getHeight(), 0.5f, renderDistance);
-		if(GameName.render != null) {
-			GameName.render.setUpPerspectives();
+		if(ENGINE.getRender() != null) {
+			ENGINE.getRender().setUpPerspectives();
 		}
 	}
 	
 	public void resetPlayer() {
+		super.reset();
 		Logger.print("Player Reseting").setType("Setup").end();
 		
 		pointerPos = new Vector2f(0, 0);
@@ -103,7 +106,7 @@ public class EntityPlayer extends Entity {
 		
 		playerMove(true);
 		
-		Client clt = GameName.client;			
+		Client clt = ENGINE.getClient();			
 		if(clt != null && clt.isOnServer()) {
 			clt.sendPacket(new PacketPlayerStats(clt.getID(), hunger, health, mana, power, money));			
 			clt.sendPacket(new PacketPlayerInventorySize(clt.getID(), invSize));
@@ -115,11 +118,12 @@ public class EntityPlayer extends Entity {
 		renderDistance = distance;
 	}
 	
-	public void updata() {
+	public void update() {
+		super.update();
+		
 		if(gravityOn) {
-			super.updata();
 			
-			selectedCube = PhysicsUtil.getLookPosition(pos, rot, currentWorld, maxReach); //rayTrace(pos.clone(), pos.add(getLook().multiply(maxReach)), currentWorld);//
+//			selectedCube = PhysicsUtil.getLookPosition(pos, rot, currentWorld, maxReach); //rayTrace(pos.clone(), pos.add(getLook().multiply(maxReach)), currentWorld);//
 			if(selectedCube == null) selectedCube = pos.clone();
 		}		
 
@@ -139,7 +143,7 @@ public class EntityPlayer extends Entity {
 	}
 	
 	private void checkControls() {
-		speed = Keyboard.isKeyDown(Keyboard.KEY_E) ? 0.5f : Keyboard.isKeyDown(Keyboard.KEY_R) ? 15 : 7; //15
+		speed = Keyboard.isKeyDown(Keyboard.KEY_E) ? 1f/15f : Keyboard.isKeyDown(Keyboard.KEY_R) ? 1f/3f : 1f/7f; //15
 		lookSpeed = Keyboard.isKeyDown(Keyboard.KEY_Y) ? 0.5f : Keyboard.isKeyDown(Keyboard.KEY_U) ? 5 : 1;
 		lookSpeedUp = lookSpeed;
 				
@@ -149,27 +153,27 @@ public class EntityPlayer extends Entity {
 			if(ctr.isActive() != 0.0){
 				
 				switch(ctr.control) {
-					case "forward": if(!GameName.lockMovement) if(PhysicsUtil.canMove(pos, PhysicsUtil.FORWARD, currentWorld)) 	access.moveZ((float) (ctr.isActive() / speed)); 	break;						
-					case "back": 	if(!GameName.lockMovement) if(PhysicsUtil.canMove(pos, PhysicsUtil.BACKWARD, currentWorld)) access.moveZ((float) (ctr.isActive() / speed)); 	break;		
-					case "left": 	if(!GameName.lockMovement) if(PhysicsUtil.canMove(pos, PhysicsUtil.LEFT, currentWorld)) 	access.moveX((float) (ctr.isActive() / speed)); 	break;
-					case "right":   if(!GameName.lockMovement) if(PhysicsUtil.canMove(pos, PhysicsUtil.RIGHT, currentWorld)) 	access.moveX((float) (ctr.isActive() / speed));     break;
-					case "up": 		if(!GameName.lockMovement) if(PhysicsUtil.canMove(pos, PhysicsUtil.UP, currentWorld)) 		access.moveY((float) (ctr.isActive() / speed)); 								break;		
-					case "down": 	if(!GameName.lockMovement) if(PhysicsUtil.canMove(pos, PhysicsUtil.DOWN, currentWorld)) 	access.moveY((float) (ctr.isActive() / speed)); 								break;
+					case "forward": if(!lockMovement) access.moveZ((float) /*(ctr.isActive() / speed)*/ 3); 	break;						
+					case "back": 	if(!lockMovement) access.moveZ((float)-/*(ctr.isActive() / speed)*/ 3); 	break;		
+					case "left": 	if(!lockMovement) access.moveX((float)-/*(ctr.isActive() / speed)*/ 3); 	break;
+					case "right":   if(!lockMovement) access.moveX((float) /*(ctr.isActive() / speed)*/ 3);   	break;
+					case "up": 		if(!lockMovement) access.moveY((float) /*(ctr.isActive() / speed)*/ 3); 	break;		
+					case "down": 	if(!lockMovement) access.moveY((float)-/*(ctr.isActive() / speed)*/ 3); 	break;
 					
-					case "lookUp": 	if(!GameName.lockMovement)  /*if(entityPhisics(0))*/ access.rotateX((float) (ctr.isActive() / lookSpeedUp));  break;				
-					case "lookDown": if(!GameName.lockMovement) /*if(entityPhisics(0))*/ access.rotateX((float) (ctr.isActive() / lookSpeedUp)); break;			
-					case "lookLeft": if(!GameName.lockMovement) /*if(entityPhisics(0))*/ access.rotateY((float) (ctr.isActive() / lookSpeed));   break;
-					case "lookRight": if(!GameName.lockMovement)/*if(entityPhisics(0))*/ access.rotateY((float) (ctr.isActive() / lookSpeed));	   break;
+					case "lookUp": 	if(!lockMovement)  /*if(entityPhisics(0))*/ access.rotateX((float) (ctr.isActive() / lookSpeedUp)); break;				
+					case "lookDown": if(!lockMovement) /*if(entityPhisics(0))*/ access.rotateX((float) (ctr.isActive() / lookSpeedUp)); break;			
+					case "lookLeft": if(!lockMovement) /*if(entityPhisics(0))*/ access.rotateY((float) (ctr.isActive() / lookSpeed));   break;
+					case "lookRight": if(!lockMovement)/*if(entityPhisics(0))*/ access.rotateY((float) (ctr.isActive() / lookSpeed));	break;
 					
 					case "jump": 					
-						if(!GameName.lockMovement) if(jumpsLeft > 0) { 
+						if(!lockMovement) if(jumpsLeft > 0) { 
 							vel.add(new Vector3f(0, jumpHeight, 0));
 							jumpsLeft --;
 						}						
 					break;
 										
-					case "resetPlayer": if(!GameName.lockMovement) resetPlayer(); break;
-					case "gravity": 	if(!GameName.lockMovement) gravityOn = !gravityOn; break;
+					case "resetPlayer": if(!lockMovement) resetPlayer(); break;
+					case "gravity": 	if(!lockMovement) gravityOn = !gravityOn; break;
 					
 					case "pointerUp": 		pointerPos.addY((float) ctr.isActive()); break;
 					case "pointerDown": 	pointerPos.addY((float) ctr.isActive()); break;
@@ -177,12 +181,12 @@ public class EntityPlayer extends Entity {
 					case "pointerRight": 	pointerPos.addX((float) ctr.isActive()); break;
 					case "click": 			isPointerDown = true; break;
 					
-					case "toggle": if(!GameName.lockMovement) { GameName.guiManager.toggle("Test"); GameName.guiManager.toggle("Pause"); } break;
+//					case "toggle": if(!lockMovement) { GameName.guiManager.toggle("Test"); GameName.guiManager.toggle("Pause"); } break;
 					
-					case "placeTest": currentWorld.setCube(selectedCube.add(PhysicsUtil.getPosNextToFace(PhysicsUtil.getDirection(rot))), Cube.ColorfulTestCube.getId()); break;
-					case "removeCube": currentWorld.setCube(selectedCube, Cube.Air.getId()); break;
+//					case "placeTest": currentWorld.setCube(selectedCube.add(PhysicsUtil.getPosNextToFace(PhysicsUtil.getDirection(rot))), Cube.ColorfulTestCube.getId()); break;
+//					case "removeCube": currentWorld.setCube(selectedCube, Cube.Air.getId()); break;
 					
-					case "reloadChunks": ((VBOUpdateThread) GameName.threadManager.accessByName("VBO Thread")).forceUpdate();
+//					case "reloadChunks": Threads.VBOThread.forceUpdate();
 					
 					default: System.err.println("Default Called: Player is not using control " + ctr.control); break;					
 				} 				
@@ -204,9 +208,8 @@ public class EntityPlayer extends Entity {
 		alListener3f(AL_POSITION, pos.getX(), pos.getY(), pos.getZ());
 		alListener3f(AL_ORIENTATION, rot.getX(), rot.getY(), rot.getZ());
 		
-		if(!send) return;
-		
-		Client clt = GameName.client;			
+		if(!send) return;		
+		Client clt = ENGINE.getClient();			
 		if(clt != null && clt.isOnServer()) {
 			clt.sendPacket(new PacketPlayerLocation(clt.getID(), pos));
 		}	

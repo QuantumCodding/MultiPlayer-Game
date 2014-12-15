@@ -1,4 +1,4 @@
-package com.GameName.Main.Threads;
+package com.GameName.Engine.Threads;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -84,7 +84,7 @@ public class GameThreadTracker extends DebugPanel {
 			tpsDiv > 0.5 ? Color.GREEN : tpsDiv > 0.25 ? Color.YELLOW : Color.RED
 		);
 		
-		if(gameThread.getTickRate() != ThreadManager.UNCAPED_TICK_RATE) 
+		if(gameThread.getTickRate() != ThreadGroup.UNCAPED_TICK_RATE) 
 			tpsLabel.setText(gameThread.getTPS() + " / " + gameThread.getTickRate());
 		else
 			tpsLabel.setText(gameThread.getTPS() + "");

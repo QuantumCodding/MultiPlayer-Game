@@ -14,8 +14,8 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.GameName.Engine.GameEngine;
 import com.GameName.GUI.GUI;
-import com.GameName.Main.GameName;
 import com.GameName.Render.Effects.Texture;
 import com.GameName.Render.Types.Render2D;
 import com.GameName.Util.BufferUtil;
@@ -31,8 +31,8 @@ public abstract class GUIComponent extends Render2D {
 	
 	private int[] textureBuffers;
 	
-	protected GUIComponent(int id, float x, float y, float width, float height) {
-		super(x, y, width, height);
+	protected GUIComponent(GameEngine eng, int id, float x, float y, float width, float height) {
+		super(eng, x, y, width, height);
 		this.id = id;
 	}
 	
@@ -44,7 +44,7 @@ public abstract class GUIComponent extends Render2D {
 		
 		//Texture
 		glBindBuffer(GL_ARRAY_BUFFER, 
-				textureBuffers[isSelected() ? GameName.player.getAccess().isPointerDown() ? 2 : 1 : 0]);
+				textureBuffers[isSelected() ? ENGINE.getPlayer().getAccess().isPointerDown() ? 2 : 1 : 0]);
 			glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
 		
 
@@ -52,7 +52,7 @@ public abstract class GUIComponent extends Render2D {
 	}
 	
 	protected void genVBO() {
-		int[] ids = GameName.getGLContext().genBufferIds(4);
+		int[] ids = ENGINE.getGLContext().genBufferIds(4);
 		
 		vertexVBO = ids[0];
 		
@@ -70,7 +70,7 @@ public abstract class GUIComponent extends Render2D {
 		verties.add(getX());				verties.add(getY() + getHeight());
 		
 		FloatBuffer vertexBuffer = BufferUtil.createFillipedFloatBuffer(verties);
-		GameName.getGLContext().addBufferBind(vertexBuffer, GL_ARRAY_BUFFER_BINDING, vertexVBO, GL_STATIC_DRAW, 'f');
+		ENGINE.getGLContext().addBufferBind(vertexBuffer, GL_ARRAY_BUFFER_BINDING, vertexVBO, GL_STATIC_DRAW, 'f');
 		
 		Vector2f[] textureCoords = new Vector2f[] 
 				{texCoordsRest1, texCoordsRest2, texCoordsSelected1, texCoordsSelected2, texCoordsPressed1, texCoordsPressed2};
@@ -84,16 +84,16 @@ public abstract class GUIComponent extends Render2D {
 			texCoords.add(textureCoords[i + 1].getX());	texCoords.add(textureCoords[i].getY());
 			
 			FloatBuffer texCoordsBuffer = BufferUtil.createFillipedFloatBuffer(texCoords);
-			GameName.getGLContext().addBufferBind(texCoordsBuffer, GL_ARRAY_BUFFER_BINDING, textureBuffers[i / 2], GL_STATIC_DRAW, 'f');
+			ENGINE.getGLContext().addBufferBind(texCoordsBuffer, GL_ARRAY_BUFFER_BINDING, textureBuffers[i / 2], GL_STATIC_DRAW, 'f');
 		}
 	}
 	
 	public boolean isSelected() {
-		if(GameName.player.getAccess().getPointer().getX() > getX() && 
-				GameName.player.getAccess().getPointer().getX() < getX() + getWidth()) {
+		if(ENGINE.getPlayer().getAccess().getPointer().getX() > getX() && 
+				ENGINE.getPlayer().getAccess().getPointer().getX() < getX() + getWidth()) {
 			
-			if(GameName.player.getAccess().getPointer().getY() > getY() && 
-					GameName.player.getAccess().getPointer().getY() < getY() + getHeight()) {
+			if(ENGINE.getPlayer().getAccess().getPointer().getY() > getY() && 
+					ENGINE.getPlayer().getAccess().getPointer().getY() < getY() + getHeight()) {
 				
 				return true;
 			}
@@ -103,7 +103,7 @@ public abstract class GUIComponent extends Render2D {
 	}
 	
 	public void update() {
-		if(isSelected() && GameName.player.getAccess().isPointerDown()) {
+		if(isSelected() && ENGINE.getPlayer().getAccess().isPointerDown()) {
 			activate();
 		}
 	}

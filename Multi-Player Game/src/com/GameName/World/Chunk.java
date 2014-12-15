@@ -6,7 +6,8 @@ import java.util.HashSet;
 import com.GameName.Cube.Cube;
 import com.GameName.Cube.Render.CubeRenderUtil;
 import com.GameName.Cube.Render.CubeTextureMap;
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
+import com.GameName.Engine.Registries.WorldRegistry;
 import com.GameName.Util.Tag.Tag;
 import com.GameName.Util.Tag.TagGroup;
 import com.GameName.Util.Vectors.Vector3f;
@@ -14,6 +15,7 @@ import com.GameName.World.Render.ChunkRender;
 
 public class Chunk {
 	private final float MINIMUM_LIGHT_DEFUTION = 0.5f;
+	private final GameEngine ENGINE;
 	
 	private boolean isInitialized;
 	private boolean hasCubes, isLoaded;
@@ -34,7 +36,8 @@ public class Chunk {
 	private float[]   lightValueMap;
 	private float 	  ambiantLight = (float) ((1d / (double) World.MAX_LIGHT) * World.AMBIANT_LIGHT);
 	
-	public Chunk(int size, int worldId, int x, int y, int z) { 
+	public Chunk(GameEngine eng, int size, int worldId, int x, int y, int z) { 
+		ENGINE = eng;
 		this.worldId = worldId;
 		
 		this.x = x; this.y = y; this.z = z;
@@ -53,7 +56,7 @@ public class Chunk {
 		
 		typesOfCubes = new HashSet<Cube>();
 		
-		render = new ChunkRender(this);
+		render = new ChunkRender(ENGINE, this);
 		isInitialized = true;
 	}
 	
@@ -184,7 +187,7 @@ public class Chunk {
 			
 		}
 		
-		if(GameName.isRunning && WorldRegistry.getWorld(worldId).isGenerated() && isPosOnEdge(x, y, z)) {
+		if(ENGINE.getGameName().isRunning() && WorldRegistry.getWorld(worldId).isGenerated() && isPosOnEdge(x, y, z)) {
 			Chunk chunk;
 			
 			if(x == 0) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x - 1, this.y, this.z); if(chunk != null && chunk.isLoaded()) chunk.forceVBOUpdate();}
@@ -291,7 +294,7 @@ public class Chunk {
 	 * Regenerates the CubeTextureMap for this chunk
 	 */
 	public void updateTextureMap() {
-		render.setTextureMap(CubeRenderUtil.generateTexturMap(typesOfCubes));
+		render.setTextureMap(CubeRenderUtil.generateTexturMap(ENGINE, typesOfCubes));
 	}
 	
 	public float[] getLightColor(int x, int y, int z) {
@@ -387,5 +390,9 @@ public class Chunk {
 	
 	public void setIsLoaded(boolean isLoaded) {
 		this.isLoaded = isLoaded;
+	}
+
+	public HashSet<Cube> getTypesOfCubes() {
+		return typesOfCubes;
 	}
 }

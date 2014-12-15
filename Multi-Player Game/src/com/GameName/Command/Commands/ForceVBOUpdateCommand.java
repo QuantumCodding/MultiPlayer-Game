@@ -1,20 +1,20 @@
 package com.GameName.Command.Commands;
 
 import com.GameName.Command.Command;
-import com.GameName.Main.GameName;
-import com.GameName.World.WorldRegistry;
+import com.GameName.Engine.GameEngine;
+import com.GameName.Engine.Registries.WorldRegistry;
 
 public class ForceVBOUpdateCommand extends Command {
 
-	public ForceVBOUpdateCommand() {
-		super("ForceVBOUpdate");
+	public ForceVBOUpdateCommand(GameEngine eng) {
+		super(eng, "ForceVBOUpdate");
 	}
 
 	public boolean action(String... parm) {
 		if(parm.length > 0) {		
 			WorldRegistry.accessByName(parm[0]).forceChunkUpdate();
 		} else {
-			GameName.player.getAccess().getCurrentWorld().forceChunkUpdate();
+			ENGINE.getPlayer().getAccess().getCurrentWorld().forceChunkUpdate();
 		}
 		
 		return true;

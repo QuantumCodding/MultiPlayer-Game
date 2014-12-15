@@ -17,7 +17,7 @@ import static org.lwjgl.openal.AL10.alSourcei;
 
 import java.util.ArrayList;
 
-import com.GameName.Main.GameName;
+import com.GameName.Engine.GameEngine;
 import com.GameName.Util.IEngine;
 import com.GameName.Util.Vectors.Vector3f;
 
@@ -25,6 +25,7 @@ public class SoundEngine implements IEngine<SoundEvent> {
 	public static int defaultSource;
 	
 	public ArrayList<SoundEvent> soundEvents;
+	private final GameEngine ENGINE;
 	
 	static {
 		defaultSource = alGenSources();
@@ -33,7 +34,8 @@ public class SoundEngine implements IEngine<SoundEvent> {
 		alSource3f(defaultSource, AL_POSITION, 0, 0, 0);
 	}
 	
-	public SoundEngine() {		
+	public SoundEngine(GameEngine eng) {		
+		ENGINE = eng;
 		soundEvents = new ArrayList<SoundEvent>();
 	}
 		
@@ -56,7 +58,7 @@ public class SoundEngine implements IEngine<SoundEvent> {
 		alSourcef(event.getSource(), AL_GAIN, event.getGain());
 		alSourcef(event.getSource(), AL_PITCH, event.getPitch());
 		
-		Vector3f playPos = GameName.player.getAccess().getPos().subtract(event.getPos());
+		Vector3f playPos = ENGINE.getPlayer().getAccess().getPos().subtract(event.getPos());
 		alSource3f(event.getSource(), AL_POSITION, playPos.getX(), playPos.getY(), playPos.getZ());
 		
 		alSourcei(event.getSource(), AL_BUFFER, event.getSound().getId());	
@@ -77,13 +79,13 @@ public class SoundEngine implements IEngine<SoundEvent> {
 	}
 
 	public void cleanUp() {
-		if(SoundRegistry.getSounds() == null) return;
-		
-		for(int i = 0; i < SoundRegistry.getSounds().length; i ++) {
-			if(SoundRegistry.getSounds()[i] != null) {
-				alDeleteBuffers(SoundRegistry.getSounds()[i].getId());
-			}
-		}
+//		if(SoundRegistry.getSounds() == null) return;
+//		
+//		for(int i = 0; i < SoundRegistry.getSounds().length; i ++) {
+//			if(SoundRegistry.getSounds()[i] != null) {
+//				alDeleteBuffers(SoundRegistry.getSounds()[i].getId());
+//			}
+//		}
 		
 		alDeleteSources(defaultSource);
 	}
