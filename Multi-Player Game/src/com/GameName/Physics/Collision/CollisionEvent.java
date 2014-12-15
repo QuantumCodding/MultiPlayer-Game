@@ -1,4 +1,4 @@
-package com.GameName.Physics.Coalition;
+package com.GameName.Physics.Collision;
 
 import com.GameName.Util.Vectors.Vector3f;
 

@@ -1,5 +1,6 @@
-package com.GameName.Physics.Coalition;
+package com.GameName.Physics.Collision;
 
+import static com.GameName.Physics.PhysicsUtil.CardinalDirection;
 import com.GameName.Util.Vectors.Vector3f;
 
 public abstract class Collidable {
@@ -41,9 +42,10 @@ public abstract class Collidable {
 		return null;
 	}
 	
-	public abstract Collidable translate(Vector3f amount);
-	
+	public abstract Collidable translate(Vector3f amount);	
 	public abstract Vector3f getCenter();
+	public abstract float getSurfaceArea(CardinalDirection dir);
+	public abstract float getVolume();
 	
 	public Shape getShape() {
 		return shape;

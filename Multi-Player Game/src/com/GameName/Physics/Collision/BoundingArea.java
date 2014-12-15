@@ -1,8 +1,9 @@
-package com.GameName.Physics.Coalition;
+package com.GameName.Physics.Collision;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
+import com.GameName.Physics.PhysicsUtil.CardinalDirection;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class BoundingArea {
@@ -80,5 +81,25 @@ public class BoundingArea {
 		}
 		
 		return this;
+	}
+	
+	public float getVolume() {
+		float volume = 0.0f;
+		
+		for(Collidable c : boundingObjetcts) {
+			volume += c.getVolume();
+		}
+		
+		return volume;
+	}
+	
+	public float getSurfaceArea(CardinalDirection dir) {
+		float surfaceArea = 0.0f;
+		
+		for(Collidable c : boundingObjetcts) {
+			surfaceArea += c.getSurfaceArea(dir);
+		}
+		
+		return surfaceArea;
 	}
 }

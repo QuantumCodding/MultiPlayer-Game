@@ -1,17 +1,21 @@
-package com.GameName.Physics.Coalition;
+package com.GameName.Physics.Collision;
 
+import com.GameName.Physics.PhysicsUtil.CardinalDirection;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class BoundingBox extends Collidable {
 
 	private Vector3f minPos;
 	private Vector3f maxPos;
+	private Vector3f length;
 	
 	public BoundingBox(Vector3f minPos, Vector3f maxPos) {
 		super(Shape.BoundingBox);
 		
 		this.minPos = minPos;
 		this.maxPos = maxPos;
+
+		length = new Vector3f(minPos.getX() - maxPos.getX(), minPos.getY() - maxPos.getY(), minPos.getZ() - maxPos.getZ()).abs();
 	}
 
 	public CollisionEvent intersect(Collidable other) {
@@ -41,5 +45,19 @@ public class BoundingBox extends Collidable {
 
 	public Vector3f getCenter() {		
 		return minPos.add(maxPos.subtract(minPos));
+	}
+
+	public float getVolume() {
+		return length.getX() * length.getY() * length.getZ();
+	}
+
+	public float getSurfaceArea(CardinalDirection dir) {
+		switch(dir) {
+			case Bottom: case Top: 	return length.getX() * length.getZ();
+			case East: case West:  	return length.getZ() * length.getY();
+			case North: case South:	return length.getX() * length.getY();	
+			
+			default: return 0;
+		}
 	}
 }
