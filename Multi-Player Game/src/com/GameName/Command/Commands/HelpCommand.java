@@ -17,9 +17,9 @@ public class HelpCommand extends Command {
 			boolean swap = false;
 			for(Command command : CommandRegistry.getCommands()) {
 				if(swap)
-					Logger.print(command.getName() + command.getInfo()).setType("").end();
+					Logger.print(command.getName() + " " + command.getInfo()).setType("").end();
 				else
-					Logger.print(command.getName() + command.getInfo()).setType("").setBold().end();
+					Logger.print(command.getName() + " " +  command.getInfo()).setType("").setBold().end();
 				swap = !swap;
 			}
 			

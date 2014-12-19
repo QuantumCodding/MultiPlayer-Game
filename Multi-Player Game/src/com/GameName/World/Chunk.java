@@ -1,5 +1,7 @@
 package com.GameName.World;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -8,6 +10,7 @@ import com.GameName.Cube.Render.CubeRenderUtil;
 import com.GameName.Cube.Render.CubeTextureMap;
 import com.GameName.Engine.GameEngine;
 import com.GameName.Engine.Registries.WorldRegistry;
+import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.Tag;
 import com.GameName.Util.Tag.TagGroup;
 import com.GameName.Util.Vectors.Vector3f;
@@ -295,6 +298,17 @@ public class Chunk {
 	 */
 	public void updateTextureMap() {
 		render.setTextureMap(CubeRenderUtil.generateTexturMap(ENGINE, typesOfCubes));
+	}
+	
+	public void save(String fileLoc) {
+		try {
+			File saveLoc =  new File(fileLoc + getX() + " x " + getY() + " x " + getZ() + ".dtg");
+			DTGLoader.saveDTGFile(saveLoc, getTagGroup());
+			
+		} catch(IOException e) {
+			System.err.println("Failed to save Chunk " + getPos().valuesToString() + " in World " + WorldRegistry.getWorld(worldId));
+			e.printStackTrace();
+		}
 	}
 	
 	public float[] getLightColor(int x, int y, int z) {

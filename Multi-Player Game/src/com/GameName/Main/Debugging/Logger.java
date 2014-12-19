@@ -56,7 +56,8 @@ public class Logger {
 	}
 	
 	public Logger setType(String type) {
-		working = "[" + type.toUpperCase() + "]" + working.substring(working.indexOf(']') + 1);
+		if(!type.isEmpty()) working = "[" + type.toUpperCase() + "]" + working.substring(working.indexOf(']') + 1);
+		else working = working.substring(working.indexOf(']') + 1);
 		
 		if(!effect.getEffects().contains("<color=")) {
 			

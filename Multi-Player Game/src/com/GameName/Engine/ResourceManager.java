@@ -3,6 +3,7 @@ package com.GameName.Engine;
 import java.util.ArrayList;
 
 import com.GameName.Command.Commands.HelpCommand;
+import com.GameName.Command.Commands.SaveCommand;
 import com.GameName.Command.Commands.SetPlayerPropertyCommand;
 import com.GameName.Command.Commands.TeleportPlayerCommand;
 import com.GameName.Cube.Cube;
@@ -60,6 +61,7 @@ public class ResourceManager implements ICubeRegister, ICommandRegister, IEntity
 		CommandRegistry.registerCommand(new HelpCommand(eng));
 		CommandRegistry.registerCommand(new TeleportPlayerCommand(eng));
 		CommandRegistry.registerCommand(new SetPlayerPropertyCommand(eng));
+		CommandRegistry.registerCommand(new SaveCommand(eng));
 	}
 	
 	public static final class Cubes {

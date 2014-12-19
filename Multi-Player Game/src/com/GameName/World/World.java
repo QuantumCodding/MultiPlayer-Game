@@ -181,6 +181,12 @@ public class World {
 	public Vector3f getSizeAsVector() {return new Vector3f(sizeX, sizeY, sizeZ);}
 	public Vector3f getChunkSizeAsVector() {return new Vector3f(chunkX, chunkY, chunkZ);}
 	
+	public void saveWorld() {
+		for(Chunk chunk : loadedWorld.getAccess().getChunkLoaded().getLoadedChunks()) {
+			chunk.save(getFileLoc().getAbsolutePath());
+		}
+	}
+	
 	public File getFileLoc() {
 		return new File(defaultWorldRootDir + name + "/" );
 	}

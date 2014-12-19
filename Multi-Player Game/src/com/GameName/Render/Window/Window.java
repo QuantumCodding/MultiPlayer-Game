@@ -61,7 +61,7 @@ public class Window {
 	public int getWidth() {return Display.getWidth();}
 	public int getHeight() {return Display.getHeight();}
 	
-	public String getOpenGLVersion() {
+	public static String getOpenGLVersion() {
 		return GL11.glGetString(GL11.GL_VERSION);
 	}
 }

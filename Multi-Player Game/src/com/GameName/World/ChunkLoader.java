@@ -6,7 +6,6 @@ import java.util.HashSet;
 
 import com.GameName.Cube.Cube;
 import com.GameName.Engine.GameEngine;
-import com.GameName.Main.Debugging.Logger;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
 import com.GameName.Util.Vectors.Vector3f;
@@ -76,8 +75,6 @@ public class ChunkLoader {
 	}
 	
 	public void loadChunks() {
-		Logger.println("Chunk Loader is loding chunks");
-				
 		for(int radius = 0; radius < loadRadius; radius ++) {
 			
 			for(int x = -radius; x < radius + 1; x ++) {
@@ -135,24 +132,13 @@ public class ChunkLoader {
 				chunk.updateTextureMap();
 				
 				ENGINE.getRender().add(chunk.getRender()); getLoadedChunks().add(chunk); chunk.forceVBOUpdate();
-				Logger.print("Chunk: " + chunk.getPos().valuesToString() + " is loaded").end();
 			}}}			
 		}
 	}
 	
 	public void saveChunks() {
 		for(Chunk chunk : getLoadedChunks()) {
-			try {
-				File saveLoc =  new File(fileLoc +
-						(int) (chunk.getX()) + " x " + (int) (chunk.getY()) + " x " + (int) (chunk.getZ())
-					+ ".dtg");
-				
-				DTGLoader.saveDTGFile(saveLoc, chunk.getTagGroup());
-				
-			} catch(IOException e) {
-				System.err.println("Failed to save Chunk " + chunk.getPos().valuesToString() + " im World " + world.getName());
-				e.printStackTrace();
-			}
+			chunk.save(fileLoc);
 		}
 	}
 	

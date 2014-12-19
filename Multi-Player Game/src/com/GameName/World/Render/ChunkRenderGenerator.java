@@ -10,9 +10,7 @@ import java.util.List;
 import com.GameName.Cube.Cube;
 import com.GameName.Engine.GameEngine;
 import com.GameName.Engine.ResourceManager.Cubes;
-import com.GameName.Main.Debugging.Logger;
 import com.GameName.Util.BufferUtil;
-import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Chunk;
 import com.GameName.World.World;
 
@@ -70,9 +68,6 @@ public class ChunkRenderGenerator {
 			chunkData2[chunkData.length] = 0;
 			chunkData = chunkData2.clone();
 		}
-		
-		//TODO: Remove
-		Logger.println("Generating Chunk Render For: " + new Vector3f(c.getX(), c.getY(), c.getZ()).valuesToString());
 		
 		ENGINE.getGLContext()
 			.addBufferBind(verticeBuffer, GL_ARRAY_BUFFER, chunkData[0], GL_DYNAMIC_DRAW, 'f');

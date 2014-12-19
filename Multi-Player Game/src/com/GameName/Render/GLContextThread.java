@@ -6,7 +6,6 @@ import static org.lwjgl.opengl.GL15.glBufferData;
 import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.nio.Buffer;
 import java.nio.DoubleBuffer;
@@ -17,9 +16,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 
-import com.GameName.Main.Debugging.Logger;
 import com.GameName.Render.Effects.Texture;
-//import com.GameName.Main.Debugging.Logger;
 import com.GameName.Util.QueuedArray;
 
 public class GLContextThread {
@@ -187,7 +184,6 @@ public class GLContextThread {
 		this.useMipmap = useMipmap; generatingTexture = true;
 		
 		while(generatingTexture) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
-		Logger.print("Have some Texture!").setColor(Color.CYAN).end();
 		return texture;
 	}
 	
@@ -206,7 +202,6 @@ public class GLContextThread {
 		this.useMipmap = useMipmap; generatingTexture = true;
 		
 		while(generatingTexture) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
-		Logger.print("Have some Texture!").setColor(Color.CYAN).end();
 		return texture;
 	}
 
