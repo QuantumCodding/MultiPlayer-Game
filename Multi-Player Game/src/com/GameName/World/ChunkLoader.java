@@ -114,7 +114,7 @@ public class ChunkLoader {
 					
 				} catch(IOException e) {
 					System.out.println("Generateing: [" + x + ", " + y + ", " + z + "]");
-					Chunk read = world.getEnvironmentGen().generate(ENGINE, World.CHUNK_SIZE, world, x, y, z, 10);
+					Chunk read = world.getEnvironmentGen().generate(World.CHUNK_SIZE, world, x, y, z, 10);
 					
 					for(int x_ = 0; x_ < read.getSize(); x_ ++) {
 					for(int y_ = 0; y_ < read.getSize(); y_ ++) {

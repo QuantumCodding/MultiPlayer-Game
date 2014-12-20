@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 
-import com.GameName.Cube.Cube;
+import com.GameName.Engine.ResourceManager.Cubes;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.Tag;
 import com.GameName.Util.Tag.TagGroup;
@@ -31,7 +31,7 @@ public class DensityGeneration {
 	}
 	
 	public Chunk generate(int scale,int x,int y,int z) {
-		Chunk out = new Chunk(scale, world.getId(), x, y, z);;
+		Chunk out = new Chunk(null, scale, world.getId(), x, y, z);;
 		addToNodeFile(new DensityNode(x, y, z, r.nextFloat()));
 		ArrayList<DensityNode> nearNodes = new ArrayList<DensityNode>();
 		for(int i=0; i<2; i++) {
@@ -47,7 +47,7 @@ public class DensityGeneration {
 		for(int i=0; i<World.CHUNK_SIZE; i++) {
 			for(int j=0; j<World.CHUNK_SIZE; j++) {
 				for(int k=0; k<World.CHUNK_SIZE; k++) {
-					out.setCube(i, j, k, Cube.Air);
+					out.setCube(i, j, k, Cubes.Air);
 				}
 			}
 		}

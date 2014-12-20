@@ -18,7 +18,7 @@ import com.GameName.World.Render.ChunkRender;
 
 public class Chunk {
 	private final float MINIMUM_LIGHT_DEFUTION = 0.5f;
-	private final GameEngine ENGINE;
+	public final GameEngine ENGINE;
 	
 	private boolean isInitialized;
 	private boolean hasCubes, isLoaded;
