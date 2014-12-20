@@ -1,7 +1,10 @@
 package com.GameName.Engine;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
@@ -17,6 +20,7 @@ import com.GameName.Engine.Threads.GameThread;
 import com.GameName.Entity.EntityPlayer;
 import com.GameName.Input.Control;
 import com.GameName.Render.Effects.ShaderRegistry;
+import com.GameName.Render.Effects.Texture;
 import com.GameName.Render.Window.Window;
 import com.GameName.Util.Interfaces.ISetup;
 
@@ -47,15 +51,16 @@ public class GameName_New implements ISetup {
 	};
 	
 	public void preInit() {
-		res = new ResourceManager();
-		window = new Window(); 
-		window.setTitle("Multi-Player Game");
+		res = new ResourceManager();		
+		window = new Window();	
 		
 		try {
-			window.initDisplay();
-		} catch (LWJGLException e) {
-			e.printStackTrace();
-		}
+			window.setTitle("Multi-Player Game");		
+			window.setIcon(ImageIO.read(new File("res/textures/icon.png"))); 
+			
+			window.initDisplay();		
+			window.drawImage(new Texture(ImageIO.read(new File("res/textures/Unspell_Names.png")), "Unspell + Names", false));
+		} catch(IOException | LWJGLException e) { e.printStackTrace(); }		
 
 		ResourceManager.addCubeRegistery(res);
 		ResourceManager.addWorldRegistery(res);
@@ -80,6 +85,7 @@ public class GameName_New implements ISetup {
 		
 		engine.init(Worlds.MainWorld);	
 		window.setupOpenGL(engine);
+		window.drawImage(new Texture("res/textures/Unspell_Names.png"));
 		
 		engine.getRender().setUpShaders(); //TODO: Remove ShaderRegistry
 		ShaderRegistry.register();

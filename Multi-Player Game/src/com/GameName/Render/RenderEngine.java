@@ -126,7 +126,11 @@ public class RenderEngine implements IEngine<Renderable> {
 	    glMatrixMode(GL_PROJECTION);
 	    
 	       glLoadIdentity();	       
-	       glOrtho(0, Display.getWidth(), Display.getHeight(), 0, 1, -1);	       
+	       glOrtho(0, 
+	    		   ENGINE.getGameName().getWindow().getWidth(), 
+	    		   ENGINE.getGameName().getWindow().getHeight(), 
+	    		   0, 1, -1
+	           );	       
 	       glGetFloat(GL_PROJECTION_MATRIX, orthographicProjectionMatrix);
 	       
 	    glLoadMatrix(perspectiveProjectionMatrix);

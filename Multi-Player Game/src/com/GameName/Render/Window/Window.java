@@ -1,5 +1,7 @@
 package com.GameName.Render.Window;
 
+import static org.lwjgl.opengl.GL11.*;
+
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 
@@ -13,6 +15,7 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
 import com.GameName.Engine.GameEngine;
+import com.GameName.Render.Effects.Texture;
 
 public class Window {
 	public static final int DEFAULT_WIDTH = 800;
@@ -63,5 +66,34 @@ public class Window {
 	
 	public static String getOpenGLVersion() {
 		return GL11.glGetString(GL11.GL_VERSION);
+	}
+	
+	public void drawImage(Texture texture) {
+		glMatrixMode(GL_PROJECTION);
+			glOrtho(0, getWidth(), getHeight(), 0, 1, -1);	 
+		glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
+		
+		glEnable(GL_TEXTURE_2D); 
+		texture.bind();	
+		
+		glBegin(GL_QUADS);		
+			glTexCoord2f(0f, 0f);
+			glVertex3f(0, 0, -1);
+			
+			glTexCoord2f(1f, 0f);
+			glVertex3f(getWidth(), 0, -1);
+			
+			glTexCoord2f(1f, 1f);
+			glVertex3f(getWidth(), getHeight(), -1);
+			
+			glTexCoord2f(0f, 1f);
+			glVertex3f(0, getHeight(), -1);			
+		glEnd();		
+		
+		glDisable(GL_TEXTURE_2D); 
+		Texture.unbind();
+		
+		Display.update();
 	}
 }
