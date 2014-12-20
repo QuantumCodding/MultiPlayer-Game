@@ -43,7 +43,7 @@ public class World {
 		this.name = name;
 		this.id = -1;
 			
-		environmentGen = new EnvironmentGenerator(seed, this);
+		environmentGen = new EnvironmentGenerator(ENGINE, seed, this);
 	}
 	
 	public void setId(int id) {
