@@ -38,7 +38,7 @@ public class GameEngine {
 	
 	public GameEngine init(World world) {
 		debugWindow = new DebugWindow(this);
-		glContextThread = new GLContextThread().init();
+		glContextThread = new GLContextThread();
 		threads = new ThreadGroup();		
 
 		currentWorld = world;

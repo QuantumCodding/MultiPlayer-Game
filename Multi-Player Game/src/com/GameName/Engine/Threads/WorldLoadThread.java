@@ -18,14 +18,14 @@ public class WorldLoadThread extends GameThread {
 	}
 
 	void tick() {
-		if(lastChunk != null && !lastChunk.equals(ENGINE.getPlayer().getAccess().getChunk())) {
-			Logger.println("Updating World through the thread");
-			world.getLoadedWorld().getAccess().setCenter(ENGINE.getPlayer().getAccess().getChunk());
-			world.getLoadedWorld().getAccess().getChunkLoaded().update();
-		}
-		
-		lastChunk = ENGINE.getPlayer().getAccess().getChunk();
-		if(lastChunk != null) lastChunk.setY(world.getSizeY() - lastChunk.getY());
+//		if(lastChunk != null && !lastChunk.equals(ENGINE.getPlayer().getAccess().getChunk())) {
+//			Logger.println("Updating World through the thread");
+//			world.getLoadedWorld().getAccess().setCenter(ENGINE.getPlayer().getAccess().getChunk());
+//			world.getLoadedWorld().getAccess().getChunkLoaded().update();
+//		}
+//		
+//		lastChunk = ENGINE.getPlayer().getAccess().getChunk();
+//		if(lastChunk != null) lastChunk.setY(world.getSizeY() - lastChunk.getY());
 	}
 
 	public World getWorld() {

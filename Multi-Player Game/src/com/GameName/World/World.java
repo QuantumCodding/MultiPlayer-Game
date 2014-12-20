@@ -26,7 +26,7 @@ public class World {
 	private String name;
 	private LoadedWorld loadedWorld;
 	private EnvironmentGenerator environmentGen;
-	private int id;
+	private int id, seed;
 		
 	private boolean isGenerated = false;
 	
@@ -40,10 +40,9 @@ public class World {
 		chunkY = y;
 		chunkZ = z;
 		
+		this.seed = seed;
 		this.name = name;
 		this.id = -1;
-			
-		environmentGen = new EnvironmentGenerator(ENGINE, seed, this);
 	}
 	
 	public void setId(int id) {
@@ -242,6 +241,7 @@ public class World {
 	public void setEngine(GameEngine eng) {
 		ENGINE = eng;
 		loadedWorld = new LoadedWorld(ENGINE, this, name);
+		environmentGen = new EnvironmentGenerator(ENGINE, seed, this);
 	}
 	
 	public void cleanUp() {

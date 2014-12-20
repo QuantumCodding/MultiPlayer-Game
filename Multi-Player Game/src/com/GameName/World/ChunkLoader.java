@@ -114,17 +114,7 @@ public class ChunkLoader {
 					
 				} catch(IOException e) {
 					System.out.println("Generateing: [" + x + ", " + y + ", " + z + "]");
-					Chunk read = world.getEnvironmentGen().generate(World.CHUNK_SIZE, world, x, y, z, 10);
-					
-					for(int x_ = 0; x_ < read.getSize(); x_ ++) {
-					for(int y_ = 0; y_ < read.getSize(); y_ ++) {
-					for(int z_ = 0; z_ < read.getSize(); z_ ++) {
-						chunk.setCubeWithMetadata(
-								x_, 	y_, 	z_, 
-								Cube.getCubeByID(read.getCube(x_, y_, z_)),
-								read.getMetadata(x_, y_, z_)
-							);
-					}}}
+					chunk = world.getEnvironmentGen().generate(World.CHUNK_SIZE, world, x, y, z, 10);
 				}
 			
 				chunk.handelMassUpdate();

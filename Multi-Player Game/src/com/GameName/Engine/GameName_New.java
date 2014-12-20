@@ -85,8 +85,9 @@ public class GameName_New implements ISetup {
 		
 		engine.init(Worlds.MainWorld);	
 		window.setupOpenGL(engine);
-		try{window.drawImage(new Texture(ImageIO.read(new File("res/textures/Unspell_Names.png")), "Unspell + Names", false));}
-		catch(IOException e) {}
+		try {
+			window.drawImage(new Texture(ImageIO.read(new File("res/textures/Unspell_Names.png")), "Unspell + Names", false));
+		} catch(IOException e) {e.printStackTrace();}
 		
 		engine.getRender().setUpShaders(); //TODO: Remove ShaderRegistry
 		ShaderRegistry.register();
