@@ -24,26 +24,13 @@ public class EnvironmentGenerator {
 		ENGINE = eng;
 	}
 	
-//	public Chunk generate(int scale, World world, int x, int y, int z, int seed) {
-//		Chunk output = new Chunk(ENGINE, scale, world.getId(), x, y, z);
-//		for(int i=0; i<World.CHUNK_SIZE; i++) {
-//			for(int j=0; j<World.CHUNK_SIZE; j++) {
-//				for(int k=0; k<World.CHUNK_SIZE; k++) {
-//					output.setCubeWithoutUpdate(i, k, j, ( ? Cubes.StoneCube:Cubes.Air));
-//				}
-//			}
-//		}
-//		
-//		return output;
-//	}
-	
 	public Chunk generate(int scale, World world, int x, int y, int z, int seed) {
 		Chunk out = new Chunk(ENGINE, scale, world.getId(), x, y, z);
 		for(int i=0; i<World.CHUNK_SIZE; i++) {
 			for(int j=0; j<World.CHUNK_SIZE; j++) {
-				ran=r.nextInt(2);
+				ran=r.nextInt(10);
 				for(int k=0; k<World.CHUNK_SIZE; k++) {
-					if(y+k <= 20+ran)
+					if(y*World.CHUNK_SIZE+k <= 20+ran)
 						out.setCubeWithoutUpdate(i, k, j, Cubes.StoneCube);
 					else
 						out.setCubeWithoutUpdate(i, k, j, Cubes.Air);
