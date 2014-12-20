@@ -19,7 +19,7 @@ public class EnvironmentGenerator {
 	public EnvironmentGenerator(GameEngine eng, int seedI, World worldI) {
 		seed = seedI;
 		world = worldI;
-		test = new DensityGeneration(seed, (int)World.SCALE, world);
+		test = new DensityGeneration(eng, seed, (int)World.SCALE, world);
 		ENGINE = eng;
 	}
 	

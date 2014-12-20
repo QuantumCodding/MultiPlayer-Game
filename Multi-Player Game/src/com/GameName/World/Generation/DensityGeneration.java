@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 
+import com.GameName.Engine.GameEngine;
 import com.GameName.Engine.ResourceManager.Cubes;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.Tag;
@@ -21,13 +22,15 @@ public class DensityGeneration {
 	private World world;
 	private Random r;
 	private HashMap<Vector3f, DensityNode> nodes = new HashMap<Vector3f, DensityNode>();
+	GameEngine ENGINE;
 	
-	public DensityGeneration(int seedI, int scaleI, World worldI) {
+	public DensityGeneration(GameEngine eng, int seedI, int scaleI, World worldI) {
 		seed = seedI;
 		scale = scaleI;
 		world = worldI;
 		r = new Random(seed);
 		pullNodes();
+		ENGINE = eng;
 	}
 	
 	public Chunk generate(int scale,int x,int y,int z) {
