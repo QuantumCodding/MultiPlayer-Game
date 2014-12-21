@@ -2,16 +2,14 @@ package com.GameName.World.Generation;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 import com.GameName.Engine.GameEngine;
 import com.GameName.Engine.ResourceManager.Cubes;
@@ -24,7 +22,7 @@ public class DensityGeneration {
 	private int seed, scale;
 	private World world;
 	private Random r;
-	private HashMap<Vector3f, DensityNode> nodes = new HashMap<Vector3f, DensityNode>();
+	private HashMap<Vector3f, DensityNode> nodes = new HashMap<>();
 	private GameEngine ENGINE;
 	private Scanner nodeReader;
 	private BufferedWriter nodeWriter;
@@ -39,36 +37,44 @@ public class DensityGeneration {
 	}
 	
 	public Chunk generate(int scale,int x,int y,int z) {
-		Chunk out = new Chunk(null, scale, world.getId(), x, y, z);;
-		addToNodeFile(new DensityNode(x, y, z, r.nextFloat()));
-		ArrayList<DensityNode> nearNodes = new ArrayList<DensityNode>();
+		Chunk out = new Chunk(ENGINE, scale, world.getId(), x, y, z);;
+		addToNodeFile(new DensityNode(x, y, z,(((float)r.nextInt(8)+1f)/10f)));
+		ArrayList<DensityNode> nearNodes = new ArrayList<>();
 		for(int i=0; i<2; i++) {
 			for(int j=0; j<2; j++) {
 				for(int k=0; k<2; k++) {
-					if(nodeExists(x+i, y+j, z+k))
-						nearNodes.add(getNode(x+i, y+j, z+k));
+					if(nodeExists(i, j, k))
+						nearNodes.add(getNode(i, j, k));
 					else {
-						nodes.put(new Vector3f(x+i, y+j, z+k), new DensityNode(x+i, y+j, z+k, r.nextFloat()));
+						nodes.put(new Vector3f(i, j, k), new DensityNode(i, j, k, r.nextFloat()));
 					}
 				}
 			}
 		}
-		for(int i=0; i<nearNodes.size(); i++) {
-			System.out.println(i);
-			nearNodes.set(i, new DensityNode(
-					nearNodes.get(i).getX()*10, 
-					nearNodes.get(i).getY()*10, 
-					nearNodes.get(i).getZ()*10, 
-					nearNodes.get(i).getValue()));
-		}
 		for(int i=0; i<World.CHUNK_SIZE; i++) {
 			for(int j=0; j<World.CHUNK_SIZE; j++) {
-				for(int k=0; k<World.CHUNK_SIZE; k++) {
-					out.setCubeWithoutUpdate(i, j, k, Cubes.Air);
+				for(int k=(i==0&&j==0 ? 1:0); k<World.CHUNK_SIZE; k++) {
+					ArrayList<Float> distances = new  ArrayList<>();
+					for(DensityNode n : nearNodes) {
+						distances.add((float)(Math.sqrt(
+								Math.abs((n.getX()*World.CHUNK_SIZE)-(i+x*World.CHUNK_SIZE))+
+								Math.abs((n.getY()*World.CHUNK_SIZE)-(j+y*World.CHUNK_SIZE))+
+								Math.abs((n.getZ()*World.CHUNK_SIZE)-(k+z*World.CHUNK_SIZE)))));
+					}					
+					float totalSum=0;
+					
+					for(int l=0; l<distances.size(); l++) {
+						totalSum += (nearNodes.get(l).getValue()/
+								distances.get(l));
+					}
+//					System.out.println("Sum:" + totalSum);
+					if(totalSum >= .3f)
+						out.setCubeWithoutUpdate(1, j, k, Cubes.StoneCube);
+					else
+						out.setCubeWithoutUpdate(1, j, k, Cubes.Air);
 				}
 			}
 		}
-		
 		
 		
 		
@@ -113,7 +119,6 @@ public class DensityGeneration {
 		float valuei;
 		while(nodeReader.hasNext()) {
 			xi=Integer.parseInt(nodeReader.next());
-			System.out.println(xi);
 			yi=nodeReader.nextInt();
 			zi=nodeReader.nextInt();
 			valuei=nodeReader.nextFloat();
