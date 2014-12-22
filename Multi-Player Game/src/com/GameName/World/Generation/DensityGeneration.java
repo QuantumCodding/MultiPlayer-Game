@@ -37,8 +37,7 @@ public class DensityGeneration {
 	}
 	
 	public Chunk generate(int scale,int x,int y,int z) {
-		Chunk out = new Chunk(ENGINE, scale, world.getId(), x, y, z);;
-		addToNodeFile(new DensityNode(x, y, z,(((float)r.nextInt(8)+1f)/10f)));
+		Chunk out = new Chunk(ENGINE, scale, world.getId(), x, y, z);
 		ArrayList<DensityNode> nearNodes = new ArrayList<>();
 		for(int i=0; i<2; i++) {
 			for(int j=0; j<2; j++) {
@@ -64,8 +63,7 @@ public class DensityGeneration {
 					float totalSum=0;
 					
 					for(int l=0; l<distances.size(); l++) {
-						totalSum += (nearNodes.get(l).getValue()/
-								distances.get(l));
+						totalSum += (distances.get(l)/nearNodes.get(l).getValue());
 					}
 //					System.out.println("Sum:" + totalSum);
 					if(totalSum >= .3f)
@@ -90,7 +88,7 @@ public class DensityGeneration {
 			nodeWriter = new BufferedWriter(new FileWriter(new File(world.getFileLoc()+"/generation/node.nodes")));
 		} catch (IOException e) { e.printStackTrace(); }
 		nodeReader.useDelimiter("-");
-		HashSet<DensityNode> nodz = new HashSet<DensityNode>();
+		ArrayList<DensityNode> nodz = new ArrayList<DensityNode>();
 		int xi, yi, zi;
 		float valuei;
 		while(nodeReader.hasNext()) {
