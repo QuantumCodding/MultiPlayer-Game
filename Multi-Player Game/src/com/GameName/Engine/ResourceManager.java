@@ -80,7 +80,7 @@ public class ResourceManager implements ICubeRegister, ICommandRegister, IEntity
 	}
 	
 	public static final class Worlds {
-		public static final World MainWorld = new World(10, 10, 10, "MainWorld");
+		public static final World MainWorld = new World(5, 5, 5, "MainWorld");
 	}
 	
 	public static final class Threads {

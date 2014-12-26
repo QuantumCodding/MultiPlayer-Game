@@ -15,7 +15,7 @@ public class World {
 	
 	public static final float AMBIANT_LIGHT = 10;
 	public static final float MAX_LIGHT = 10;
-	public static final int CHUNK_SIZE = 10;
+	public static final int CHUNK_SIZE = 20;
 	public static final int VERTICE_SIZE = CHUNK_SIZE + 2;
 	public static final float SCALE = 2;
 	public static final float CUBE_SIZE = 0.2f;
