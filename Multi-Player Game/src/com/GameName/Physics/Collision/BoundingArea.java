@@ -65,6 +65,16 @@ public class BoundingArea {
 		return boundingObjetcts;
 	}
 	
+	public ArrayList<Collidable> getBoundingObjectsClone(Vector3f amount) {
+		ArrayList<Collidable> clone = new ArrayList<>();
+		
+		for(Collidable c : boundingObjetcts) {
+			clone.add(c.clone(amount));
+		}
+		
+		return clone;
+	}
+	
 	public ArrayList<Collidable> clone() {
 		ArrayList<Collidable> toRep = new ArrayList<Collidable>();
 		

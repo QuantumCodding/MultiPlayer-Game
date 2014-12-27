@@ -42,6 +42,7 @@ public abstract class Collidable {
 		return null;
 	}
 	
+	public abstract Collidable clone(Vector3f amount);	
 	public abstract Collidable translate(Vector3f amount);	
 	public abstract Vector3f getCenter();
 	public abstract float getSurfaceArea(CardinalDirection dir);

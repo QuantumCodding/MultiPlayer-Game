@@ -60,6 +60,10 @@ public class PhysicsAccess {
 	public boolean isOnGround() {
 		return object.onGround;
 	}
+	
+	public boolean noClip() {
+		return object.noClip;
+	}
 
 	public void setPos(Vector3f pos) {
 		object.pos = pos;
@@ -100,10 +104,6 @@ public class PhysicsAccess {
 	public void setBounding(BoundingArea bounding) {
 		object.bounding = bounding;
 	}
-
-	public void setOnGround(boolean onGround) {
-		object.onGround = onGround;
-	}
 	
 	public void setX(float x) {
 		object.pos.setX(x);
@@ -127,5 +127,9 @@ public class PhysicsAccess {
 	
 	public void setRotZ(float rotZ) {
 		object.rot.setZ(rotZ);
+	}
+	
+	public void setNoClip(boolean noClip) {
+		object.noClip = noClip;
 	}
 }

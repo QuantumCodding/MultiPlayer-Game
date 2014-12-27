@@ -10,6 +10,7 @@ import com.GameName.Cube.Render.CubeRenderUtil;
 import com.GameName.Cube.Render.CubeTextureMap;
 import com.GameName.Engine.GameEngine;
 import com.GameName.Engine.Registries.WorldRegistry;
+import com.GameName.Physics.Collision.BoundingArea;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.Tag;
 import com.GameName.Util.Tag.TagGroup;
@@ -28,7 +29,7 @@ public class Chunk {
 	private final int x, y, z;
 	
 	private ChunkRender render;
-	
+	private BoundingArea bounding;
 	private HashSet<Cube> typesOfCubes;
 	
 	private int[] cubes;
@@ -58,7 +59,7 @@ public class Chunk {
 		}
 		
 		typesOfCubes = new HashSet<Cube>();
-		
+		bounding = new BoundingArea();
 		render = new ChunkRender(ENGINE, this);
 		isInitialized = true;
 	}
@@ -231,11 +232,29 @@ public class Chunk {
 			}
 			
 			typesOfCubes.add(cube);
+			
+			if(true){//isCubeVisable(x, y, z)) {		TODO: Fix when world loading is fixed		
+				bounding.addAll(cube.getBoundingArea(metadata).getBoundingObjectsClone(new Vector3f(
+						getX() * World.CHUNK_SIZE + x, 
+						getY() * World.CHUNK_SIZE + y,
+						getZ() * World.CHUNK_SIZE + z
+					)));
+			}
 		}}}
 		
 		updateTextureMap();
 		render.setHasCubes(hasCubes);		
 		render.forceVBOUpdate();
+	}
+	
+	public boolean isCubeVisable(int x, int y, int z) {
+		for(Cube cube : getSurroundingCubes(x, y, z)) {
+			if(cube == null) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	public boolean isPosOnEdge(int x, int y, int z) {
@@ -408,5 +427,9 @@ public class Chunk {
 
 	public HashSet<Cube> getTypesOfCubes() {
 		return typesOfCubes;
+	}
+	
+	public BoundingArea getBoundingArea() {
+		return bounding;
 	}
 }

@@ -25,6 +25,10 @@ public class BoundingSphere extends Collidable {
 		}
 	}
 	
+	public Collidable clone(Vector3f amount) {
+		return new BoundingSphere(pos, radius).translate(amount);
+	}
+	
 	public Collidable translate(Vector3f amount) {
 		pos.add(amount);
 		return this;

@@ -10,21 +10,20 @@ public class SetPlayerPropertyCommand extends Command {
 	}
 
 	public boolean action(String... parm) {
-		if(parm.length < 2) return false;
-		
+		if(parm.length < 2 && !parm[0].equals("reset")) return false;		
 		String affect = parm[0];
-		int value = Integer.parseInt(parm[1]);
 
 		switch(affect) {
-			case "health": ENGINE.getPlayer().getAccess().setHealth(value); return true;
-			case "mana": ENGINE.getPlayer().getAccess().setMana(value); return true;
-			case "hunger": ENGINE.getPlayer().getAccess().setHunger(value); return true;
+			case "health": ENGINE.getPlayer().getAccess().setHealth(Integer.parseInt(parm[1])); return true;
+			case "mana": ENGINE.getPlayer().getAccess().setMana(Integer.parseInt(parm[1])); return true;
+			case "hunger": ENGINE.getPlayer().getAccess().setHunger(Integer.parseInt(parm[1])); return true;
 			
-			case "maxHealth": ENGINE.getPlayer().getAccess().setMaxHealth(value); return true;
-			case "maxMana": ENGINE.getPlayer().getAccess().setMaxMana(value); return true;
-			case "maxHunger": ENGINE.getPlayer().getAccess().setMaxHunger(value); return true;
+			case "maxHealth": ENGINE.getPlayer().getAccess().setMaxHealth(Integer.parseInt(parm[1])); return true;
+			case "maxMana": ENGINE.getPlayer().getAccess().setMaxMana(Integer.parseInt(parm[1])); return true;
+			case "maxHunger": ENGINE.getPlayer().getAccess().setMaxHunger(Integer.parseInt(parm[1])); return true;
 			
 			case "reset": ENGINE.getPlayer().resetPlayer(); return true;
+			case "noClip": ENGINE.getPlayer().getAccess().setNoClip(Boolean.parseBoolean(parm[1])); return true;
 			
 			default: return false;
 		}

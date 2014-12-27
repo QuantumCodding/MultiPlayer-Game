@@ -11,11 +11,11 @@ public class PhysicsThread extends GameThread {
 	}
 
 	void init() {
-
+		
 	}
 
 	void tick() {
-		physicsEngine.step(timeSinceLastTick * getTickRate());
+		physicsEngine.step(1);//timeSinceLastTick * getTickRate());
 	}
 	
 	public void setEngine(PhysicsEngine physicsEngine) {

@@ -59,7 +59,12 @@ public class GameName_New implements ISetup {
 			window.setIcon(ImageIO.read(new File("res/textures/icon.png"))); 
 			
 			window.initDisplay();		
-			window.drawImage(new Texture(ImageIO.read(new File("res/textures/Unspell_Names.png")), "Unspell + Names", false));
+			
+			File[] files = new File("res/textures/Splash Screen").listFiles();
+			File splashImage = files[(int) (Math.random() * 100) % files.length];
+			
+			window.setSplash(new Texture(ImageIO.read(splashImage), "Unspell + Names", false));
+			window.drawSplash();
 		} catch(IOException | LWJGLException e) { e.printStackTrace(); }		
 
 		ResourceManager.addCubeRegistery(res);
@@ -74,8 +79,8 @@ public class GameName_New implements ISetup {
 	}
 	
 	public void init() {
-		ResourceManager.registerAll(engine);	
 		engine = new GameEngine(this);
+		ResourceManager.registerAll(engine);	
 		
 		CubeRegistry.conclude();
 		WorldRegistry.conclude(engine);
@@ -85,9 +90,7 @@ public class GameName_New implements ISetup {
 		
 		engine.init(Worlds.MainWorld);	
 		window.setupOpenGL(engine);
-		try {
-			window.drawImage(new Texture(ImageIO.read(new File("res/textures/Unspell_Names.png")), "Unspell + Names", false));
-		} catch(IOException e) {e.printStackTrace();}
+		window.drawSplash();
 		
 		engine.getRender().setUpShaders(); //TODO: Remove ShaderRegistry
 		ShaderRegistry.register();
@@ -128,6 +131,8 @@ public class GameName_New implements ISetup {
 		engine.getThreads().addAll(engine.getDebugWindow());
 		engine.getThreads().startAll(); FPS_Thread.start();
 		engine.getDebugWindow().start(engine.getDebugWindow());
+		
+		engine.getPlayer().reset();
 		
 		while(isRunning && !window.isCloseRequested()) {
 			engine.getGLContext().tick();

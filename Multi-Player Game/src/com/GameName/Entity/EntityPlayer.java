@@ -88,7 +88,7 @@ public class EntityPlayer extends Entity {
 		invSize = 10;
 		inv = new ItemStack[invSize];
 		
-		pos = new Vector3f(20, 110, 20);		
+		pos = new Vector3f(20, 95, 20);		
 		rot = new Vector3f(180, 0, 0);
 		
 		gravityOn = false;
@@ -153,12 +153,12 @@ public class EntityPlayer extends Entity {
 			if(ctr.isActive() != 0.0){
 				
 				switch(ctr.control) {
-					case "forward": if(!lockMovement) access.moveZ((float) /*(ctr.isActive() / speed)*/ 3); 	break;						
-					case "back": 	if(!lockMovement) access.moveZ((float)-/*(ctr.isActive() / speed)*/ 3); 	break;		
-					case "left": 	if(!lockMovement) access.moveX((float)-/*(ctr.isActive() / speed)*/ 3); 	break;
-					case "right":   if(!lockMovement) access.moveX((float) /*(ctr.isActive() / speed)*/ 3);   	break;
-					case "up": 		if(!lockMovement) access.moveY((float) /*(ctr.isActive() / speed)*/ 3); 	break;		
-					case "down": 	if(!lockMovement) access.moveY((float)-/*(ctr.isActive() / speed)*/ 3); 	break;
+					case "forward": if(!lockMovement) access.moveZ((float) /*(ctr.isActive() / speed)*/ 2); 	break;						
+					case "back": 	if(!lockMovement) access.moveZ((float)-/*(ctr.isActive() / speed)*/ 2); 	break;		
+					case "left": 	if(!lockMovement) access.moveX((float)-/*(ctr.isActive() / speed)*/ 2); 	break;
+					case "right":   if(!lockMovement) access.moveX((float) /*(ctr.isActive() / speed)*/ 2);   	break;
+					case "up": 		if(!lockMovement) access.moveY((float) /*(ctr.isActive() / speed)*/ 5); 	break;		
+					case "down": 	if(!lockMovement) access.moveY((float)-/*(ctr.isActive() / speed)*/ 5); 	break;
 					
 					case "lookUp": 	if(!lockMovement)  /*if(entityPhisics(0))*/ access.rotateX((float) (ctr.isActive() / lookSpeedUp)); break;				
 					case "lookDown": if(!lockMovement) /*if(entityPhisics(0))*/ access.rotateX((float) (ctr.isActive() / lookSpeedUp)); break;			

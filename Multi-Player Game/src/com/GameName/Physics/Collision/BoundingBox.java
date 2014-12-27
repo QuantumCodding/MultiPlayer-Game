@@ -28,6 +28,10 @@ public class BoundingBox extends Collidable {
 		}
 	}
 
+	public Collidable clone(Vector3f amount) {
+		return new BoundingBox(minPos, minPos).translate(amount);
+	}
+	
 	public Collidable translate(Vector3f amount) {
 		minPos.add(amount);
 		maxPos.add(amount);
@@ -44,7 +48,7 @@ public class BoundingBox extends Collidable {
 	}
 
 	public Vector3f getCenter() {		
-		return minPos.add(maxPos.subtract(minPos));
+		return minPos.add(length.divide(2));
 	}
 
 	public float getVolume() {

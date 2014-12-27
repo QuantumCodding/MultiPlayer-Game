@@ -24,6 +24,7 @@ public class Window {
 		
 	private String title;
 	private ByteBuffer[] icon;
+	private Texture splash;
 	
 	public Window() {}
 	
@@ -69,7 +70,11 @@ public class Window {
 		return GL11.glGetString(GL11.GL_VERSION);
 	}
 	
-	public void drawImage(Texture texture) {
+	public void setSplash(Texture splash) {
+		this.splash = splash;
+	}
+	
+	public void drawSplash() {
 		glMatrixMode(GL_PROJECTION);
 	        glLoadIdentity();
 			glOrtho(0, getWidth(), getHeight(), 0, 1, -1);	 
@@ -83,7 +88,7 @@ public class Window {
         glDisable(GL_RESCALE_NORMAL);
 			
 		glEnable(GL_TEXTURE_2D); 
-		texture.bind();	
+		splash.bind();	
 		
 		glBegin(GL_QUADS);		
 			glTexCoord2f(0f, 0f);

@@ -22,4 +22,8 @@ public class CollisionEvent {
 	public Vector3f getDirection() {
 		return direction;
 	}
+
+	public String toString() {
+		return "CollisionEvent [isColliding=" + isColliding + ", direction=" + direction + "]";
+	}
 }

@@ -324,4 +324,7 @@ public class Vector3f {
 		return this;
 	}
 	
+	public Vector3f reset() {
+		return this.setX(0).setY(0).setZ(0);
+	}
 }
