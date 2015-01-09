@@ -3,10 +3,10 @@ package com.GameName.Util.Vectors;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
-public class Vector3f {
+public class MathVec3f {
 	private float x, y, z;
 
-	public Vector3f(float x, float y, float z) {
+	public MathVec3f(float x, float y, float z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -26,9 +26,9 @@ public class Vector3f {
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
 		if (obj == null) return false;
-		if (!(obj instanceof Vector3f)) return false;
+		if (!(obj instanceof MathVec3f)) return false;
 		
-		Vector3f other = (Vector3f) obj;
+		MathVec3f other = (MathVec3f) obj;
 		if (Float.floatToIntBits(x) != Float.floatToIntBits(other.x)) return false;
 		if (Float.floatToIntBits(y) != Float.floatToIntBits(other.y)) return false;
 		if (Float.floatToIntBits(z) != Float.floatToIntBits(other.z)) return false;
@@ -36,102 +36,102 @@ public class Vector3f {
 		return true;
 	}
 
-	public Vector3f add(Vector3f add) {
-		return new Vector3f(
+	public MathVec3f add(MathVec3f add) {
+		return new MathVec3f(
 				x + add.getX(),
 				y + add.getY(),
 				z + add.getZ()
 			);
 	}
 	
-	public Vector3f add(float add) {
-		return new Vector3f(
+	public MathVec3f add(float add) {
+		return new MathVec3f(
 				x + add,
 				y + add,
 				z + add
 			);
 	}
 
-	public Vector3f addAndSet(Vector3f add) {set(add(add)); return this;}
-	public Vector3f addAndSet(float add) {set(add(add));	   return this;}
+	public MathVec3f addAndSet(MathVec3f add) {set(add(add)); return this;}
+	public MathVec3f addAndSet(float add) {set(add(add));	   return this;}
 	
-	public Vector3f subtract(Vector3f subtract) {
-		return new Vector3f(
+	public MathVec3f subtract(MathVec3f subtract) {
+		return new MathVec3f(
 				x - subtract.getX(),
 				y - subtract.getY(),
 				z - subtract.getZ()
 			);
 	}
 	
-	public Vector3f subtract(float subtract) {
-		return new Vector3f(
+	public MathVec3f subtract(float subtract) {
+		return new MathVec3f(
 				x - subtract,
 				y - subtract,
 				z - subtract
 			);
 	}
 
-	public Vector3f subtractAndSet(Vector3f subtract) {set(subtract(subtract)); return this;}
-	public Vector3f subtractAndSet(float subtract) {set(subtract(subtract));	   return this;}
+	public MathVec3f subtractAndSet(MathVec3f subtract) {set(subtract(subtract)); return this;}
+	public MathVec3f subtractAndSet(float subtract) {set(subtract(subtract));	   return this;}
 	
-	public Vector3f multiply(Vector3f mult) {
-		return new Vector3f(
+	public MathVec3f multiply(MathVec3f mult) {
+		return new MathVec3f(
 				x * mult.getX(),
 				y * mult.getY(),
 				z * mult.getZ()
 			);
 	}
 	
-	public Vector3f multiply(float mult) {
-		return new Vector3f(
+	public MathVec3f multiply(float mult) {
+		return new MathVec3f(
 				x * mult,
 				y * mult,
 				z * mult
 			);
 	}
 	
-	public Vector3f multiplyAndSet(Vector3f mult) {set(multiply(mult)); return this;}
-	public Vector3f multiplyAndSet(float mult) {set(multiply(mult));	   return this;}
+	public MathVec3f multiplyAndSet(MathVec3f mult) {set(multiply(mult)); return this;}
+	public MathVec3f multiplyAndSet(float mult) {set(multiply(mult));	   return this;}
 	
-	public Vector3f divide(Vector3f divide) {
-		return new Vector3f(
+	public MathVec3f divide(MathVec3f divide) {
+		return new MathVec3f(
 				x / divide.getX(),
 				y / divide.getY(),
 				z / divide.getZ()
 			);
 	}
 	
-	public Vector3f divide(float divide) {
-		return new Vector3f(
+	public MathVec3f divide(float divide) {
+		return new MathVec3f(
 				x / divide,
 				y / divide,
 				z / divide
 			);
 	}
 	
-	public Vector3f divideAndSet(Vector3f divide) {set(divide(divide)); return this;}
-	public Vector3f divideAndSet(float divide) {set(divide(divide));	   return this;}
+	public MathVec3f divideAndSet(MathVec3f divide) {set(divide(divide)); return this;}
+	public MathVec3f divideAndSet(float divide) {set(divide(divide));	   return this;}
 	
-	public Vector3f mod(Vector3f mod) {
-		return new Vector3f(
+	public MathVec3f mod(MathVec3f mod) {
+		return new MathVec3f(
 				x % mod.getX(),
 				y % mod.getY(),
 				z % mod.getZ()
 			);
 	}
 	
-	public Vector3f mod(float mod) {
-		return new Vector3f(
+	public MathVec3f mod(float mod) {
+		return new MathVec3f(
 				x % mod,
 				y % mod,
 				z % mod
 			);
 	}
 	
-	public Vector3f modAndSet(Vector3f mod) {set(mod(mod)); return this;}
-	public Vector3f modAndSet(float mod) {set(mod(mod));    return this;}
+	public MathVec3f modAndSet(MathVec3f mod) {set(mod(mod)); return this;}
+	public MathVec3f modAndSet(float mod) {set(mod(mod));    return this;}
 	
-	public float distance(Vector3f other) {
+	public float distance(MathVec3f other) {
 		return (float) Math.sqrt(
 				Math.pow(x - other.getX(), 2) +
 				Math.pow(y - other.getY(), 2) + 
@@ -145,14 +145,14 @@ public class Vector3f {
 			);
 	}
 	
-	public float dot(Vector3f other) {
+	public float dot(MathVec3f other) {
 		return (x * other.x) +
 			   (y * other.y) +
 			   (z * other.z) ;
 	}
 	
-	public Vector3f max(Vector3f other) {
-		return new Vector3f(
+	public MathVec3f max(MathVec3f other) {
+		return new MathVec3f(
 				x > other.getX() ? x : other.getX(),
 				y > other.getY() ? y : other.getY(),
 				z > other.getZ() ? z : other.getZ()
@@ -169,124 +169,132 @@ public class Vector3f {
 		return max;
 	}
 	
-	public Vector3f truncate() {
-		return new Vector3f(
+	public MathVec3f truncate() {
+		return new MathVec3f(
 				(int) x, 
 				(int) y, 
 				(int) z
 			);
 	}
 	
-	public Vector3f truncateAndSet() {set(truncate()); return this;}
+	public MathVec3f truncateAndSet() {set(truncate()); return this;}
 	
-	public Vector3f round() {
-		return new Vector3f(
+	public MathVec3f round() {
+		return new MathVec3f(
 				Math.round(x),
 				Math.round(y),
 				Math.round(z)
 			);
 	}
 	
-	public Vector3f roundAndSet() {set(round()); return this;}
+	public MathVec3f roundAndSet() {set(round()); return this;}
 	
-	public Vector3f abs() {
-		return new Vector3f(
+	public MathVec3f abs() {
+		return new MathVec3f(
 				Math.abs(x),
 				Math.abs(y),
 				Math.abs(z)
 			);
 	}
 	
-	public Vector3f normalized() {
+	public MathVec3f normalized() {
 		return divide(length());
 	}
 	
-	public Vector3f reflect(Vector3f normal) {
+	public MathVec3f reflect(MathVec3f normal) {
 		return subtract(normal.multiply(dot(normal) * 2));
 	}
 	
-	public Vector3f rotate(Vector3f center, Vector3f rot) {
+	public MathVec3f rotate(MathVec3f center, MathVec3f rot) {
 		rot = rot.toRadians();
 		
-		return new Vector3f(
+		return new MathVec3f(
 				(float) (((cos(rot.getZ()) * cos(rot.getY()) + sin(rot.getY()) * -sin(rot.getZ()) * cos(rot.getX())) * x)		+ ((-sin(rot.getZ()) * cos(rot.getX())) * y)	+ ((-sin(rot.getY()) * cos(rot.getZ()) + cos(rot.getY()) * -sin(rot.getZ()) *  sin(rot.getX()) ) * z)),
 				(float) (((sin(rot.getZ()) * cos(rot.getY()) + sin(rot.getY()) * -sin(rot.getX()) * cos(rot.getZ())) * x)		+ (( cos(rot.getZ()) * cos(rot.getX())) * y)	+ ((-sin(rot.getY()) * sin(rot.getZ()) + cos(rot.getY()) *  cos(rot.getZ()) * -sin(rot.getX()) ) * z)),
 				(float) (((cos(rot.getX()) * sin(rot.getY())													   ) * x)		+ (( sin(rot.getX()) 				  ) * y)	+ (( cos(rot.getY()) * cos(rot.getX())														   ) * z))		
 			);
 	}
 	
-	public Vector3f capMin(Vector3f cap) {
-		return new Vector3f(
+	public MathVec3f capMin(MathVec3f cap) {
+		return new MathVec3f(
 				x < cap.getX() ? cap.getX() : x, 
 				y < cap.getY() ? cap.getY() : y, 
 				z < cap.getZ() ? cap.getZ() : z
 			);
 	}
 	
-	public Vector3f capMin(float cap) {
-		return new Vector3f(
+	public MathVec3f capMin(float cap) {
+		return new MathVec3f(
 				x < cap ? cap : x, 
 				y < cap ? cap : y, 
 				z < cap ? cap : z
 			);
 	}
 	
-	public Vector3f capMinAndSet(Vector3f cap) {set(capMin(cap)); return this;}
-	public Vector3f capMinAndSet(float cap) {set(capMin(cap)); return this;}
+	public MathVec3f capMinAndSet(MathVec3f cap) {set(capMin(cap)); return this;}
+	public MathVec3f capMinAndSet(float cap) {set(capMin(cap)); return this;}
 	
 
-	public Vector3f capMax(Vector3f cap) {
-		return new Vector3f(
+	public MathVec3f capMax(MathVec3f cap) {
+		return new MathVec3f(
 				x > cap.getX() ? cap.getX() : x, 
 				y > cap.getY() ? cap.getY() : y, 
 				z > cap.getZ() ? cap.getZ() : z
 			);
 	}
 	
-	public Vector3f capMax(float cap) {
-		return new Vector3f(
+	public MathVec3f capMax(float cap) {
+		return new MathVec3f(
 				x > cap ? cap : x, 
 				y > cap ? cap : y, 
 				z > cap ? cap : z
 			);
 	}
 	
-	public Vector3f capMaxAndSet(Vector3f cap) {set(capMin(cap)); return this;}
-	public Vector3f capMaxAndSet(float cap) {set(capMin(cap)); return this;}
+	public MathVec3f capMaxAndSet(MathVec3f cap) {set(capMin(cap)); return this;}
+	public MathVec3f capMaxAndSet(float cap) {set(capMin(cap)); return this;}
 	
-	public Vector3f toRadians() {
-		return new Vector3f(
+	public MathVec3f toRadians() {
+		return new MathVec3f(
 				(float) Math.toRadians(x),
 				(float) Math.toRadians(y),
 				(float) Math.toRadians(z)
 			);
 	}
 	
-	public boolean greaterThen(Vector3f then) {return x > then.getX() && y > then.getY() && z > then.getZ();}	
+	public boolean greaterThen(MathVec3f then) {return x > then.getX() && y > then.getY() && z > then.getZ();}	
 	public boolean greaterThen(float then) {return x > then && y > then && z > then;}
 	
-	public boolean lessThen(Vector3f then) {return x < then.getX() && y < then.getY() && z < then.getZ();}	
+	public boolean lessThen(MathVec3f then) {return x < then.getX() && y < then.getY() && z < then.getZ();}	
 	public boolean lessThen(float then) {return x < then && y < then && z < then;}
 	
-	public boolean equaleTo(Vector3f then) {return x == then.getX() && y == then.getY() && z == then.getZ();}
+	public boolean equaleTo(MathVec3f then) {return x == then.getX() && y == then.getY() && z == then.getZ();}
 	public boolean equalTo(float then) {return x == then && y == then && z == then;}
 	
-	public Vector3f toDegrees() {
-		return new Vector3f(
+	public MathVec3f toDegrees() {
+		return new MathVec3f(
 				(float) Math.toDegrees(x),
 				(float) Math.toDegrees(y),
 				(float) Math.toDegrees(z)
 			);
 	}
 	
-	public void set(Vector3f set) {
+	public void set(MathVec3f set) {
 		this.x = set.x;
 		this.y = set.y;
 		this.z = set.z;
 	}
 	
-	public Vector3f clone() {
-		return new Vector3f(x, y, z);
+	public MathVec3f convert(javax.vecmath.Vector3f other) {
+		return new MathVec3f(other.x, other.y, other.z);
+	}
+	
+	public javax.vecmath.Vector3f convert() {
+		return new javax.vecmath.Vector3f(x, y, z);
+	}
+	
+	public MathVec3f clone() {
+		return new MathVec3f(x, y, z);
 	}
 	
 	public String toString() {
@@ -309,22 +317,22 @@ public class Vector3f {
 		return z;
 	}
 
-	public Vector3f setX(float x) {
+	public MathVec3f setX(float x) {
 		this.x = x;
 		return this;
 	}
 
-	public Vector3f setY(float y) {
+	public MathVec3f setY(float y) {
 		this.y = y;
 		return this;
 	}
 
-	public Vector3f setZ(float z) {
+	public MathVec3f setZ(float z) {
 		this.z = z;
 		return this;
 	}
 	
-	public Vector3f reset() {
+	public MathVec3f reset() {
 		return this.setX(0).setY(0).setZ(0);
 	}
 }

@@ -11,7 +11,7 @@ import javax.swing.Box;
 import javax.swing.JLabel;
 
 import com.GameName.Main.Debugging.DebugPanel;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 import com.GameName.World.World;
 
 public class PlayerMonitor extends DebugPanel {	
@@ -112,7 +112,7 @@ public class PlayerMonitor extends DebugPanel {
 		float chunkCoordZ = player.getAccess().getPos().getZ() / World.CHUNK_SIZE;
 		
 		positionLabel.setText("Pos: " + player.getAccess().getPos().truncate().valuesToString());
-		chunkLabel.setText("Chunk: " + new Vector3f(chunkCoordX, chunkCoordY, chunkCoordZ).truncate().valuesToString());
+		chunkLabel.setText("Chunk: " + new MathVec3f(chunkCoordX, chunkCoordY, chunkCoordZ).truncate().valuesToString());
 		selectedLabel.setText("Slected: " + player.getAccess().getSelectedCube().valuesToString());
 	}
 }

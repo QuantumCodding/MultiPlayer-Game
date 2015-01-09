@@ -10,9 +10,10 @@ import static org.lwjgl.opengl.GL11.glTexCoord2f;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex2f;
 
+import javax.vecmath.TexCoord2f;
+
 import com.GameName.Engine.GameEngine;
 import com.GameName.Render.Effects.Texture;
-import com.GameName.Util.Vectors.Vector2f;
 
 public class RenderImage extends Render2D {
 	private Texture image;
@@ -30,8 +31,8 @@ public class RenderImage extends Render2D {
 		setColor(null);
 		setTexture(null);
 		
-		setTexCoordsTop(new Vector2f(0, 0));
-		setTexCoordsBottom(new Vector2f(1, 1));
+		setTexCoordsTop(new TexCoord2f(0, 0));
+		setTexCoordsBottom(new TexCoord2f(1, 1));
 	}
 
 	protected void renderForground() {
@@ -42,16 +43,16 @@ public class RenderImage extends Render2D {
 			glTranslatef(getX(), getY(), 0);
 		
 			glBegin(GL_QUADS);			
-				glTexCoord2f(texCoordsTop.getX(), texCoordsTop.getY());
+				glTexCoord2f(texCoordsTop.x, texCoordsTop.y);
 				glVertex2f(0, 0);
 				
-				glTexCoord2f(texCoordsBottom.getX(), texCoordsTop.getY());
+				glTexCoord2f(texCoordsBottom.x, texCoordsTop.y);
 				glVertex2f(getWidth(), 0);
 				
-				glTexCoord2f(texCoordsBottom.getX(), texCoordsBottom.getY());
+				glTexCoord2f(texCoordsBottom.x, texCoordsBottom.y);
 				glVertex2f(getWidth(), getHeight());
 				
-				glTexCoord2f(texCoordsTop.getX(), texCoordsBottom.getY());
+				glTexCoord2f(texCoordsTop.x, texCoordsBottom.y);
 				glVertex2f(0, getHeight());			
 			glEnd();
 			

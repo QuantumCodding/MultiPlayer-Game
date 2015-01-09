@@ -7,14 +7,14 @@ import com.GameName.Physics.PhysicsEngine;
 import com.GameName.Physics.PhysicsUtil.CardinalDirection;
 import com.GameName.Physics.PhysicsUtil.Collision;
 import com.GameName.Physics.Collision.BoundingArea;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 import com.GameName.World.World;
 
 public abstract class PhysicsObject {
 	protected final GameEngine ENGINE;
 	
-	protected Vector3f pos, vel, acc, force;	
-	protected Vector3f rot, rotVel, rotAcc, rotForce;
+	protected MathVec3f pos, vel, acc, force;	
+	protected MathVec3f rot, rotVel, rotAcc, rotForce;
 	protected Material material, median, surface;
 	
 	protected BoundingArea bounding;	
@@ -29,15 +29,15 @@ public abstract class PhysicsObject {
 		this.median = Materials.Air;
 		this.surface = Materials.Stone;
 		
-		pos = new Vector3f(0, 0, 0);     
-		vel = new Vector3f(0, 0, 0);     
-		acc = new Vector3f(0, 0, 0);     
-		force = new Vector3f(0, 0, 0);   
+		pos = new MathVec3f(0, 0, 0);     
+		vel = new MathVec3f(0, 0, 0);     
+		acc = new MathVec3f(0, 0, 0);     
+		force = new MathVec3f(0, 0, 0);   
 		                                 
-		rot = new Vector3f(0, 0, 0);     
-		rotVel = new Vector3f(0, 0, 0);  
-		rotAcc = new Vector3f(0, 0, 0);  
-		rotForce = new Vector3f(0, 0, 0);
+		rot = new MathVec3f(0, 0, 0);     
+		rotVel = new MathVec3f(0, 0, 0);  
+		rotAcc = new MathVec3f(0, 0, 0);  
+		rotForce = new MathVec3f(0, 0, 0);
 		
 		bounding = new BoundingArea();
 		addBounding();
@@ -61,24 +61,24 @@ public abstract class PhysicsObject {
 	
 	protected abstract void addBounding();
 	
-	public Vector3f getLook() {
+	public MathVec3f getLook() {
 		float f1 = (float)  Math.cos(-Math.toRadians(rot.getY()) - (float) Math.PI);
 		float f2 = (float)  Math.sin(-Math.toRadians(rot.getY()) - (float) Math.PI);
 		float f3 = (float) -Math.cos(-Math.toRadians(rot.getX()));
 		float f4 = (float)  Math.sin(-Math.toRadians(rot.getX()));
 		
-		return new Vector3f((f2 * f3), f4, (f1 * f3));
+		return new MathVec3f((f2 * f3), f4, (f1 * f3));
 	}
 	
 	public void intergrate(PhysicsEngine physics, float delta) {
 
 //		Applies Velocity
-		Vector3f lastAcc = acc.clone();
+		MathVec3f lastAcc = acc.clone();
 		pos = pos.add(vel.multiply(delta).add(lastAcc.multiply(0.5f * delta * delta)));		
-		pos = pos.capMax(physics.getWorld().getSizeAsVector().subtract(1)).capMin(new Vector3f(0, 6, 0));
+		pos = pos.capMax(physics.getWorld().getSizeAsVector().subtract(1)).capMin(new MathVec3f(0, 6, 0));
 
 //		Calculates world interaction values
-		Vector3f newAcc = physics.getAcceleration(force, physics.getMass(material, bounding.getVolume()));	
+		MathVec3f newAcc = physics.getAcceleration(force, physics.getMass(material, bounding.getVolume()));	
 		
 		if(!noClip) {
 			surface = physics.getWorld().getCube(pos.getX(), physics.getWorld().getSizeY() - (pos.getY() - 5), pos.getZ())
@@ -89,15 +89,15 @@ public abstract class PhysicsObject {
 				newAcc.setY(newAcc.getY() - 0.5f);//PhysicsEngine.GRAVITY);
 			} 
 			
-			Vector3f chunkPos = pos.divide(World.CHUNK_SIZE).truncate();			
+			MathVec3f chunkPos = pos.divide(World.CHUNK_SIZE).truncate();			
 			if(bounding.intersect(physics.getWorld().getChunk(chunkPos).getBoundingArea()).isColliding() ||					
-				bounding.intersect(physics.getWorld().getChunk(chunkPos.add(new Vector3f(1, 0, 0))
+				bounding.intersect(physics.getWorld().getChunk(chunkPos.add(new MathVec3f(1, 0, 0))
 						.capMax(physics.getWorld().getChunkSizeAsVector().subtract(1))).getBoundingArea()).isColliding() || 					
-				bounding.intersect(physics.getWorld().getChunk(chunkPos.add(new Vector3f(0, 0, 1))
+				bounding.intersect(physics.getWorld().getChunk(chunkPos.add(new MathVec3f(0, 0, 1))
 						.capMax(physics.getWorld().getChunkSizeAsVector().subtract(1))).getBoundingArea()).isColliding() || 					
-				bounding.intersect(physics.getWorld().getChunk(chunkPos.add(new Vector3f(-1, 0, 0))
+				bounding.intersect(physics.getWorld().getChunk(chunkPos.add(new MathVec3f(-1, 0, 0))
 						.capMin(0)).getBoundingArea()).isColliding() ||					
-				bounding.intersect(physics.getWorld().getChunk(chunkPos.add(new Vector3f(0, 0, -1))
+				bounding.intersect(physics.getWorld().getChunk(chunkPos.add(new MathVec3f(0, 0, -1))
 						.capMin(0)).getBoundingArea()).isColliding()
 			) {
 //				newAcc.reset(); vel.reset(); force.reset();
@@ -108,23 +108,23 @@ public abstract class PhysicsObject {
 		}
 		
 //		Drag
-		vel = vel.subtract(new Vector3f(
+		vel = vel.subtract(new MathVec3f(
 				physics.getDrag(median, vel.getX(), bounding.getSurfaceArea(vel.getX() < 0 ? CardinalDirection.West : CardinalDirection.East)),
 				physics.getDrag(median, vel.getY(), bounding.getSurfaceArea(vel.getY() < 0 ? CardinalDirection.Bottom : CardinalDirection.Top)),
 				physics.getDrag(median, vel.getZ(), bounding.getSurfaceArea(vel.getZ() < 0 ? CardinalDirection.South : CardinalDirection.North))	
 			));
 		
 //		Friction
-		vel = vel.add(new Vector3f(
+		vel = vel.add(new MathVec3f(
 				physics.getFriction(surface, force.getY()), 0.0f, 
 				physics.getFriction(surface, force.getY())
-			).multiply(new Vector3f(
+			).multiply(new MathVec3f(
 				physics.getOppsiteDir(vel.getX()), 1.0f,
 				physics.getOppsiteDir(vel.getZ())				
 			)));
 		
 //		Apply Acceleration to Velocity
-		Vector3f avgAcc = lastAcc.add(newAcc).divide(2);
+		MathVec3f avgAcc = lastAcc.add(newAcc).divide(2);
 		vel = vel.add(avgAcc.multiply(delta));
 		vel = vel.divide(Threads.PhysicsThread.getTPS());
 		

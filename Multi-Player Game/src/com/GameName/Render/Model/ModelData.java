@@ -9,15 +9,16 @@ import static org.lwjgl.opengl.GL11.glShadeModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.GameName.Util.Vectors.Vector2f;
-import com.GameName.Util.Vectors.Vector3f;
+import javax.vecmath.TexCoord2f;
+
+import com.GameName.Util.Vectors.MathVec3f;
 
 
 public class ModelData {
 
-    private ArrayList<Vector3f> vertices;
-    private ArrayList<Vector2f> textureCoordinates;
-    private ArrayList<Vector3f> normals;
+    private ArrayList<MathVec3f> vertices;
+    private ArrayList<TexCoord2f> textureCoordinates;
+    private ArrayList<MathVec3f> normals;
     
     private ArrayList<Face> faces;
     
@@ -25,12 +26,12 @@ public class ModelData {
     private boolean enableSmoothShading;
 
     public ModelData() {
-    	vertices = new ArrayList<Vector3f>();
-    	textureCoordinates = new ArrayList<Vector2f>();
-    	normals = new ArrayList<Vector3f>();
+    	vertices = new ArrayList<>();
+    	textureCoordinates = new ArrayList<>();
+    	normals = new ArrayList<>();
     	
-    	faces = new ArrayList<Face>();
-    	materials = new HashMap<String, Material>();
+    	faces = new ArrayList<>();
+    	materials = new HashMap<>();
     	
     	enableSmoothShading = true;
     }
@@ -55,15 +56,15 @@ public class ModelData {
         return getNormals().size() > 0;
     }
 
-    public ArrayList<Vector3f> getVertices() {
+    public ArrayList<MathVec3f> getVertices() {
         return vertices;
     }
 
-    public ArrayList<Vector2f> getTextureCoordinates() {
+    public ArrayList<TexCoord2f> getTextureCoordinates() {
         return textureCoordinates;
     }
 
-    public ArrayList<Vector3f> getNormals() {
+    public ArrayList<MathVec3f> getNormals() {
         return normals;
     }
 

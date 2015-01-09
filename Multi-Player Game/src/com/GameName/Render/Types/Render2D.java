@@ -15,10 +15,12 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.vecmath.TexCoord2f;
+import javax.vecmath.Vector2f;
+
 import com.GameName.Engine.GameEngine;
 import com.GameName.Render.Effects.ShaderRegistry;
 import com.GameName.Util.BufferUtil;
-import com.GameName.Util.Vectors.Vector2f;
 
 public abstract class Render2D extends Renderable {
 	private Vector2f pos;
@@ -76,10 +78,10 @@ public abstract class Render2D extends Renderable {
 		//Vertices
 		List<Float> verties = new ArrayList<Float>();
 		
-		verties.add(pos.getX());			verties.add(pos.getY());
-		verties.add(pos.getX() + width);	verties.add(pos.getY());
-		verties.add(pos.getX() + width);	verties.add(pos.getY() + height);
-		verties.add(pos.getX());			verties.add(pos.getY() + height);
+		verties.add(pos.x);			verties.add(pos.y);
+		verties.add(pos.x + width);	verties.add(pos.y);
+		verties.add(pos.x + width);	verties.add(pos.y + height);
+		verties.add(pos.x);			verties.add(pos.y + height);
 		
 		FloatBuffer vertexBuffer = BufferUtil.createFillipedFloatBuffer(verties);
 		ENGINE.getGLContext().addBufferBind(vertexBuffer, GL_ARRAY_BUFFER_BINDING, vertexVBO, GL_STATIC_DRAW, 'f');
@@ -87,21 +89,21 @@ public abstract class Render2D extends Renderable {
 		//Texture
 		List<Float> texCoords = new ArrayList<Float>();
 		
-		texCoords.add(texCoordsTop.getX());			texCoords.add(texCoordsTop.getY());
-		texCoords.add(texCoordsBottom.getX());		texCoords.add(texCoordsTop.getY());
-		texCoords.add(texCoordsBottom.getX());		texCoords.add(texCoordsBottom.getY());
-		texCoords.add(texCoordsTop.getX());			texCoords.add(texCoordsBottom.getY());
+		texCoords.add(texCoordsTop.x);			texCoords.add(texCoordsTop.y);
+		texCoords.add(texCoordsBottom.x);		texCoords.add(texCoordsTop.y);
+		texCoords.add(texCoordsBottom.x);		texCoords.add(texCoordsBottom.y);
+		texCoords.add(texCoordsTop.x);			texCoords.add(texCoordsBottom.y);
 		
 		FloatBuffer texCoordsBuffer = BufferUtil.createFillipedFloatBuffer(texCoords);
 		ENGINE.getGLContext().addBufferBind(texCoordsBuffer, GL_ARRAY_BUFFER_BINDING, textureVBO, GL_STATIC_DRAW, 'f');
 	}
 	
 	protected float getX() {
-		return pos.getX();
+		return pos.x;
 	}
 	
 	protected float getY() {
-		return pos.getY();
+		return pos.y;
 	}
 	
 	protected float getHeight() {
@@ -113,11 +115,11 @@ public abstract class Render2D extends Renderable {
 	}	
 	
 	protected void setX(float x) {
-		pos.setX(x);
+		pos.x = x;
 	}
 	
 	protected void setY(float y) {
-		pos.setY(y);
+		pos.y = y;
 	}
 
 	protected void setWidth(float width) {
@@ -130,12 +132,12 @@ public abstract class Render2D extends Renderable {
 		forceVBOUpdate();
 	}
 	
-	public void setTexCoordsTop(Vector2f texCoordsTop) {
+	public void setTexCoordsTop(TexCoord2f texCoordsTop) {
 		this.texCoordsTop = texCoordsTop;
 		forceVBOUpdate();
 	}
 
-	public void setTexCoordsBottom(Vector2f texCoordsBottom) {
+	public void setTexCoordsBottom(TexCoord2f texCoordsBottom) {
 		this.texCoordsBottom = texCoordsBottom;
 		forceVBOUpdate();
 	}

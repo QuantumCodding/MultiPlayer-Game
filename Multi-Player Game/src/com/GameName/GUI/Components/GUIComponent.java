@@ -14,20 +14,21 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.vecmath.TexCoord2f;
+
 import com.GameName.Engine.GameEngine;
 import com.GameName.GUI.GUI;
 import com.GameName.Render.Effects.Texture;
 import com.GameName.Render.Types.Render2D;
 import com.GameName.Util.BufferUtil;
-import com.GameName.Util.Vectors.Vector2f;
 
 public abstract class GUIComponent extends Render2D {
 	private int id;		
 	private GUI gui;
 	
-	private Vector2f texCoordsRest1, texCoordsRest2;
-	private Vector2f texCoordsSelected1, texCoordsSelected2;
-	private Vector2f texCoordsPressed1, texCoordsPressed2;
+	private TexCoord2f texCoordsRest1, texCoordsRest2;
+	private TexCoord2f texCoordsSelected1, texCoordsSelected2;
+	private TexCoord2f texCoordsPressed1, texCoordsPressed2;
 	
 	private int[] textureBuffers;
 	
@@ -72,16 +73,16 @@ public abstract class GUIComponent extends Render2D {
 		FloatBuffer vertexBuffer = BufferUtil.createFillipedFloatBuffer(verties);
 		ENGINE.getGLContext().addBufferBind(vertexBuffer, GL_ARRAY_BUFFER_BINDING, vertexVBO, GL_STATIC_DRAW, 'f');
 		
-		Vector2f[] textureCoords = new Vector2f[] 
+		TexCoord2f[] textureCoords = new TexCoord2f[] 
 				{texCoordsRest1, texCoordsRest2, texCoordsSelected1, texCoordsSelected2, texCoordsPressed1, texCoordsPressed2};
 		
 		for(int i = 0; i < textureCoords.length; i += 2) {
 			ArrayList<Float> texCoords = new ArrayList<Float>();
 			
-			texCoords.add(textureCoords[i + 1].getX());	texCoords.add(textureCoords[i + 1].getY());
-			texCoords.add(textureCoords[i].getX());		texCoords.add(textureCoords[i + 1].getY());
-			texCoords.add(textureCoords[i].getX());		texCoords.add(textureCoords[i].getY());
-			texCoords.add(textureCoords[i + 1].getX());	texCoords.add(textureCoords[i].getY());
+			texCoords.add(textureCoords[i + 1].x);	texCoords.add(textureCoords[i + 1].y);
+			texCoords.add(textureCoords[i].x);		texCoords.add(textureCoords[i + 1].y);
+			texCoords.add(textureCoords[i].x);		texCoords.add(textureCoords[i].y);
+			texCoords.add(textureCoords[i + 1].x);	texCoords.add(textureCoords[i].y);
 			
 			FloatBuffer texCoordsBuffer = BufferUtil.createFillipedFloatBuffer(texCoords);
 			ENGINE.getGLContext().addBufferBind(texCoordsBuffer, GL_ARRAY_BUFFER_BINDING, textureBuffers[i / 2], GL_STATIC_DRAW, 'f');
@@ -89,11 +90,11 @@ public abstract class GUIComponent extends Render2D {
 	}
 	
 	public boolean isSelected() {
-		if(ENGINE.getPlayer().getAccess().getPointer().getX() > getX() && 
-				ENGINE.getPlayer().getAccess().getPointer().getX() < getX() + getWidth()) {
+		if(ENGINE.getPlayer().getAccess().getPointer().x > getX() && 
+				ENGINE.getPlayer().getAccess().getPointer().x < getX() + getWidth()) {
 			
-			if(ENGINE.getPlayer().getAccess().getPointer().getY() > getY() && 
-					ENGINE.getPlayer().getAccess().getPointer().getY() < getY() + getHeight()) {
+			if(ENGINE.getPlayer().getAccess().getPointer().y > getY() && 
+					ENGINE.getPlayer().getAccess().getPointer().y < getY() + getHeight()) {
 				
 				return true;
 			}
@@ -116,21 +117,21 @@ public abstract class GUIComponent extends Render2D {
 		if(gui != null) gui.action(id);
 	}
 	
-	public void setTextureRest(Texture texture, Vector2f texCoordsRest1, Vector2f texCoordsRest2) {
+	public void setTextureRest(Texture texture, TexCoord2f texCoordsRest1, TexCoord2f texCoordsRest2) {
 		setTexture(texture);
 		
 		this.texCoordsRest1 = texCoordsRest1;
 		this.texCoordsRest2 = texCoordsRest2;
 	}
 	
-	public void setTextureSelected(Texture texture, Vector2f texCoordsSelected1, Vector2f texCoordsSelected2) {
+	public void setTextureSelected(Texture texture, TexCoord2f texCoordsSelected1, TexCoord2f texCoordsSelected2) {
 		setTexture(texture);
 		
 		this.texCoordsSelected1 = texCoordsSelected1;
 		this.texCoordsSelected2 = texCoordsSelected2;
 	}
 	
-	public void setTexturePressed(Texture texture, Vector2f texCoordsPressed1, Vector2f texCoordsPressed2) {
+	public void setTexturePressed(Texture texture, TexCoord2f texCoordsPressed1, TexCoord2f texCoordsPressed2) {
 		setTexture(texture);
 		
 		this.texCoordsPressed1 = texCoordsPressed1;

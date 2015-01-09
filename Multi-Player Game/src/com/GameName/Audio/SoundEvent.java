@@ -1,6 +1,6 @@
 package com.GameName.Audio;
 
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 
 public class SoundEvent {
 	private int source;
@@ -9,13 +9,13 @@ public class SoundEvent {
 	private int pitch;
 	private int gain;
 	
-	private Vector3f pos;
+	private MathVec3f pos;
 	
 	public SoundEvent(int source, Sound sound, int pitch, int gain) {
-		this(source, sound, pitch, gain, new Vector3f(0, 0, 0));
+		this(source, sound, pitch, gain, new MathVec3f(0, 0, 0));
 	}
 	
-	public SoundEvent(int source, Sound sound, int pitch, int gain, Vector3f pos) {
+	public SoundEvent(int source, Sound sound, int pitch, int gain, MathVec3f pos) {
 		this.source = source;
 		this.sound = sound;
 		this.pitch = pitch;
@@ -39,11 +39,11 @@ public class SoundEvent {
 		return gain;
 	}
 
-	public Vector3f getPos() {
+	public MathVec3f getPos() {
 		return pos;
 	}
 
-	public void setPos(Vector3f pos) {
+	public void setPos(MathVec3f pos) {
 		this.pos = pos;
 	}
 

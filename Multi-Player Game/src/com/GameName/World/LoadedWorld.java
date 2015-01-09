@@ -1,7 +1,7 @@
 package com.GameName.World;
 
 import com.GameName.Engine.GameEngine;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 import com.GameName.World.Object.WorldObject;
 
 public class LoadedWorld {
@@ -13,7 +13,7 @@ public class LoadedWorld {
 		
 	protected ChunkLoader chunkLoader;
 	protected WorldObject[] objects;
-	protected Vector3f center;
+	protected MathVec3f center;
 	
 	public LoadedWorld(GameEngine eng, World world, String worldName) {
 		ENGINE = eng;

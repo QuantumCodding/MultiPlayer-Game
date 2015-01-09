@@ -2,6 +2,8 @@ package com.GameName.Entity;
 
 import java.util.List;
 
+import javax.vecmath.Vector2f;
+
 import com.GameName.Engine.GameEngine;
 import com.GameName.Input.Control;
 import com.GameName.Items.ItemStack;
@@ -9,8 +11,7 @@ import com.GameName.Networking.Client;
 import com.GameName.Networking.Packets.PacketPlayerInventorySize;
 import com.GameName.Networking.Packets.PacketPlayerInventorySlot;
 import com.GameName.Networking.Packets.PacketPlayerStats;
-import com.GameName.Util.Vectors.Vector2f;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 
 public class EntityPlayerAccess extends EntityAccess {
 	
@@ -85,7 +86,7 @@ public class EntityPlayerAccess extends EntityAccess {
 		return player.maxReach;
 	}
 
-	public Vector3f getSelectedCube() {
+	public MathVec3f getSelectedCube() {
 		return player.selectedCube;
 	}
 	

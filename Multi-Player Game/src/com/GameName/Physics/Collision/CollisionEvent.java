@@ -1,12 +1,12 @@
 package com.GameName.Physics.Collision;
 
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 
 public class CollisionEvent {
 	private boolean isColliding;
-	private Vector3f direction;
+	private MathVec3f direction;
 	
-	public CollisionEvent(boolean isColliding, Vector3f direction) {
+	public CollisionEvent(boolean isColliding, MathVec3f direction) {
 		this.isColliding = isColliding;
 		this.direction = direction;
 	}
@@ -19,7 +19,7 @@ public class CollisionEvent {
 		return direction.length();
 	}
 	
-	public Vector3f getDirection() {
+	public MathVec3f getDirection() {
 		return direction;
 	}
 

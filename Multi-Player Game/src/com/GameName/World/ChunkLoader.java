@@ -8,7 +8,7 @@ import com.GameName.Cube.Cube;
 import com.GameName.Engine.GameEngine;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 
 public class ChunkLoader {
 	private String fileLoc;
@@ -16,7 +16,7 @@ public class ChunkLoader {
 	private HashSet<Chunk> unloadedChunks;
 	private HashSet<Chunk> loadedChunks;
 	
-	private Vector3f center;
+	private MathVec3f center;
 	private int loadRadius;
 	
 	private World world;
@@ -31,12 +31,12 @@ public class ChunkLoader {
 		unloadedChunks = new HashSet<Chunk>();
 		loadedChunks = new HashSet<Chunk>();
 		
-		center = new Vector3f(0, 0, 0);
+		center = new MathVec3f(0, 0, 0);
 		fileLoc = world.getFileLoc() + "/chunks/";
 	}
 	
 	public void update() {
-		if(center == null) center = new Vector3f(0, 0, 0);
+		if(center == null) center = new MathVec3f(0, 0, 0);
 		
 		findUnloadedChunks();
 		unloadChunks();
@@ -44,8 +44,8 @@ public class ChunkLoader {
 	}
 	
 	public void findUnloadedChunks() {
-		Vector3f minPos = center.subtract(loadRadius);
-		Vector3f maxPos = center.add(loadRadius);
+		MathVec3f minPos = center.subtract(loadRadius);
+		MathVec3f maxPos = center.add(loadRadius);
 		
 		for(Chunk chunk : getLoadedChunks()) {//int i = 0; i < getLoadedChunks().size(); i ++) { //Chunk chunk : getLoadedChunks()
 //			Chunk chunk = getLoadedChunks().get(i);
@@ -82,7 +82,7 @@ public class ChunkLoader {
 			for(int z = -radius; z < radius + 1; z ++) {
 				if(x < 0 || y < 0 || z < 0) continue;
 				
-				Vector3f loadPos = new Vector3f(x, y, z).add(center).capMax(world.getChunkSizeAsVector()).capMin(0);
+				MathVec3f loadPos = new MathVec3f(x, y, z).add(center).capMax(world.getChunkSizeAsVector()).capMin(0);
 				Chunk chunk = getChunk(loadPos);
 				
 				if(chunk == null) {
@@ -99,12 +99,12 @@ public class ChunkLoader {
 				
 				try {
 					HashSet<TagGroup> tags = DTGLoader.readDTGFile(loadFile);
-					Vector3f pos; int id;
+					MathVec3f pos; int id;
 					
 					for(TagGroup group : tags) {
 						if(!(((String) group.getIdTag().getTagInfo()).equals("cube"))) continue;
 						
-						pos = (Vector3f) group.getTagByName("pos").getTagInfo();					
+						pos = (MathVec3f) group.getTagByName("pos").getTagInfo();					
 						id = ((Integer) group.getTagByName("cubeId").getTagInfo()).intValue();
 						
 						chunk.setCubeWithoutUpdate(
@@ -162,7 +162,7 @@ public class ChunkLoader {
 		}	
 	}
 		
-	public Chunk getChunk(Vector3f pos) {		
+	public Chunk getChunk(MathVec3f pos) {		
 		for(Chunk chunk : getLoadedChunks()) {//int i = 0; i < getLoadedChunks().size(); i ++) { //Chunk chunk : getLoadedChunks()
 //			Chunk chunk = getLoadedChunks().get(i);
 			
@@ -174,7 +174,7 @@ public class ChunkLoader {
 		return null;
 	}
 
-	public Vector3f getCenter() {
+	public MathVec3f getCenter() {
 		return center;
 	}
 
@@ -182,7 +182,7 @@ public class ChunkLoader {
 		return loadRadius;
 	}
 
-	public void setCenter(Vector3f center) {
+	public void setCenter(MathVec3f center) {
 		this.center = center;
 	}
 

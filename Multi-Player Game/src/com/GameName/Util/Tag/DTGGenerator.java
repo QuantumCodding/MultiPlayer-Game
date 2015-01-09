@@ -2,20 +2,17 @@ package com.GameName.Util.Tag;
 
 import java.util.HashSet;
 
-import com.GameName.Util.Vectors.Vector2d;
-import com.GameName.Util.Vectors.Vector2f;
-import com.GameName.Util.Vectors.Vector3d;
-import com.GameName.Util.Vectors.Vector3f;
-import com.GameName.Util.Vectors.Vector4d;
-import com.GameName.Util.Vectors.Vector4f;
+import javax.vecmath.Vector2f;
+
+import com.GameName.Util.Vectors.MathVec3f;
 
 public class DTGGenerator {
-	public static String generateTag(String tagName, Vector2d data) {return tagName + "=<"+data.getX() + "d," + data.getY() + "d> ";}
-	public static String generateTag(String tagName, Vector2f data) {return tagName + "=<"+data.getX() + "f," + data.getY() + "f> ";}
-	public static String generateTag(String tagName, Vector3d data) {return tagName + "=<"+data.getX() + "d," + data.getY() + "d," + data.getZ() + "d> ";}
-	public static String generateTag(String tagName, Vector3f data) {return tagName + "=<"+data.getX() + "f," + data.getY() + "f," + data.getZ() + "f> ";}
-	public static String generateTag(String tagName, Vector4d data) {return tagName + "=<"+data.getX() + "d," + data.getY() + "d," + data.getZ() + "d," + data.getW() + "d> ";}
-	public static String generateTag(String tagName, Vector4f data) {return tagName + "=<"+data.getX() + "f," + data.getY() + "f," + data.getZ() + "f," + data.getW() + "f> ";}
+//	public static String generateTag(String tagName, Vector2d data) {return tagName + "=<"+data.getX() + "d," + data.getY() + "d> ";}
+	public static String generateTag(String tagName, Vector2f data) {return tagName + "=<"+data.x + "f," + data.y + "f> ";}
+//	public static String generateTag(String tagName, Vector3d data) {return tagName + "=<"+data.getX() + "d," + data.getY() + "d," + data.getZ() + "d> ";}
+	public static String generateTag(String tagName, MathVec3f data) {return tagName + "=<"+data.getX() + "f," + data.getY() + "f," + data.getZ() + "f> ";}
+//	public static String generateTag(String tagName, Vector4d data) {return tagName + "=<"+data.getX() + "d," + data.getY() + "d," + data.getZ() + "d," + data.getW() + "d> ";}
+//	public static String generateTag(String tagName, Vector4f data) {return tagName + "=<"+data.getX() + "f," + data.getY() + "f," + data.getZ() + "f," + data.getW() + "f> ";}
 
 	public static String generateTag(String tagName, float data)  {return tagName + "=" + data + "f ";}   public static String generateTag(String tagName, Float data)  {return tagName + "=" + data.floatValue() 	+ "f ";}
 	public static String generateTag(String tagName, double data) {return tagName + "=" + data + "d ";}   public static String generateTag(String tagName, Double data) {return tagName + "=" + data.doubleValue() 	+ "d ";}
@@ -87,12 +84,12 @@ public class DTGGenerator {
 		if(data.getClass().equals(Character.class)) {return generateTag(tagName, (Character) data);}
 		if(data.getClass().equals(String.class)) 	{return generateTag(tagName, (String) data);}
 
-		if(data.getClass().equals(Vector2f.class)) {return generateTag(tagName, (Vector2f) data);}
-		if(data.getClass().equals(Vector2d.class)) {return generateTag(tagName, (Vector2d) data);}
-		if(data.getClass().equals(Vector3f.class)) {return generateTag(tagName, (Vector3f) data);}
-		if(data.getClass().equals(Vector3d.class)) {return generateTag(tagName, (Vector3d) data);}
-		if(data.getClass().equals(Vector4f.class)) {return generateTag(tagName, (Vector4f) data);}
-		if(data.getClass().equals(Vector4d.class)) {return generateTag(tagName, (Vector4d) data);}
+//		if(data.getClass().equals(Vector2f.class)) {return generateTag(tagName, (Vector2f) data);}
+//		if(data.getClass().equals(Vector2d.class)) {return generateTag(tagName, (Vector2d) data);}
+		if(data.getClass().equals(MathVec3f.class)) {return generateTag(tagName, (MathVec3f) data);}
+//		if(data.getClass().equals(Vector3d.class)) {return generateTag(tagName, (Vector3d) data);}
+//		if(data.getClass().equals(Vector4f.class)) {return generateTag(tagName, (Vector4f) data);}
+//		if(data.getClass().equals(Vector4d.class)) {return generateTag(tagName, (Vector4d) data);}
 		
 		if(data.getClass().equals(Float[].class)) 	{return generateTag(tagName, (Float[]) data);}
 		if(data.getClass().equals(Double[].class)) 	{return generateTag(tagName, (Double[]) data);}

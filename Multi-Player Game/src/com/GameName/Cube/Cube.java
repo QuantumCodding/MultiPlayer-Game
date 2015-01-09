@@ -8,6 +8,7 @@ import java.security.InvalidParameterException;
 import java.util.HashSet;
 
 import javax.imageio.ImageIO;
+import javax.vecmath.Vector2f;
 
 import com.GameName.Cube.Render.DefaultCubeRender;
 import com.GameName.Cube.Render.ICubeRender;
@@ -18,8 +19,7 @@ import com.GameName.Physics.Collision.BoundingBox;
 import com.GameName.Physics.Object.Material;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
-import com.GameName.Util.Vectors.Vector2f;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 
 public class Cube {
 	private static DefaultCubeRender defaultCubeRender;
@@ -171,15 +171,15 @@ public class Cube {
 			
 			if(fullTexture == null) throw new IOException("Texture == NULL");
 
-			int xStart = (int) ((sheetPosition.getX() * textureSize) + (sheetPosition.getX() * textureSpacing.getX()));
-			int yStart = (int) ((sheetPosition.getY() * textureSize) + (sheetPosition.getY() * textureSpacing.getY()));	
+			int xStart = (int) ((sheetPosition.x * textureSize) + (sheetPosition.x * textureSpacing.x));
+			int yStart = (int) ((sheetPosition.y * textureSize) + (sheetPosition.y * textureSpacing.y));	
 			
 			for(int frame = 0; frame < frames; frame ++) {
 				for(int i = 0; i < textures[frame].length; i ++) {					
 					
-					int x = i % (int) texturesPerLine.getX(), y = (int) (i / texturesPerLine.getX());					
-					int xOffset = (x * textureSize) + (x * (int) textureSpacing.getX());
-					int yOffset = (y * textureSize) + (y * (int) textureSpacing.getY());
+					int x = i % (int) texturesPerLine.x, y = (int) (i / texturesPerLine.x);					
+					int xOffset = (x * textureSize) + (x * (int) textureSpacing.x);
+					int yOffset = (y * textureSize) + (y * (int) textureSpacing.y);
 					
 					for(int posX = 0; posX < textureSize; posX ++) {
 					for(int posY = 0; posY < textureSize; posY ++) {
@@ -217,7 +217,7 @@ public class Cube {
 	 */		
 	private BoundingArea getDefaultBoundingArea() {
 		BoundingArea bound = new BoundingArea();		
-		bound.add(new BoundingBox(new Vector3f(0, 0, 0), new Vector3f(1, 1, 1)));
+		bound.add(new BoundingBox(new MathVec3f(0, 0, 0), new MathVec3f(1, 1, 1)));
 		
 		return bound;
 	}

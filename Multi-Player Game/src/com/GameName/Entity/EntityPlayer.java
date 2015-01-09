@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.vecmath.Vector2f;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
@@ -24,8 +26,7 @@ import com.GameName.Networking.Packets.PacketPlayerLocation;
 import com.GameName.Networking.Packets.PacketPlayerStats;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
-import com.GameName.Util.Vectors.Vector2f;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 
 public class EntityPlayer extends Entity {
 	protected ItemStack[] inv;
@@ -51,7 +52,7 @@ public class EntityPlayer extends Entity {
 	protected float speed;
 		
 	protected int maxReach;
-	protected Vector3f selectedCube;
+	protected MathVec3f selectedCube;
 	
 	protected Vector2f pointerPos;
 	protected boolean isPointerDown;
@@ -88,8 +89,8 @@ public class EntityPlayer extends Entity {
 		invSize = 10;
 		inv = new ItemStack[invSize];
 		
-		pos = new Vector3f(20, 95, 20);		
-		rot = new Vector3f(180, 0, 0);
+		pos = new MathVec3f(20, 95, 20);		
+		rot = new MathVec3f(180, 0, 0);
 		
 		gravityOn = false;
 		
@@ -102,7 +103,7 @@ public class EntityPlayer extends Entity {
 		
 		maxReach = 50;
 
-		selectedCube = new Vector3f(0, 0, 0);
+		selectedCube = new MathVec3f(0, 0, 0);
 		
 		playerMove(true);
 		
@@ -147,7 +148,7 @@ public class EntityPlayer extends Entity {
 		lookSpeed = Keyboard.isKeyDown(Keyboard.KEY_Y) ? 0.5f : Keyboard.isKeyDown(Keyboard.KEY_U) ? 5 : 1;
 		lookSpeedUp = lookSpeed;
 				
-		Vector3f oldPos = pos.clone();
+		MathVec3f oldPos = pos.clone();
 		
 		for(Control ctr : controls) {
 			if(ctr.isActive() != 0.0){
@@ -167,7 +168,7 @@ public class EntityPlayer extends Entity {
 					
 					case "jump": 					
 						if(!lockMovement) if(jumpsLeft > 0) { 
-							vel.add(new Vector3f(0, jumpHeight, 0));
+							vel.add(new MathVec3f(0, jumpHeight, 0));
 							jumpsLeft --;
 						}						
 					break;
@@ -175,10 +176,10 @@ public class EntityPlayer extends Entity {
 					case "resetPlayer": if(!lockMovement) resetPlayer(); break;
 					case "gravity": 	if(!lockMovement) gravityOn = !gravityOn; break;
 					
-					case "pointerUp": 		pointerPos.addY((float) ctr.isActive()); break;
-					case "pointerDown": 	pointerPos.addY((float) ctr.isActive()); break;
-					case "pointerLeft": 	pointerPos.addX((float) ctr.isActive()); break;
-					case "pointerRight": 	pointerPos.addX((float) ctr.isActive()); break;
+					case "pointerUp": 		pointerPos.y += ((float) ctr.isActive()); break;
+					case "pointerDown": 	pointerPos.y += ((float) ctr.isActive()); break;
+					case "pointerLeft": 	pointerPos.x += ((float) ctr.isActive()); break;
+					case "pointerRight": 	pointerPos.x += ((float) ctr.isActive()); break;
 					case "click": 			isPointerDown = true; break;
 					
 //					case "toggle": if(!lockMovement) { GameName.guiManager.toggle("Test"); GameName.guiManager.toggle("Pause"); } break;

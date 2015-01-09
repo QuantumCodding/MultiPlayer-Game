@@ -5,7 +5,7 @@ import org.newdawn.slick.UnicodeFont;
 import org.newdawn.slick.font.effects.ColorEffect;
 
 import com.GameName.Engine.GameEngine;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 
 public class GUIText extends GUIComponent {
 	
@@ -40,7 +40,7 @@ public class GUIText extends GUIComponent {
 		setFont(new java.awt.Font(fontName, modifiers, size), color);
 	}
 	
-	public void setFont(String fontName, int modifiers, int size, Vector3f color) {
+	public void setFont(String fontName, int modifiers, int size, MathVec3f color) {
 		setFont(new java.awt.Font(fontName, modifiers, size), new java.awt.Color(color.getX(), color.getY(), color.getZ()));
 	}
 	

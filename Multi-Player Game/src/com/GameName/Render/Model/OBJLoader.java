@@ -5,9 +5,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import javax.vecmath.TexCoord2f;
+
 import com.GameName.Render.Effects.Texture;
-import com.GameName.Util.Vectors.Vector2f;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 
 public class OBJLoader {
 	 public static ModelData loadTexturedModel(File f) throws IOException {
@@ -92,7 +93,7 @@ public class OBJLoader {
 	                float y = Float.valueOf(xyz[2]);
 	                float z = Float.valueOf(xyz[3]);
 	                
-	                m.getVertices().add(new Vector3f(x, y, z));
+	                m.getVertices().add(new MathVec3f(x, y, z));
 	                
 	            } else if (line.startsWith("vn ")) {
 	                String[] xyz = line.split(" ");
@@ -101,7 +102,7 @@ public class OBJLoader {
 	                float y = Float.valueOf(xyz[2]);
 	                float z = Float.valueOf(xyz[3]);
 	                
-	                m.getNormals().add(new Vector3f(x, y, z));
+	                m.getNormals().add(new MathVec3f(x, y, z));
 	                
 	            } else if (line.startsWith("vt ")) {
 	                String[] xyz = line.split(" ");
@@ -109,7 +110,7 @@ public class OBJLoader {
 	                float s = Float.valueOf(xyz[1]);
 	                float t = Float.valueOf(xyz[2]);
 	                
-	                m.getTextureCoordinates().add(new Vector2f(s, t));
+	                m.getTextureCoordinates().add(new TexCoord2f(s, t));
 	                
 	            } else if (line.startsWith("f ")) {
 	                String[] faceIndices = line.split(" ");

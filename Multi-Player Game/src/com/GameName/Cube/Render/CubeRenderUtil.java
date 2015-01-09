@@ -5,9 +5,10 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import javax.vecmath.Vector2f;
+
 import com.GameName.Cube.Cube;
 import com.GameName.Engine.GameEngine;
-import com.GameName.Util.Vectors.Vector2f;
 
 public class CubeRenderUtil {
 	public static CubeTextureMap generateTexturMap(GameEngine eng, HashSet<Cube> typesOfCubes) {

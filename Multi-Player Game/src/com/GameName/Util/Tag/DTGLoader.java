@@ -10,12 +10,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import com.GameName.Util.Vectors.Vector2d;
-import com.GameName.Util.Vectors.Vector2f;
-import com.GameName.Util.Vectors.Vector3d;
-import com.GameName.Util.Vectors.Vector3f;
-import com.GameName.Util.Vectors.Vector4d;
-import com.GameName.Util.Vectors.Vector4f;
+import javax.vecmath.Vector2f;
+
+import com.GameName.Util.Vectors.MathVec3f;
 
 public class DTGLoader {
 	
@@ -48,17 +45,17 @@ public class DTGLoader {
 						if(c == '<') {
 							info = removeFirst(removeLast(info));
 							String[] numbers = split(info, ",");
-							char type = numbers[0].charAt(numbers[0].length() - 1);
+//							char type = numbers[0].charAt(numbers[0].length() - 1);
 							
 							if(numbers.length == 2) {
-								if(type == 'd')	obj = new Vector2d(asDouble(numbers[0]), asDouble(numbers[1]));	
-								else			obj = new Vector2f(asFloat(numbers[0]), asFloat(numbers[1]));
+//								if(type == 'd')	obj = new Vector2d(asDouble(numbers[0]), asDouble(numbers[1]));	
+								/*else*/		obj = new Vector2f(asFloat(numbers[0]), asFloat(numbers[1]));
 							} else if(numbers.length == 3) {
-								if(type == 'd')	obj = new Vector3d(asDouble(numbers[0]), asDouble(numbers[1]), asDouble(numbers[2]));	
-								else			obj = new Vector3f(asFloat(numbers[0]), asFloat(numbers[1]), asFloat(numbers[2]));								
+//								if(type == 'd')	obj = new Vector3d(asDouble(numbers[0]), asDouble(numbers[1]), asDouble(numbers[2]));	
+								/*else*/		obj = new MathVec3f(asFloat(numbers[0]), asFloat(numbers[1]), asFloat(numbers[2]));								
 							} else if(numbers.length == 4) {
-								if(type == 'd')	obj = new Vector4d(asDouble(numbers[0]), asDouble(numbers[1]), asDouble(numbers[2]), asDouble(numbers[3]));	
-								else			obj = new Vector4f(asFloat(numbers[0]), asFloat(numbers[1]), asFloat(numbers[2]), asFloat(numbers[3]));								
+//								if(type == 'd')	obj = new Vector4d(asDouble(numbers[0]), asDouble(numbers[1]), asDouble(numbers[2]), asDouble(numbers[3]));	
+//								else			obj = new Vector4f(asFloat(numbers[0]), asFloat(numbers[1]), asFloat(numbers[2]), asFloat(numbers[3]));								
 							}
 							
 						} else if(c == '\'') {

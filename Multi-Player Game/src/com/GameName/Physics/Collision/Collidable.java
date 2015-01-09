@@ -1,7 +1,7 @@
 package com.GameName.Physics.Collision;
 
 import static com.GameName.Physics.PhysicsUtil.CardinalDirection;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 
 public abstract class Collidable {
 	private Shape shape;
@@ -19,7 +19,7 @@ public abstract class Collidable {
 	CollisionEvent intersectBoundingSphereWithBoundingSphere(BoundingSphere sphere, BoundingSphere other) {
 					
 		float radiusLength = sphere.getRadius() + other.getRadius();
-		Vector3f direction = other.getCenter().subtract(getCenter());		
+		MathVec3f direction = other.getCenter().subtract(getCenter());		
 		float centerDistance = direction.length();
 		
 		direction.divideAndSet(centerDistance);
@@ -29,10 +29,10 @@ public abstract class Collidable {
 	}
 
 	CollisionEvent intersectBoundingBoxWithBoundingBox(BoundingBox box, BoundingBox other) {
-		Vector3f distances1 = box.getMaxPos().subtract(other.getMinPos());
-		Vector3f distances2 = box.getMinPos().subtract(other.getMaxPos());
+		MathVec3f distances1 = box.getMaxPos().subtract(other.getMinPos());
+		MathVec3f distances2 = box.getMinPos().subtract(other.getMaxPos());
 		
-		Vector3f distances = distances1.max(distances2);		
+		MathVec3f distances = distances1.max(distances2);		
 		float maxDistance = distances.max();
 		
 		return new CollisionEvent(maxDistance < 0, distances);
@@ -42,9 +42,9 @@ public abstract class Collidable {
 		return null;
 	}
 	
-	public abstract Collidable clone(Vector3f amount);	
-	public abstract Collidable translate(Vector3f amount);	
-	public abstract Vector3f getCenter();
+	public abstract Collidable clone(MathVec3f amount);	
+	public abstract Collidable translate(MathVec3f amount);	
+	public abstract MathVec3f getCenter();
 	public abstract float getSurfaceArea(CardinalDirection dir);
 	public abstract float getVolume();
 	

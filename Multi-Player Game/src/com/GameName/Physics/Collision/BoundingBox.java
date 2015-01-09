@@ -1,21 +1,21 @@
 package com.GameName.Physics.Collision;
 
 import com.GameName.Physics.PhysicsUtil.CardinalDirection;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 
 public class BoundingBox extends Collidable {
 
-	private Vector3f minPos;
-	private Vector3f maxPos;
-	private Vector3f length;
+	private MathVec3f minPos;
+	private MathVec3f maxPos;
+	private MathVec3f length;
 	
-	public BoundingBox(Vector3f minPos, Vector3f maxPos) {
+	public BoundingBox(MathVec3f minPos, MathVec3f maxPos) {
 		super(Shape.BoundingBox);
 		
 		this.minPos = minPos;
 		this.maxPos = maxPos;
 
-		length = new Vector3f(minPos.getX() - maxPos.getX(), minPos.getY() - maxPos.getY(), minPos.getZ() - maxPos.getZ()).abs();
+		length = new MathVec3f(minPos.getX() - maxPos.getX(), minPos.getY() - maxPos.getY(), minPos.getZ() - maxPos.getZ()).abs();
 	}
 
 	public CollisionEvent intersect(Collidable other) {
@@ -24,30 +24,30 @@ public class BoundingBox extends Collidable {
 //			case BoundingSphere: return intersectBoundingSphereWithBoundingBox((BoundingSphere) other, this); 
 			
 			default: System.err.println("Error: Tried to intersect a BoundingBox and an Unknown Shape"); 
-					 return new CollisionEvent(false, new Vector3f(0, 0, 0));			
+					 return new CollisionEvent(false, new MathVec3f(0, 0, 0));			
 		}
 	}
 
-	public Collidable clone(Vector3f amount) {
+	public Collidable clone(MathVec3f amount) {
 		return new BoundingBox(minPos, minPos).translate(amount);
 	}
 	
-	public Collidable translate(Vector3f amount) {
+	public Collidable translate(MathVec3f amount) {
 		minPos.add(amount);
 		maxPos.add(amount);
 		
 		return this;
 	}
 
-	public Vector3f getMinPos() {
+	public MathVec3f getMinPos() {
 		return minPos;
 	}
 
-	public Vector3f getMaxPos() {
+	public MathVec3f getMaxPos() {
 		return maxPos;
 	}
 
-	public Vector3f getCenter() {		
+	public MathVec3f getCenter() {		
 		return minPos.add(length.divide(2));
 	}
 

@@ -14,7 +14,7 @@ import com.GameName.Physics.Collision.BoundingArea;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.Tag;
 import com.GameName.Util.Tag.TagGroup;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 import com.GameName.World.Render.ChunkRender;
 
 public class Chunk {
@@ -234,7 +234,7 @@ public class Chunk {
 			typesOfCubes.add(cube);
 			
 			if(true){//isCubeVisable(x, y, z)) {		TODO: Fix when world loading is fixed		
-				bounding.addAll(cube.getBoundingArea(metadata).getBoundingObjectsClone(new Vector3f(
+				bounding.addAll(cube.getBoundingArea(metadata).getBoundingObjectsClone(new MathVec3f(
 						getX() * World.CHUNK_SIZE + x, 
 						getY() * World.CHUNK_SIZE + y,
 						getZ() * World.CHUNK_SIZE + z
@@ -267,8 +267,8 @@ public class Chunk {
 		World world = WorldRegistry.getWorld(worldId);
 		LoadedWorldAccess access = world.getLoadedWorld().getAccess();
 		
-		Vector3f minPos = access.getCenter().subtract(LoadedWorldAccess.getRenderRadius()).capMin(0);		
-		Vector3f maxPos = access.getCenter().add(LoadedWorldAccess.getRenderRadius()).capMax(world.getSizeAsVector()).subtract(1);
+		MathVec3f minPos = access.getCenter().subtract(LoadedWorldAccess.getRenderRadius()).capMin(0);		
+		MathVec3f maxPos = access.getCenter().add(LoadedWorldAccess.getRenderRadius()).capMax(world.getSizeAsVector()).subtract(1);
 		
 		if(isPosOnEdge(x, y, z)) {
 			if(x == 0) {
@@ -356,8 +356,8 @@ public class Chunk {
 		return z;
 	}
 	
-	public Vector3f getPos() {
-		return new Vector3f(x, y, z);
+	public MathVec3f getPos() {
+		return new MathVec3f(x, y, z);
 	}
 
 	public boolean isInitialized() {
@@ -384,7 +384,7 @@ public class Chunk {
 			
 			tagLines.add(new TagGroup(new Tag("type", "cube"), new Tag[] {
 				new Tag("cubeId", cube),
-				new Tag("pos", new Vector3f(x, y, z))
+				new Tag("pos", new MathVec3f(x, y, z))
 			}));
 		}}}
 		

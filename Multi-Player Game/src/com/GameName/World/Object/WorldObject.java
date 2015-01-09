@@ -3,13 +3,13 @@ package com.GameName.World.Object;
 import com.GameName.Engine.GameEngine;
 import com.GameName.Physics.Collision.BoundingBox;
 import com.GameName.Physics.Object.PhysicsObject;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 import com.GameName.World.World;
 
 public abstract class WorldObject extends PhysicsObject {
 
-	protected Vector3f chunk;
-	protected Vector3f renderPos, adjust;	
+	protected MathVec3f chunk;
+	protected MathVec3f renderPos, adjust;	
 	protected float height, width, length;
 	protected World currentWorld;
 	
@@ -19,7 +19,7 @@ public abstract class WorldObject extends PhysicsObject {
 		super(eng);
 		
 		height = 1;	width = 1; length = 1;		
-		renderPos = new Vector3f(0, 0, 0);
+		renderPos = new MathVec3f(0, 0, 0);
 	}
 	
 	public void update() {
@@ -27,7 +27,7 @@ public abstract class WorldObject extends PhysicsObject {
 		
 		renderPos = pos.multiply(adjust);
 		
-		Vector3f tempChunk = pos.divide(World.CHUNK_SIZE).truncate();
+		MathVec3f tempChunk = pos.divide(World.CHUNK_SIZE).truncate();
 		
 		if(tempChunk.getX() > currentWorld.getChunkX() - 1) tempChunk.setX(currentWorld.getChunkX() - 1); 
 		else if(tempChunk.getX() < 0) tempChunk.setX(0);			
@@ -41,7 +41,7 @@ public abstract class WorldObject extends PhysicsObject {
 	
 	public void addBounding() {
 		bounding.add(new BoundingBox(
-				new Vector3f(0, 0, 0), new Vector3f(1, 1, 1)
+				new MathVec3f(0, 0, 0), new MathVec3f(1, 1, 1)
 //				new Vector3f(pos.getX() - (width / 2f), pos.getY() - (height / 2f), pos.getZ() - (length / 2f)), 
 //				new Vector3f(pos.getX() + (width / 2f), pos.getY() + (height / 2f), pos.getZ() + (length / 2f))
 			));

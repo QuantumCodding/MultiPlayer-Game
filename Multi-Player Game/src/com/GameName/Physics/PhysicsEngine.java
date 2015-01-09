@@ -9,7 +9,7 @@ import com.GameName.Physics.Collision.CollisionEvent;
 import com.GameName.Physics.Object.Material;
 import com.GameName.Physics.Object.PhysicsObject;
 import com.GameName.Util.IEngine;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 import com.GameName.World.World;
 
 public class PhysicsEngine implements IEngine<PhysicsObject> {
@@ -104,7 +104,7 @@ public class PhysicsEngine implements IEngine<PhysicsObject> {
 		return dir > 0 ? -1 : dir < 0 ? 1 : 0;
 	}
 	
-	public Vector3f getAcceleration(Vector3f force, float mass) {
+	public MathVec3f getAcceleration(MathVec3f force, float mass) {
 		return force.divide(mass);
 	}
 	

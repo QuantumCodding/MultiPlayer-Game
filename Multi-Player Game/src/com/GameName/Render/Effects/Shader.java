@@ -9,7 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 
 public class Shader {
 	private int programId;
@@ -147,7 +147,7 @@ public class Shader {
 		glUniform1f(uniforms.get(uniformName), value);
 	}
 	
-	public void setUniform(String uniformName, Vector3f value) {
+	public void setUniform(String uniformName, MathVec3f value) {
 		glUniform3f(uniforms.get(uniformName), value.getX(), value.getY(), value.getZ());
 	}
 

@@ -2,7 +2,7 @@ package com.GameName.Physics.Object;
 
 import com.GameName.Engine.GameEngine;
 import com.GameName.Physics.Collision.BoundingArea;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 
 public class PhysicsAccess {
 	protected final GameEngine ENGINE;
@@ -13,35 +13,35 @@ public class PhysicsAccess {
 		this.object = object;
 	}
 
-	public Vector3f getPos() {
+	public MathVec3f getPos() {
 		return object.pos;
 	}
 
-	public Vector3f getVel() {
+	public MathVec3f getVel() {
 		return object.vel;
 	}
 
-	public Vector3f getAcc() {
+	public MathVec3f getAcc() {
 		return object.acc;
 	}
 
-	public Vector3f getForce() {
+	public MathVec3f getForce() {
 		return object.force;
 	}
 
-	public Vector3f getRot() {
+	public MathVec3f getRot() {
 		return object.rot;
 	}
 
-	public Vector3f getRotVel() {
+	public MathVec3f getRotVel() {
 		return object.rotVel;
 	}
 
-	public Vector3f getRotAcc() {
+	public MathVec3f getRotAcc() {
 		return object.rotAcc;
 	}
 
-	public Vector3f getRotForce() {
+	public MathVec3f getRotForce() {
 		return object.rotForce;
 	}
 
@@ -65,35 +65,35 @@ public class PhysicsAccess {
 		return object.noClip;
 	}
 
-	public void setPos(Vector3f pos) {
+	public void setPos(MathVec3f pos) {
 		object.pos = pos;
 	}
 
-	public void setVel(Vector3f vel) {
+	public void setVel(MathVec3f vel) {
 		object.vel = vel;
 	}
 
-	public void setAcc(Vector3f acc) {
+	public void setAcc(MathVec3f acc) {
 		object.acc = acc;
 	}
 
-	public void setForce(Vector3f force) {
+	public void setForce(MathVec3f force) {
 		object.force = force;
 	}
 
-	public void setRot(Vector3f rot) {
+	public void setRot(MathVec3f rot) {
 		object.rot = rot;
 	}
 
-	public void setRotVel(Vector3f rotVel) {
+	public void setRotVel(MathVec3f rotVel) {
 		object.rotVel = rotVel;
 	}
 
-	public void setRotAcc(Vector3f rotAcc) {
+	public void setRotAcc(MathVec3f rotAcc) {
 		object.rotAcc = rotAcc;
 	}
 
-	public void setRotForce(Vector3f rotForce) {
+	public void setRotForce(MathVec3f rotForce) {
 		object.rotForce = rotForce;
 	}
 

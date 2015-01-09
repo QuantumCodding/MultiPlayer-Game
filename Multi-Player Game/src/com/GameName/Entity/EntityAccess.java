@@ -1,7 +1,7 @@
 package com.GameName.Entity;
 
 import com.GameName.Engine.GameEngine;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 import com.GameName.World.Object.WorldObject;
 import com.GameName.World.Object.WorldObjectAccess;
 
@@ -81,14 +81,14 @@ public class EntityAccess extends WorldObjectAccess {
 	}
 	
 	public void rotateX(float amount) {
-		getRot().addAndSet(new Vector3f(amount, 0.0f, 0.0f));
+		getRot().addAndSet(new MathVec3f(amount, 0.0f, 0.0f));
 	}
 	
 	public void rotateY(float amount) {
-		getRot().addAndSet(new Vector3f(0.0f, amount * -1, 0.0f));
+		getRot().addAndSet(new MathVec3f(0.0f, amount * -1, 0.0f));
 	}
 	
 	public void rotateZ(float amount) {
-		getRot().addAndSet(new Vector3f(0.0f, amount, 0.0f));
+		getRot().addAndSet(new MathVec3f(0.0f, amount, 0.0f));
 	}
 }

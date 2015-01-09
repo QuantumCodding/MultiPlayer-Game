@@ -3,7 +3,7 @@ package com.GameName.World.Object;
 import com.GameName.Engine.GameEngine;
 import com.GameName.Physics.Object.PhysicsAccess;
 import com.GameName.Physics.Object.PhysicsObject;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 import com.GameName.World.World;
 
 public class WorldObjectAccess extends PhysicsAccess {
@@ -31,15 +31,15 @@ public class WorldObjectAccess extends PhysicsAccess {
 		return wObject.currentWorld;
 	}
 	
-	public Vector3f getChunk() {
+	public MathVec3f getChunk() {
 		return wObject.chunk;
 	}
 	
-	public Vector3f getRenderPos() {
+	public MathVec3f getRenderPos() {
 		return wObject.renderPos;
 	}
 
-	public Vector3f getAdjust() {
+	public MathVec3f getAdjust() {
 		return wObject.adjust;
 	}
 
@@ -58,7 +58,7 @@ public class WorldObjectAccess extends PhysicsAccess {
 	public void setCurrentWorld(World currentWorld) {
 		wObject.currentWorld = currentWorld;
 		
-		wObject.adjust = new Vector3f(
+		wObject.adjust = new MathVec3f(
 				(World.SCALE / 10f),
 				(World.SCALE / 10f),
 				(World.SCALE / 10f)

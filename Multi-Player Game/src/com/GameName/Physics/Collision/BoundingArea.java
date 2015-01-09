@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.GameName.Physics.PhysicsUtil.CardinalDirection;
-import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.Util.Vectors.MathVec3f;
 
 public class BoundingArea {
 	private ArrayList<Collidable> boundingObjetcts;
@@ -47,8 +47,8 @@ public class BoundingArea {
 		return new CollisionEvent(false, getAvgCenter().subtract(other.getCenter()));
 	}
 	
-	public Vector3f getAvgCenter() {
-		Vector3f avgCenter = new Vector3f(0, 0, 0);
+	public MathVec3f getAvgCenter() {
+		MathVec3f avgCenter = new MathVec3f(0, 0, 0);
 		
 		for(Collidable c : boundingObjetcts) {
 			avgCenter.add(c.getCenter());
@@ -65,7 +65,7 @@ public class BoundingArea {
 		return boundingObjetcts;
 	}
 	
-	public ArrayList<Collidable> getBoundingObjectsClone(Vector3f amount) {
+	public ArrayList<Collidable> getBoundingObjectsClone(MathVec3f amount) {
 		ArrayList<Collidable> clone = new ArrayList<>();
 		
 		for(Collidable c : boundingObjetcts) {
@@ -85,7 +85,7 @@ public class BoundingArea {
 		return toRep;
 	}
 	
-	public BoundingArea translate(Vector3f amount) {
+	public BoundingArea translate(MathVec3f amount) {
 		for(Collidable c : boundingObjetcts) {
 			c.translate(amount);
 		}
