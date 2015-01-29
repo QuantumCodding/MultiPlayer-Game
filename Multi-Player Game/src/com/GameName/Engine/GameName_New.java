@@ -108,14 +108,14 @@ public class GameName_New implements ISetup {
 	public void postInit() {
 		engine.getThreads().setEngine(engine);
 		
-		engine.getPlayer().getAccess().setCurrentWorld(Worlds.MainWorld);
-		engine.getPlayer().getAccess().setControls(EntityPlayer.loadControls(new File("res/option/controls.dtg")));
+		engine.getPlayer().setCurrentWorld(Worlds.MainWorld);
+		engine.getPlayer().setControls(EntityPlayer.loadControls(new File("res/option/controls.dtg")));
 		engine.getPlayer().setRenderDistance(1000);
 		engine.getPlayer().resetCam();
 		
 		Threads.EntityThread.addEntity(engine.getPlayer());
 		Threads.PhysicsThread.setEngine(engine.getPhysics());
-		engine.getPhysics().add(engine.getPlayer());
+		engine.add(engine.getPlayer());
 		
 		Threads.WorldLoadThread.setWorld(Worlds.MainWorld);
 		

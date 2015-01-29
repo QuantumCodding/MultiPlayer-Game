@@ -20,15 +20,12 @@ public class NetworkPlayer extends EntityPlayer implements Runnable {
 	public NetworkPlayer(GameEngine eng, DataInputStream in, DataOutputStream out, NetworkPlayer[] users, int id) {
 		super(eng);
 		
-		this.in = in;
-		this.out = out;
-		
-		this.users = users;
-		this.id = id;
+		this.in = in;		this.out = out;		
+		this.users = users;	this.id = id;
 		
 		online = true;
 	}
-	
+		
 	public boolean sendPacket(Packet p) {
 		try {
 			out.writeInt(p.id);

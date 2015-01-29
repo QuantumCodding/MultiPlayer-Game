@@ -10,16 +10,15 @@ import java.util.HashSet;
 import javax.imageio.ImageIO;
 import javax.vecmath.Vector2f;
 
+import com.GameName.Cube.Collision.DefaultCubeCollisionBox;
+import com.GameName.Cube.Collision.ICubeCollisionBox;
 import com.GameName.Cube.Render.DefaultCubeRender;
 import com.GameName.Cube.Render.ICubeRender;
 import com.GameName.Engine.ResourceManager.Materials;
 import com.GameName.Engine.Registries.CubeRegistry;
-import com.GameName.Physics.Collision.BoundingArea;
-import com.GameName.Physics.Collision.BoundingBox;
 import com.GameName.Physics.Object.Material;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
-import com.GameName.Util.Vectors.MathVec3f;
 
 public class Cube {
 	private static DefaultCubeRender defaultCubeRender;
@@ -34,9 +33,9 @@ public class Cube {
 	private String displayName;
 	private int id;
 	
-	private BoundingArea boundingArea;
 	private Material material;
 	private ICubeRender render;
+	private ICubeCollisionBox collisionBox;
 	
 	/** Texture Colors: Frame, Face, Colors */
 	private int[][][] texture;
@@ -53,16 +52,6 @@ public class Cube {
 	private boolean isSolid;
 	private boolean isVisable;
 	private float opacity;
-				
-//	public static Cube Air = new AirCube();
-//	
-//	public static Cube TestCube = new TestCube();
-//	public static Cube ColorfulTestCube = new ColorfulTestCube();
-//	
-//	public static Cube StoneCube = new StoneCube();
-//	
-//	public static Cube GoldCube = new GoldCube();
-//	public static Cube CopperCube = new CopperCube();
 	
 	protected Cube(String name) {
 		this.name = name;
@@ -75,7 +64,7 @@ public class Cube {
 		setLightSorce(false);
 		setLightValue(0f);
 		
-		setBoundingArea(getDefaultBoundingArea());
+		setCollisionBox(getCollisionBox());
 		setMaterial(Materials.Stone);
 		setRender(getDefaultRender());
 		
@@ -213,13 +202,10 @@ public class Cube {
 	}
 	
 	/**
-	 * 	Returns the default BoundingArea
+	 * 	Returns the default CollisionBox
 	 */		
-	private BoundingArea getDefaultBoundingArea() {
-		BoundingArea bound = new BoundingArea();		
-		bound.add(new BoundingBox(new MathVec3f(0, 0, 0), new MathVec3f(1, 1, 1)));
-		
-		return bound;
+	private ICubeCollisionBox getCollisionBox() {
+		return new DefaultCubeCollisionBox();
 	}
 	
 	/**
@@ -347,11 +333,11 @@ public class Cube {
 	}
 	
 	/**
-	 * Returns the BoundingArea for this cube
+	 * Returns the CollisionBox for this cube
 	 * @param metadata The metadata of the cube	
 	 */
-	public BoundingArea getBoundingArea(int metadata) {
-		return boundingArea;
+	public ICubeCollisionBox getCollisionBox(int metadata) {
+		return collisionBox;
 	}
 	
 	/**
@@ -427,10 +413,10 @@ public class Cube {
 	}
 	
 	/**
-	 * 	Sets the BoundingArea for this cube (Used for coalition detection)
+	 * 	Sets the CollisionBox for this cube
 	 */	
-	protected void setBoundingArea(BoundingArea boundingArea) {
-		this.boundingArea = boundingArea;
+	protected void setCollisionBox(ICubeCollisionBox collisionBox) {
+		this.collisionBox = collisionBox;
 	}
 
 	/**

@@ -5,7 +5,7 @@ import com.GameName.Util.Vectors.MathVec3f;
 import com.GameName.World.Object.WorldObject;
 
 public class LoadedWorld {
-	protected static int loadRadius = 10;//3;//5;
+	protected static int loadRadius = 5;//10;//3;//5;
 	private final GameEngine ENGINE;
 	
 	private LoadedWorldAccess access;

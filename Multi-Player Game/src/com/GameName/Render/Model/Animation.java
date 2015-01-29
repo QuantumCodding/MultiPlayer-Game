@@ -123,7 +123,7 @@ public class Animation {
 		}
 
 		public boolean isDone() {
-			return current.abs().greaterThen(endValue.abs()) || current.equaleTo(endValue);
+			return current.abs().greaterThen(endValue.abs()) || current.equalTo(endValue);
 		}
 		
 		public void step() {

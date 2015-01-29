@@ -14,7 +14,7 @@ public class ForceVBOUpdateCommand extends Command {
 		if(parm.length > 0) {		
 			WorldRegistry.accessByName(parm[0]).forceChunkUpdate();
 		} else {
-			ENGINE.getPlayer().getAccess().getCurrentWorld().forceChunkUpdate();
+			ENGINE.getPlayer().getCurrentWorld().forceChunkUpdate();
 		}
 		
 		return true;

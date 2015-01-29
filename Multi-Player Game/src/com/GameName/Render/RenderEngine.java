@@ -120,7 +120,7 @@ public class RenderEngine implements IEngine<Renderable> {
 		
 		glViewport(0, 0, Display.getWidth(), Display.getHeight());		
 			
-		ENGINE.getPlayer().getAccess().getCamera().applyPerspectiveMatrix();
+		ENGINE.getPlayer().getCamera().applyPerspectiveMatrix();
 		glGetFloat(GL_PROJECTION_MATRIX, perspectiveProjectionMatrix);		
 		
 	    glMatrixMode(GL_PROJECTION);
@@ -163,7 +163,7 @@ public class RenderEngine implements IEngine<Renderable> {
 		glEnable(GL_DEPTH_TEST);
         glEnable(GL_TEXTURE_2D);
 			
-        ENGINE.getPlayer().getAccess().getCamera().useView();		
+        ENGINE.getPlayer().getCamera().useView();		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 //			glScalef(100, 100, 100);
@@ -198,7 +198,7 @@ public class RenderEngine implements IEngine<Renderable> {
         glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
 			
-			ENGINE.getPlayer().getAccess().getCamera().useView();		
+			ENGINE.getPlayer().getCamera().useView();		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		glPushMatrix();
@@ -258,17 +258,17 @@ public class RenderEngine implements IEngine<Renderable> {
 			glEnableVertexAttribArray(1); // Texture Data
 			
 			//TODO: Remove Test Code
-			float x = oneDecimal(ENGINE.getPlayer().getAccess().getPos().getX());
-			float y = oneDecimal(ENGINE.getPlayer().getAccess().getPos().getY());
-			float z = oneDecimal(ENGINE.getPlayer().getAccess().getPos().getZ());
+			float x = oneDecimal(ENGINE.getPlayer().getPos().getX());
+			float y = oneDecimal(ENGINE.getPlayer().getPos().getY());
+			float z = oneDecimal(ENGINE.getPlayer().getPos().getZ());
 			
 			glTranslatef(0, 540, 0);
 			
 			org.newdawn.slick.Color col = new org.newdawn.slick.Color(Color.BLUE.getRGB());	        
 			
-	        font.drawString(0, 0, "FPS: " + ENGINE.getGameName().getFPS() + ", " + ENGINE.getPlayer().getAccess().getSelectedCube().getX() + " " + ENGINE.getPlayer().getAccess().getSelectedCube().getY() + " " + ENGINE.getPlayer().getAccess().getSelectedCube().getZ(), col); // 
+	        font.drawString(0, 0, "FPS: " + ENGINE.getGameName().getFPS() + ", " + ENGINE.getPlayer().getSelectedCube().getX() + " " + ENGINE.getPlayer().getSelectedCube().getY() + " " + ENGINE.getPlayer().getSelectedCube().getZ(), col); // 
 	        font.drawString(0, 20, x + "," + y + "," + z, col);
-	        font.drawString(0, 40, oneDecimal(ENGINE.getPlayer().getAccess().getRot().getX()) + "," + oneDecimal(ENGINE.getPlayer().getAccess().getRot().getY()) + "," + oneDecimal(ENGINE.getPlayer().getAccess().getRot().getZ()), col);
+	        font.drawString(0, 40, oneDecimal(ENGINE.getPlayer().getRot().x) + "," + oneDecimal(ENGINE.getPlayer().getRot().y) + "," + oneDecimal(ENGINE.getPlayer().getRot().z), col);
 
 		glPopMatrix();
 

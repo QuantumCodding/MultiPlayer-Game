@@ -1,156 +1,163 @@
 package com.GameName.Physics.Object;
 
-import com.GameName.Engine.GameEngine;
-import com.GameName.Engine.ResourceManager.Materials;
-import com.GameName.Engine.ResourceManager.Threads;
-import com.GameName.Physics.PhysicsEngine;
-import com.GameName.Physics.PhysicsUtil.CardinalDirection;
-import com.GameName.Physics.PhysicsUtil.Collision;
-import com.GameName.Physics.Collision.BoundingArea;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Quat4f;
+import javax.vecmath.Vector3f;
+
+import com.GameName.Physics.PhysicsWorld;
 import com.GameName.Util.Vectors.MathVec3f;
-import com.GameName.World.World;
+import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.MotionState;
+import com.bulletphysics.linearmath.Transform;
 
-public abstract class PhysicsObject {
-	protected final GameEngine ENGINE;
+public class PhysicsObject extends RigidBody {
+	private boolean noClip, lastClipState;
+	private CollisionShape oldShape;
 	
-	protected MathVec3f pos, vel, acc, force;	
-	protected MathVec3f rot, rotVel, rotAcc, rotForce;
-	protected Material material, median, surface;
-	
-	protected BoundingArea bounding;	
-	private PhysicsAccess access;
-
-	protected boolean onGround, noClip;
-	
-	public PhysicsObject(GameEngine eng) {
-		ENGINE = eng;
-		
-		this.material = Materials.Stone;
-		this.median = Materials.Air;
-		this.surface = Materials.Stone;
-		
-		pos = new MathVec3f(0, 0, 0);     
-		vel = new MathVec3f(0, 0, 0);     
-		acc = new MathVec3f(0, 0, 0);     
-		force = new MathVec3f(0, 0, 0);   
-		                                 
-		rot = new MathVec3f(0, 0, 0);     
-		rotVel = new MathVec3f(0, 0, 0);  
-		rotAcc = new MathVec3f(0, 0, 0);  
-		rotForce = new MathVec3f(0, 0, 0);
-		
-		bounding = new BoundingArea();
-		addBounding();
+	public PhysicsObject(RigidBodyConstructionInfo constructionInfo) {
+		super(constructionInfo);
+		noClip = true;
 	}
-	
-	public void reset() {
-		pos.reset();
-		vel.reset();
-		acc.reset();
-		force.reset();
 
-		rot.reset();
-		rotVel.reset();
-		rotAcc.reset();
-		rotForce.reset();
+	public void reset() {
+		super.clearForces();
+		System.out.println("Physics Reset");
 	}
 	
 	public void update() {
-		rot.modAndSet(360);
-	}
-	
-	protected abstract void addBounding();
-	
-	public MathVec3f getLook() {
-		float f1 = (float)  Math.cos(-Math.toRadians(rot.getY()) - (float) Math.PI);
-		float f2 = (float)  Math.sin(-Math.toRadians(rot.getY()) - (float) Math.PI);
-		float f3 = (float) -Math.cos(-Math.toRadians(rot.getX()));
-		float f4 = (float)  Math.sin(-Math.toRadians(rot.getX()));
-		
-		return new MathVec3f((f2 * f3), f4, (f1 * f3));
-	}
-	
-	public void intergrate(PhysicsEngine physics, float delta) {
-
-//		Applies Velocity
-		MathVec3f lastAcc = acc.clone();
-		pos = pos.add(vel.multiply(delta).add(lastAcc.multiply(0.5f * delta * delta)));		
-		pos = pos.capMax(physics.getWorld().getSizeAsVector().subtract(1)).capMin(new MathVec3f(0, 6, 0));
-
-//		Calculates world interaction values
-		MathVec3f newAcc = physics.getAcceleration(force, physics.getMass(material, bounding.getVolume()));	
-		
-		if(!noClip) {
-			surface = physics.getWorld().getCube(pos.getX(), physics.getWorld().getSizeY() - (pos.getY() - 5), pos.getZ())
-				.getMaterial(physics.getWorld().getCubeMetadata(pos.getX(), physics.getWorld().getSizeY() - (pos.getY() - 5), pos.getZ()));			
-			onGround = surface.getDensity() >= material.getDensity();
-			
-			if(!onGround) {
-				newAcc.setY(newAcc.getY() - 0.5f);//PhysicsEngine.GRAVITY);
-			} 
-			
-			MathVec3f chunkPos = pos.divide(World.CHUNK_SIZE).truncate();			
-			if(bounding.intersect(physics.getWorld().getChunk(chunkPos).getBoundingArea()).isColliding() ||					
-				bounding.intersect(physics.getWorld().getChunk(chunkPos.add(new MathVec3f(1, 0, 0))
-						.capMax(physics.getWorld().getChunkSizeAsVector().subtract(1))).getBoundingArea()).isColliding() || 					
-				bounding.intersect(physics.getWorld().getChunk(chunkPos.add(new MathVec3f(0, 0, 1))
-						.capMax(physics.getWorld().getChunkSizeAsVector().subtract(1))).getBoundingArea()).isColliding() || 					
-				bounding.intersect(physics.getWorld().getChunk(chunkPos.add(new MathVec3f(-1, 0, 0))
-						.capMin(0)).getBoundingArea()).isColliding() ||					
-				bounding.intersect(physics.getWorld().getChunk(chunkPos.add(new MathVec3f(0, 0, -1))
-						.capMin(0)).getBoundingArea()).isColliding()
-			) {
-//				newAcc.reset(); vel.reset(); force.reset();
-//				pos = pos.add(lastAcc.multiply(1000000).capMax(1).capMin(-1).multiply(-0.1f));
-//				reset();
-				System.out.println("colliding");
-			}			
+		if(lastClipState != noClip) {
+			if(lastClipState) {
+				setGravity(PhysicsWorld.GRAVITY);
+				setCollisionShape(oldShape);
+			} else {
+				setGravity(new Vector3f(0, 0, 0));
+				oldShape = getCollisionShape();
+				setCollisionShape(new BoxShape(new Vector3f(0, 0, 0)));
+			}
 		}
 		
-//		Drag
-		vel = vel.subtract(new MathVec3f(
-				physics.getDrag(median, vel.getX(), bounding.getSurfaceArea(vel.getX() < 0 ? CardinalDirection.West : CardinalDirection.East)),
-				physics.getDrag(median, vel.getY(), bounding.getSurfaceArea(vel.getY() < 0 ? CardinalDirection.Bottom : CardinalDirection.Top)),
-				physics.getDrag(median, vel.getZ(), bounding.getSurfaceArea(vel.getZ() < 0 ? CardinalDirection.South : CardinalDirection.North))	
-			));
+		if(noClip) {
+			setDamping(0.9f, 0.0f);
+			setGravity(new Vector3f(0, 0, 0));
+		}
 		
-//		Friction
-		vel = vel.add(new MathVec3f(
-				physics.getFriction(surface, force.getY()), 0.0f, 
-				physics.getFriction(surface, force.getY())
-			).multiply(new MathVec3f(
-				physics.getOppsiteDir(vel.getX()), 1.0f,
-				physics.getOppsiteDir(vel.getZ())				
-			)));
-		
-//		Apply Acceleration to Velocity
-		MathVec3f avgAcc = lastAcc.add(newAcc).divide(2);
-		vel = vel.add(avgAcc.multiply(delta));
-		vel = vel.divide(Threads.PhysicsThread.getTPS());
-		
-//		Cap values
-//		if(vel.abs().lessThen(0.9f)) vel = vel.capMax(0);
-//		if(acc.abs().lessThen(0.9f)) acc = acc.capMax(0);
-//		
-//		if(vel.abs().greaterThen(PhysicsEngine.MAX_VELOCITY)) 
-//			 vel = vel.capMax(PhysicsEngine.MAX_VELOCITY).capMin(-PhysicsEngine.MAX_VELOCITY);		
-//		if(acc.abs().greaterThen(PhysicsEngine.MAX_VELOCITY)) 
-//			 acc = acc.capMax(PhysicsEngine.MAX_VELOCITY).capMin(-PhysicsEngine.MAX_VELOCITY);
-		
-		//Reset for next cycle
-		acc = newAcc.clone(); 		
-		force.reset();
+		lastClipState = noClip;
 	}
 	
-	public void handelCollision(Collision collision) {
-		if(noClip) return;
+	public boolean isNoClip() { return noClip; }
+	public void setNoClip(boolean noClip) { this.noClip = noClip; }
+	
+	public MathVec3f getPos() {
+		Transform transform = new Transform();
+        getMotionState().getWorldTransform(transform);
+        return MathVec3f.convert(transform.origin);
 	}
 	
-	protected void setMaterial(Material material) {
-		this.material = material;
+	public MathVec3f getRot() {
+		Transform transform = new Transform();
+        getMotionState().getWorldTransform(transform);
+        Quat4f out = new Quat4f(); transform.getRotation(out);
+        return new MathVec3f(out.x, out.y, out.z);
 	}
 	
-	public PhysicsAccess getAccess() {
-		return access;
+	public void applyForce(MathVec3f force) {
+		applyForce(force.convert());}
+	public void applyForce(Vector3f force) {
+		super.activate(true);
+		super.applyCentralForce(force);
+	}
+
+	public void applyRotation(MathVec3f torque) {
+		applyRotation(torque.convert());}
+	public void applyRotation(Vector3f torque) {
+		super.activate(true);
+		super.applyTorque(torque);
+	}
+	
+	public void setPosition(MathVec3f position) {
+		setPosition(position.convert());}
+	public void setPosition(Vector3f position) {
+		Transform transform = new Transform();
+        getMotionState().getWorldTransform(transform);
+        
+        Quat4f rotation = new Quat4f();
+        transform.getRotation(rotation);
+        float scale = transform.basis.getScale();
+        
+        Transform newTransform = new Transform(new Matrix4f(
+        		rotation, position, scale));
+        setCenterOfMassTransform(newTransform);
+	}
+	
+	public void setRotation(MathVec3f rot) {
+		setRotation(rot.convert());}
+	public void setRotation(Vector3f rot) {
+		setRotation(new Quat4f(rot.x, rot.y, rot.z, 1.0f));}
+	public void setRotation(Quat4f rotation) {
+		Transform transform = new Transform();
+        getMotionState().getWorldTransform(transform);
+        transform.setRotation(rotation);
+	}
+	
+	public static class Builder {
+		private Quat4f rotation;
+		private Vector3f position;
+		private float scale = 1;
+		
+		private Material material;
+		private float volume = -1;
+		
+		private CollisionShape shape;
+		
+		public Builder setRotation(MathVec3f rotation) {
+			return setRotation(rotation.convert());}
+		public Builder setRotation(Vector3f rotation) { 
+			this.rotation = new Quat4f(rotation.x, rotation.y, rotation.z, 1.0f); 
+			return this;
+		}
+		
+		public Builder setRotation(Quat4f rotation) { this.rotation = rotation; return this; }
+
+		public Builder setPosition(float x, float y, float z) { return setPosition(new Vector3f(x, y, z)); }
+		public Builder setPosition(MathVec3f position) { return setPosition(position.convert()); }
+		public Builder setPosition(Vector3f position) { this.position = position; return this; }
+		
+		public Builder setMaterial(Material material) { this.material = material; return this; }
+		public Builder setShape(CollisionShape shape) { this.shape = shape; return this; }
+		public Builder setScale(float scale) { this.scale = scale; return this; }
+		public Builder setVolume(float volume) { this.volume = volume; return this; }
+
+		public PhysicsObject build() {			
+			return new PhysicsObject(buildInfo());}		
+		public RigidBodyConstructionInfo buildInfo() {
+			if(shape == null) throw new IllegalArgumentException("No Shape was provided");
+			if(material == null) throw new IllegalArgumentException("No Material was provided");			
+			if(rotation == null) rotation = new Quat4f();
+			if(position == null) position = new Vector3f();
+			
+			MotionState motionState = new DefaultMotionState(new Transform(
+					new Matrix4f( rotation, position, scale )
+				));
+			
+			if(volume == -1) {
+				Vector3f minPos = new Vector3f(), maxPos = new Vector3f();
+				shape.getAabb(new Transform(new Matrix4f(
+						new Quat4f(), new Vector3f(1, 1, 1), 1)), minPos, maxPos);
+				maxPos.sub(minPos); volume = maxPos.x * maxPos.y * maxPos.z;
+			}
+			
+			float mass = volume * material.getDensity();
+			Vector3f inertia = new Vector3f(); shape.calculateLocalInertia(mass, inertia);
+			RigidBodyConstructionInfo constructInfo = new RigidBodyConstructionInfo(mass, motionState, shape, inertia);
+			
+			constructInfo.restitution = material.getElasticity();
+			constructInfo.friction = material.getFrictionalCoefficient();
+			
+			return constructInfo;
+		}
 	}
 }

@@ -29,9 +29,7 @@ public class ChunkRenderGenerator {
 		for(int x = 0; x < c.getSize(); x ++) {
 			for(int y = 0; y < c.getSize(); y ++) {
 				for(int z = 0; z < c.getSize(); z ++) {
-					
-					if(!c.isInitialized()) continue;
-					if(!c.isLoaded()) continue;
+					if(!c.isAccessible()) continue;
 					
 					xPos = x + (c.getX() * World.CHUNK_SIZE);
 					yPos = y + (c.getY() * World.CHUNK_SIZE);

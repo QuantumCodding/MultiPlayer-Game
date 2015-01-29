@@ -14,16 +14,16 @@ public class SetPlayerPropertyCommand extends Command {
 		String affect = parm[0];
 
 		switch(affect) {
-			case "health": ENGINE.getPlayer().getAccess().setHealth(Integer.parseInt(parm[1])); return true;
-			case "mana": ENGINE.getPlayer().getAccess().setMana(Integer.parseInt(parm[1])); return true;
-			case "hunger": ENGINE.getPlayer().getAccess().setHunger(Integer.parseInt(parm[1])); return true;
+			case "health": ENGINE.getPlayer().setHealth(Integer.parseInt(parm[1])); return true;
+			case "mana": ENGINE.getPlayer().setMana(Integer.parseInt(parm[1])); return true;
+			case "hunger": ENGINE.getPlayer().setHunger(Integer.parseInt(parm[1])); return true;
 			
-			case "maxHealth": ENGINE.getPlayer().getAccess().setMaxHealth(Integer.parseInt(parm[1])); return true;
-			case "maxMana": ENGINE.getPlayer().getAccess().setMaxMana(Integer.parseInt(parm[1])); return true;
-			case "maxHunger": ENGINE.getPlayer().getAccess().setMaxHunger(Integer.parseInt(parm[1])); return true;
+			case "maxHealth": ENGINE.getPlayer().setMaxHealth(Integer.parseInt(parm[1])); return true;
+			case "maxMana": ENGINE.getPlayer().setMaxMana(Integer.parseInt(parm[1])); return true;
+			case "maxHunger": ENGINE.getPlayer().setMaxHunger(Integer.parseInt(parm[1])); return true;
 			
 			case "reset": ENGINE.getPlayer().resetPlayer(); return true;
-			case "noClip": ENGINE.getPlayer().getAccess().setNoClip(Boolean.parseBoolean(parm[1])); return true;
+			case "noClip": ENGINE.getPlayer().setNoClip(Boolean.parseBoolean(parm[1])); return true;
 			
 			default: return false;
 		}

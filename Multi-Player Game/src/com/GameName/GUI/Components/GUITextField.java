@@ -44,15 +44,15 @@ public class GUITextField extends GUIComponent {
 	public void update() {
 		boolean pre = hasFocus;
 		
-		if(isSelected() && ENGINE.getPlayer().getAccess().isPointerDown()) {
+		if(isSelected() && ENGINE.getPlayer().isPointerDown()) {
 			hasFocus = true;
-			ENGINE.getPlayer().getAccess().setCanMove(false);
-		} else if(ENGINE.getPlayer().getAccess().isPointerDown()) {
+			ENGINE.getPlayer().setCanMove(false);
+		} else if(ENGINE.getPlayer().isPointerDown()) {
 			hasFocus = false;
 		}
 		
 		if(hasFocus != pre) {
-			ENGINE.getPlayer().getAccess().setCanMove(true);
+			ENGINE.getPlayer().setCanMove(true);
 		}
 		
 		if(hasFocus) {

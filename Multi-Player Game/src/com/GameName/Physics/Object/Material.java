@@ -56,6 +56,16 @@ public class Material {
 	public Phase getPhase() {return phase;}
 	public String getName() {return name;}
 	
+	@Override
+	public String toString() {
+		return "Material [density=" + density + ", elasticity=" + elasticity
+				+ ", meltingPoint=" + meltingPoint + ", boilingPoint="
+				+ boilingPoint + ", meltsTo=" + meltsTo + ", boilsTo="
+				+ boilsTo + ", isConductor=" + isConductor + ", resistance="
+				+ resistance + ", cof=" + cof + ", phase=" + phase + ", name="
+				+ name + "]";
+	}
+
 	public enum Phase {
 		Solid, Liquid, Gas;
 	}

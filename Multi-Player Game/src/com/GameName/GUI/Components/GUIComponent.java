@@ -45,7 +45,7 @@ public abstract class GUIComponent extends Render2D {
 		
 		//Texture
 		glBindBuffer(GL_ARRAY_BUFFER, 
-				textureBuffers[isSelected() ? ENGINE.getPlayer().getAccess().isPointerDown() ? 2 : 1 : 0]);
+				textureBuffers[isSelected() ? ENGINE.getPlayer().isPointerDown() ? 2 : 1 : 0]);
 			glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
 		
 
@@ -90,11 +90,11 @@ public abstract class GUIComponent extends Render2D {
 	}
 	
 	public boolean isSelected() {
-		if(ENGINE.getPlayer().getAccess().getPointer().x > getX() && 
-				ENGINE.getPlayer().getAccess().getPointer().x < getX() + getWidth()) {
+		if(ENGINE.getPlayer().getPointerPos().x > getX() && 
+				ENGINE.getPlayer().getPointerPos().x < getX() + getWidth()) {
 			
-			if(ENGINE.getPlayer().getAccess().getPointer().y > getY() && 
-					ENGINE.getPlayer().getAccess().getPointer().y < getY() + getHeight()) {
+			if(ENGINE.getPlayer().getPointerPos().y > getY() && 
+					ENGINE.getPlayer().getPointerPos().y < getY() + getHeight()) {
 				
 				return true;
 			}
@@ -104,7 +104,7 @@ public abstract class GUIComponent extends Render2D {
 	}
 	
 	public void update() {
-		if(isSelected() && ENGINE.getPlayer().getAccess().isPointerDown()) {
+		if(isSelected() && ENGINE.getPlayer().isPointerDown()) {
 			activate();
 		}
 	}

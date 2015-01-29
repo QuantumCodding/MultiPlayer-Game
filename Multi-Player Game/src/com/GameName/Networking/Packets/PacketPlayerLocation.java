@@ -53,4 +53,7 @@ public class PacketPlayerLocation extends Packet {
 		return z;
 	}
 
+	public MathVec3f getPos() {
+		return new MathVec3f(x, y ,z);
+	}
 }

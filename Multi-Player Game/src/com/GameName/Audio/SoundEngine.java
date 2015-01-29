@@ -57,7 +57,7 @@ public class SoundEngine implements IEngine<SoundEvent> {
 		alSourcef(event.getSource(), AL_GAIN, event.getGain());
 		alSourcef(event.getSource(), AL_PITCH, event.getPitch());
 		
-		MathVec3f playPos = ENGINE.getPlayer().getAccess().getPos().subtract(event.getPos());
+		MathVec3f playPos = ENGINE.getPlayer().getPos().subtract(event.getPos());
 		alSource3f(event.getSource(), AL_POSITION, playPos.getX(), playPos.getY(), playPos.getZ());
 		
 		alSourcei(event.getSource(), AL_BUFFER, event.getSound().getId());	

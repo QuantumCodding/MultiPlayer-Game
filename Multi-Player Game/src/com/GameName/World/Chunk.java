@@ -10,26 +10,29 @@ import com.GameName.Cube.Render.CubeRenderUtil;
 import com.GameName.Cube.Render.CubeTextureMap;
 import com.GameName.Engine.GameEngine;
 import com.GameName.Engine.Registries.WorldRegistry;
-import com.GameName.Physics.Collision.BoundingArea;
+import com.GameName.Physics.Object.ChunkCollisionShapeBuilder;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.Tag;
 import com.GameName.Util.Tag.TagGroup;
 import com.GameName.Util.Vectors.MathVec3f;
 import com.GameName.World.Render.ChunkRender;
+import com.bulletphysics.dynamics.RigidBody;
 
 public class Chunk {
 	private final float MINIMUM_LIGHT_DEFUTION = 0.5f;
 	private final GameEngine ENGINE;
 	
 	private boolean isInitialized;
+	private boolean isAccessible;
 	private boolean hasCubes, isLoaded;
+	private boolean[] loadedNeighbors;
 	private int cubeCount;
 	
 	private final int worldId;
 	private final int x, y, z;
 	
 	private ChunkRender render;
-	private BoundingArea bounding;
+	private RigidBody rigidBody;
 	private HashSet<Cube> typesOfCubes;
 	
 	private int[] cubes;
@@ -58,8 +61,9 @@ public class Chunk {
 			lightValueMap[i] = ambiantLight;
 		}
 		
+		loadedNeighbors = new boolean[]{false, false, false, false, false, false};
+		
 		typesOfCubes = new HashSet<Cube>();
-		bounding = new BoundingArea();
 		render = new ChunkRender(ENGINE, this);
 		isInitialized = true;
 	}
@@ -194,13 +198,13 @@ public class Chunk {
 		if(ENGINE.getGameName().isRunning() && WorldRegistry.getWorld(worldId).isGenerated() && isPosOnEdge(x, y, z)) {
 			Chunk chunk;
 			
-			if(x == 0) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x - 1, this.y, this.z); if(chunk != null && chunk.isLoaded()) chunk.forceVBOUpdate();}
-			if(y == 0) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y - 1, this.z); if(chunk != null && chunk.isLoaded()) chunk.forceVBOUpdate();}
-			if(z == 0) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y, this.z - 1); if(chunk != null && chunk.isLoaded()) chunk.forceVBOUpdate();}
+			if(x == 0) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x - 1, this.y, this.z); if(chunk != null && chunk.isAccessible()) chunk.forceVBOUpdate();}
+			if(y == 0) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y - 1, this.z); if(chunk != null && chunk.isAccessible()) chunk.forceVBOUpdate();}
+			if(z == 0) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y, this.z - 1); if(chunk != null && chunk.isAccessible()) chunk.forceVBOUpdate();}
 
-			if(x == size - 1) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x + 1, this.y, this.z); if(chunk != null && chunk.isLoaded()) chunk.forceVBOUpdate();}
-			if(y == size - 1) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y + 1, this.z); if(chunk != null && chunk.isLoaded()) chunk.forceVBOUpdate();}
-			if(z == size - 1) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y, this.z + 1); if(chunk != null && chunk.isLoaded()) chunk.forceVBOUpdate();}
+			if(x == size - 1) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x + 1, this.y, this.z); if(chunk != null && chunk.isAccessible()) chunk.forceVBOUpdate();}
+			if(y == size - 1) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y + 1, this.z); if(chunk != null && chunk.isAccessible()) chunk.forceVBOUpdate();}
+			if(z == size - 1) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y, this.z + 1); if(chunk != null && chunk.isAccessible()) chunk.forceVBOUpdate();}
 		}
 		
 		render.setHasCubes(hasCubes);		
@@ -233,14 +237,11 @@ public class Chunk {
 			
 			typesOfCubes.add(cube);
 			
-			if(true){//isCubeVisable(x, y, z)) {		TODO: Fix when world loading is fixed		
-				bounding.addAll(cube.getBoundingArea(metadata).getBoundingObjectsClone(new MathVec3f(
-						getX() * World.CHUNK_SIZE + x, 
-						getY() * World.CHUNK_SIZE + y,
-						getZ() * World.CHUNK_SIZE + z
-					)));
-			}
 		}}}
+		
+		if(true){//isCubeVisable(x, y, z)) {		TODO: Fix when world loading is fixed		
+			rigidBody = ChunkCollisionShapeBuilder.build(this);
+		}
 		
 		updateTextureMap();
 		render.setHasCubes(hasCubes);		
@@ -268,7 +269,8 @@ public class Chunk {
 		LoadedWorldAccess access = world.getLoadedWorld().getAccess();
 		
 		MathVec3f minPos = access.getCenter().subtract(LoadedWorldAccess.getRenderRadius()).capMin(0);		
-		MathVec3f maxPos = access.getCenter().add(LoadedWorldAccess.getRenderRadius()).capMax(world.getSizeAsVector()).subtract(1);
+		MathVec3f maxPos = access.getCenter().add(LoadedWorldAccess.getRenderRadius())
+				.capMax(world.getChunkSizeAsVector().subtract(1));
 		
 		if(isPosOnEdge(x, y, z)) {
 			if(x == 0) {
@@ -292,7 +294,7 @@ public class Chunk {
 			}  
 
 			if(y == size - 1) {
-				if(this.y == maxPos.getZ())	cubes[4] = -1;
+				if(this.y == maxPos.getY())	cubes[4] = -1;
 				else cubes[4] = world.getChunk(this.x, this.y + 1, this.z).getCube(x, 0, z);
 			} 
 
@@ -424,12 +426,37 @@ public class Chunk {
 	public void setIsLoaded(boolean isLoaded) {
 		this.isLoaded = isLoaded;
 	}
+	
+	public boolean isAccessible() {
+		return isAccessible;
+	}
+	
+	public boolean[] getLoadedNeighbors() {
+		return loadedNeighbors;
+	}
+	
+	public void loadNeighbor(int side, boolean state) {
+		loadedNeighbors[side] = state;
+
+		for(boolean bool : loadedNeighbors) {
+			if(!bool) {
+				isAccessible = false;
+				return;
+			}
+		}
+		
+		isAccessible = true;
+	}
 
 	public HashSet<Cube> getTypesOfCubes() {
 		return typesOfCubes;
 	}
 	
-	public BoundingArea getBoundingArea() {
-		return bounding;
+	public RigidBody getRigidBody() {
+		return rigidBody;
+	}
+	
+	public int getCubeCount() {
+		return cubeCount;
 	}
 }

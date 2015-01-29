@@ -34,34 +34,34 @@ public class GUISlideBar extends GUIComponent {
 	}
 	
 	public void update() {		
-		if(isSelected() && ENGINE.getPlayer().getAccess().isPointerDown()) { 
-			if(!hasFocus) last = (int) ENGINE.getPlayer().getAccess().getPointer().y; hasFocus = true; 
+		if(isSelected() && ENGINE.getPlayer().isPointerDown()) { 
+			if(!hasFocus) last = (int) ENGINE.getPlayer().getPointerPos().y; hasFocus = true; 
 		}
 		
-		if(hasFocus && !ENGINE.getPlayer().getAccess().isPointerDown()) hasFocus = false;
+		if(hasFocus && !ENGINE.getPlayer().isPointerDown()) hasFocus = false;
 		
 		if(hasFocus) {
 //			System.out.println(getId() + ": " + last + ", " + GameName.pointer.y + " / " + value);
 			if(vertical) {
-				if(last == (int) ENGINE.getPlayer().getAccess().getPointer().y) {
+				if(last == (int) ENGINE.getPlayer().getPointerPos().y) {
 					return;
 				} else {
-					int change = (last - (int) ENGINE.getPlayer().getAccess().getPointer().y);
+					int change = (last - (int) ENGINE.getPlayer().getPointerPos().y);
 
 					setValue(getValue() + ((((float)(max - min)) / run) * (float) change));
 				}
 				
-				last = (int) ENGINE.getPlayer().getAccess().getPointer().y;
+				last = (int) ENGINE.getPlayer().getPointerPos().y;
 				
 			} else {
-				if(last == (int) ENGINE.getPlayer().getAccess().getPointer().x) {
+				if(last == (int) ENGINE.getPlayer().getPointerPos().x) {
 					return;
 				} else {
-					int change = (int) ENGINE.getPlayer().getAccess().getPointer().x - last;
+					int change = (int) ENGINE.getPlayer().getPointerPos().x - last;
 					setValue((float)(run / (float)(max - min)) * (float)change);
 				}
 				
-				last = (int) ENGINE.getPlayer().getAccess().getPointer().x;
+				last = (int) ENGINE.getPlayer().getPointerPos().x;
 			}
 			
 			activate();

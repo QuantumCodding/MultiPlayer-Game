@@ -4,8 +4,6 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 import com.GameName.Engine.GameEngine;
-import com.GameName.Engine.Registries.WorldRegistry;
-import com.GameName.Entity.EntityNPC;
 import com.GameName.Networking.NetworkPlayer;
 
 public class ClientPacketProcesor {
@@ -22,10 +20,7 @@ public class ClientPacketProcesor {
 				packet.readInfo(in);
 				
 				NetworkPlayer player = ENGINE.getClient().getNetworkPlayer(packet.getPlayerID());
-				
-				player.getAccess().setX(packet.getX());
-				player.getAccess().setY(packet.getY());
-				player.getAccess().setZ(packet.getZ());
+				player.setPosition(packet.getPos());
 				
 			} else if(id == PacketConnectResponse.id) {
 				PacketConnectResponse packet = new PacketConnectResponse();
@@ -40,38 +35,25 @@ public class ClientPacketProcesor {
 				
 				NetworkPlayer player = ENGINE.getClient().getNetworkPlayer(packet.getPlayerID());
 				
-				player.getAccess().setHealth(packet.getHealth(), false);
-				player.getAccess().setHunger(packet.getHunger(), false);
-				player.getAccess().setMana(packet.getMana(), false);
-				
-				player.getAccess().setPower(packet.getPower(), false);
-				player.getAccess().setMoney(packet.getMoney(), false);
+				player.setHealth(packet.getHealth(), false);
+				player.setHunger(packet.getHunger(), false);
+				player.setMana(packet.getMana(), false);
 				
 			} else if(id == PacketPlayerInventorySize.id) {
 				PacketPlayerInventorySize packet = new PacketPlayerInventorySize();
 				packet.readInfo(in);
 				
 				NetworkPlayer player = ENGINE.getClient().getNetworkPlayer(packet.getPlayerID());
-				player.getAccess().setInvSize(packet.getInvSize(), false);
+				player.setInvSize(packet.getInvSize(), false);
 				
 			} else if(id == PacketPlayerInventorySlot.id) {
 				PacketPlayerInventorySlot packet = new PacketPlayerInventorySlot();
 				packet.readInfo(in);
 				
 				NetworkPlayer player = ENGINE.getClient().getNetworkPlayer(packet.getPlayerID());
-				player.getAccess().setInvSlot(packet.getSlot(), packet.getInvSlot(), false);
+				player.setInvSlot(packet.getSlot(), packet.getInvSlot(), false);
 				
-			}  else if(id == PacketNPCLocation.id) {
-				PacketNPCLocation packet = new PacketNPCLocation();
-				packet.readInfo(in);
-				
-				EntityNPC npc = (EntityNPC) WorldRegistry.getWorld(packet.getWorldID()).getObject(packet.getNpcID());
-								
-				npc.getAccess().setX(packet.getX());
-				npc.getAccess().setY(packet.getY());
-				npc.getAccess().setZ(packet.getZ());
-			}
-			
+			}  			
 			
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -95,7 +77,6 @@ public class ClientPacketProcesor {
 			case PacketPlayerStats.id: toRep = new PacketPlayerStats(); break;
 			case PacketPlayerInventorySize.id: toRep = new PacketPlayerInventorySize(); break;
 			case PacketPlayerInventorySlot.id: toRep = new PacketPlayerInventorySlot(); break;
-			case PacketNPCLocation.id: toRep = new PacketNPCLocation(); break;
 			
 			default: toRep = null; break;
 		}

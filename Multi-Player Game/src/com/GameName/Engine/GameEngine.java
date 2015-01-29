@@ -8,12 +8,13 @@ import com.GameName.Entity.EntityPlayer;
 import com.GameName.Main.Debugging.DebugWindow;
 import com.GameName.Networking.Client;
 import com.GameName.Networking.Server;
-import com.GameName.Physics.PhysicsEngine;
+import com.GameName.Physics.PhysicsWorld;
 import com.GameName.Physics.Object.PhysicsObject;
 import com.GameName.Render.GLContextThread;
 import com.GameName.Render.RenderEngine;
 import com.GameName.Render.Types.Renderable;
 import com.GameName.World.World;
+import com.bulletphysics.dynamics.RigidBody;
 
 public class GameEngine {
 	private GameName_New gameName;
@@ -22,7 +23,7 @@ public class GameEngine {
 	private GLContextThread glContextThread;
 	private ThreadGroup threads;
 	
-	private PhysicsEngine physics;
+	private PhysicsWorld physics;
 	private RenderEngine render;
 	private SoundEngine sound;
 	
@@ -44,7 +45,7 @@ public class GameEngine {
 		currentWorld = world;
 		player = new EntityPlayer(this);
 		
-		physics = new PhysicsEngine(world);
+		physics = new PhysicsWorld();
 		render = new RenderEngine(this);
 		sound = new SoundEngine(this);
 		
@@ -59,11 +60,11 @@ public class GameEngine {
 	public ThreadGroup getThreads() {return threads;}
 	public void addThread(GameThread thread) {threads.addThread(thread);}
 	
-	public void add(PhysicsObject obj) {physics.add(obj);}
+	public void add(RigidBody obj) {physics.addObject(obj);}
 	public void add(Renderable obj) {render.add(obj);}
 	public void add(SoundEvent obj) {sound.add(obj);}
 
-	public PhysicsEngine getPhysics() {return physics;}	
+	public PhysicsWorld getPhysics() {return physics;}	
 	public RenderEngine getRender() {return render;}	
 	public SoundEngine getSound() {return sound;}
 

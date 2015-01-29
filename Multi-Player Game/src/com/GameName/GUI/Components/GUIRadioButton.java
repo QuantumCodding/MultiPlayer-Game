@@ -17,8 +17,8 @@ public class GUIRadioButton extends GUIComponent {
 	}
 	
 	public void update() {
-		if(ENGINE.getPlayer().getAccess().isPointerDown() != prvClickStart) {
-			prvClickStart = ENGINE.getPlayer().getAccess().isPointerDown();
+		if(ENGINE.getPlayer().isPointerDown() != prvClickStart) {
+			prvClickStart = ENGINE.getPlayer().isPointerDown();
 			super.update();
 		}
 	}

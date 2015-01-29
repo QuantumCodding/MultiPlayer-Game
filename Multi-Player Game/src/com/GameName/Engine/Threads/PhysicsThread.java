@@ -1,10 +1,10 @@
 package com.GameName.Engine.Threads;
 
-import com.GameName.Physics.PhysicsEngine;
+import com.GameName.Physics.PhysicsWorld;
 
 public class PhysicsThread extends GameThread {
 
-	private PhysicsEngine physicsEngine;
+	private PhysicsWorld physicsWorld;
 	
 	public PhysicsThread(int tickRate) {
 		super(tickRate, "Physics Thread");	
@@ -15,10 +15,10 @@ public class PhysicsThread extends GameThread {
 	}
 
 	void tick() {
-		physicsEngine.step(1);//timeSinceLastTick * getTickRate());
+		physicsWorld.simulate(1f/60f);//timeSinceLastTick * getTickRate());
 	}
 	
-	public void setEngine(PhysicsEngine physicsEngine) {
-		this.physicsEngine = physicsEngine;
+	public void setEngine(PhysicsWorld physicsWorld) {
+		this.physicsWorld = physicsWorld;
 	}
 }

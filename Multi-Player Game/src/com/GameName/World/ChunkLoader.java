@@ -6,6 +6,8 @@ import java.util.HashSet;
 
 import com.GameName.Cube.Cube;
 import com.GameName.Engine.GameEngine;
+import com.GameName.Engine.ResourceManager.Cubes;
+import com.GameName.Engine.ResourceManager.Worlds;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
 import com.GameName.Util.Vectors.MathVec3f;
@@ -44,8 +46,8 @@ public class ChunkLoader {
 	}
 	
 	public void findUnloadedChunks() {
-		MathVec3f minPos = center.subtract(loadRadius);
-		MathVec3f maxPos = center.add(loadRadius);
+		MathVec3f minPos = center.subtract(loadRadius).capMin(0);
+		MathVec3f maxPos = center.add(loadRadius).capMax(world.getChunkSizeAsVector()).subtract(1);
 		
 		for(Chunk chunk : getLoadedChunks()) {//int i = 0; i < getLoadedChunks().size(); i ++) { //Chunk chunk : getLoadedChunks()
 //			Chunk chunk = getLoadedChunks().get(i);
@@ -64,8 +66,10 @@ public class ChunkLoader {
 	public void unloadChunks() {
 		for(Chunk chunk : unloadedChunks) {//int i = 0; i < unloadedChunks.size(); i ++) { // Chunk chunk : unloadedChunks
 //			Chunk chunk = unloadedChunks.get(i);
+			updateNeighbors(chunk, false);
 			
 			chunk.setIsLoaded(false);
+			ENGINE.getPhysics().removeObject(chunk.getRigidBody());
 			ENGINE.getRender().remove(chunk.getRender());
 			chunk.getRender().cleanUp();
 			unloadedChunks.remove(chunk);//.remove(i);
@@ -81,8 +85,9 @@ public class ChunkLoader {
 			for(int y = -radius; y < radius + 1; y ++) {
 			for(int z = -radius; z < radius + 1; z ++) {
 				if(x < 0 || y < 0 || z < 0) continue;
+				if(x > world.getChunkX() || y > world.getChunkY() || z > world.getChunkZ()) continue;
 				
-				MathVec3f loadPos = new MathVec3f(x, y, z).add(center).capMax(world.getChunkSizeAsVector()).capMin(0);
+				MathVec3f loadPos = new MathVec3f(x, y, z).add(center).capMax(world.getChunkSizeAsVector().subtract(1)).capMin(0);
 				Chunk chunk = getChunk(loadPos);
 				
 				if(chunk == null) {
@@ -114,16 +119,71 @@ public class ChunkLoader {
 					
 				} catch(IOException e) {
 					System.out.println("Generateing: [" + x + ", " + y + ", " + z + "]");
-					chunk = world.getEnvironmentGen().generate(World.CHUNK_SIZE, world, x, y, z, 10);
+					chunk = new Chunk(ENGINE, World.CHUNK_SIZE, Worlds.MainWorld.getId(), x, y, z);//world.getEnvironmentGen().generate(World.CHUNK_SIZE, world, x, y, z, 10);
+					
+					for(int x_ = 0; x_ < chunk.getSize(); x_ ++) {
+					for(int y_ = 0; y_ < chunk.getSize(); y_ ++) {
+					for(int z_ = 0; z_ < chunk.getSize(); z_ ++) {
+						if(x_ + y_ + z_ < 10) {
+							chunk.setCube(x_, y_, z_, x+y+z == 0 ? Cubes.ColorfulTestCube : Cubes.TestCube);
+						}
+					}}}
 				}
-			
-				chunk.handelMassUpdate();
-				chunk.setIsLoaded(true);
-				chunk.updateTextureMap();
 				
-				ENGINE.getRender().add(chunk.getRender()); getLoadedChunks().add(chunk); chunk.forceVBOUpdate();
+				chunk.setIsLoaded(true);
+				getLoadedChunks().add(chunk); 
+				updateNeighbors(chunk, true);
 			}}}			
 		}
+	}
+	
+	private void updateNeighbors(Chunk current, boolean state) {
+		MathVec3f min = center.subtract(loadRadius).capMin(0);
+		MathVec3f max = center.add(loadRadius).capMax(world.getChunkSizeAsVector()).subtract(1);
+		MathVec3f pos = current.getPos().clone(); 
+				
+		if(pos.lessThen(min) || pos.greaterThen(max)) return;
+		
+		updateNeighbor(pos.subtract(1, 0, 0), current, min, max, false, 2, state);
+		updateNeighbor(pos.subtract(0, 1, 0), current, min, max, false, 4, state);
+		updateNeighbor(pos.subtract(0, 0, 1), current, min, max, false, 1, state);
+		
+		updateNeighbor(pos.add(1, 0, 0), current, min, max, true, 0, state);
+		updateNeighbor(pos.add(0, 1, 0), current, min, max, true, 5, state);
+		updateNeighbor(pos.add(0, 0, 1), current, min, max, true, 3, state);
+	}
+	
+	public void updateNeighbor(MathVec3f pos, Chunk current, MathVec3f min, MathVec3f max, boolean greater, int side, boolean state) {
+		int oppSide = side == 4 ? 5 : side == 5 ? 4 : (side + 2) % 4;		
+		if((pos.lessThenOrEqual(max) && greater) || (pos.greaterThenOrEqual(min) && !greater)) {
+			Chunk chunk = getChunk(pos);
+//			System.out.println("+++++++++++++++++++++ " + (chunk!=null?chunk:"null") + " " + (chunk!=null?chunk.isInitialized():false) + "   " + current.getPos());
+			
+			if(chunk != null && chunk.isInitialized()){
+				if(chunk.isLoaded() && current.isLoaded()) {
+//					System.out.println("------BackTrack------ Chunk " + current.getPos().valuesToString() + " Side: " + oppSide + " State: " + state);
+					current.loadNeighbor(oppSide, state);
+				}
+				
+				if(!chunk.isAccessible() && chunk.isLoaded()) {
+//					System.out.println("-------Neighbor------ Chunk " + chunk.getPos().valuesToString() + " Side: " + side + " State: " + state);
+					chunk.loadNeighbor(side, state);
+					if(chunk.isAccessible()) registerChunk(chunk);
+				}
+			}
+		} else { 
+//			System.out.println("--------Edge--------- Chunk " + current.getPos().valuesToString() + " Side: " + oppSide + " State: " + state);
+			current.loadNeighbor(oppSide, state);
+		}
+	}
+	
+	private void registerChunk(Chunk chunk) {
+		chunk.handelMassUpdate();
+		chunk.updateTextureMap();
+		
+		ENGINE.add(chunk.getRigidBody());
+		ENGINE.add(chunk.getRender()); 
+		chunk.forceVBOUpdate();
 	}
 	
 	public void saveChunks() {
@@ -134,7 +194,7 @@ public class ChunkLoader {
 	
 	public boolean checkChunksVBO() {
 		for(Chunk chunk : getLoadedChunks()) {
-			if(chunk != null && chunk.getRender().isVboUpdateNeeded()) {
+			if(chunk != null && chunk.isAccessible() && chunk.getRender().isVboUpdateNeeded()) {
 				return true;
 			}	
 		}	
@@ -146,7 +206,7 @@ public class ChunkLoader {
 		for(Chunk chunk : getLoadedChunks()) {//int i = 0; i < getLoadedChunks().size(); i ++) { //Chunk chunk : getLoadedChunks()
 //			Chunk chunk = getLoadedChunks().get(i);
 			
-			if(chunk != null && chunk.getRender().isVboUpdateNeeded()) {
+			if(chunk != null && chunk.isAccessible() && chunk.getRender().isVboUpdateNeeded()) {
 				chunk.getRender().updateVBOs();
 			}	
 		}	
@@ -156,12 +216,14 @@ public class ChunkLoader {
 		for(Chunk chunk : getLoadedChunks()) {//int i = 0; i < getLoadedChunks().size(); i ++) { //Chunk chunk : getLoadedChunks()
 //			Chunk chunk = getLoadedChunks().get(i);
 			
-			if(chunk != null) {
+			if(chunk != null && chunk.isAccessible()) {
 				chunk.getRender().updateVBOs();
 			}	
 		}	
 	}
 		
+	public Chunk getChunk(float x, float y, float z) {
+		return getChunk(new MathVec3f(x, y, z));}
 	public Chunk getChunk(MathVec3f pos) {		
 		for(Chunk chunk : getLoadedChunks()) {//int i = 0; i < getLoadedChunks().size(); i ++) { //Chunk chunk : getLoadedChunks()
 //			Chunk chunk = getLoadedChunks().get(i);
@@ -202,3 +264,71 @@ public class ChunkLoader {
 		return loadedChunks;
 	}
 }
+
+
+
+//if(sub.x >= min.x) {
+//	chunk = getChunk(sub.x, pos.y, pos.z);
+//	if(chunk != null && chunk.isInitialized()){
+//		if(chunk.isLoaded()) 
+//			current.loadNeighbors(0, state);
+//		if(!chunk.isAccessible()) {
+//			chunk.loadNeighbors(2, state);
+//			if(chunk.isAccessible()) registerChunk(chunk);
+//		}
+//}} else { current.loadNeighbors(0, state); }
+//
+//if(sub.y >= min.y) {
+//	chunk = getChunk(pos.x, sub.y, pos.z);
+//	if(chunk != null && chunk.isInitialized()){
+//		if(chunk.isLoaded()) 
+//			current.loadNeighbors(5, state);
+//		if(!chunk.isAccessible()) {
+//			chunk.loadNeighbors(4, state);
+//			if(chunk.isAccessible()) registerChunk(chunk);
+//		}
+//}} else { current.loadNeighbors(5, state); }	
+//
+//if(sub.z >= min.z) {
+//	chunk = getChunk(pos.x, pos.y, sub.z);
+//	if(chunk != null && chunk.isInitialized()){
+//		if(chunk.isLoaded()) 
+//			current.loadNeighbors(3, state);
+//		if(!chunk.isAccessible()) {
+//			chunk.loadNeighbors(1, state);
+//			if(chunk.isAccessible()) registerChunk(chunk);
+//		}
+//}} else { current.loadNeighbors(3, state); }	
+//
+//if(add.x >= max.x) {
+//	chunk = getChunk(add.x, pos.y, pos.z);
+//	if(chunk != null && chunk.isInitialized()){
+//		if(chunk.isLoaded()) 
+//			current.loadNeighbors(2, state);
+//		if(!chunk.isAccessible()) {
+//			chunk.loadNeighbors(0, state);
+//			if(chunk.isAccessible()) registerChunk(chunk);
+//		}
+//}} else { current.loadNeighbors(2, state); }	
+//
+//if(add.y >= max.y) {
+//	chunk = getChunk(pos.x, add.y, pos.z);
+//	if(chunk != null && chunk.isInitialized()){
+//		if(chunk.isLoaded()) 
+//			current.loadNeighbors(4, state);
+//		if(!chunk.isAccessible()) {
+//			chunk.loadNeighbors(5, state);
+//			if(chunk.isAccessible()) registerChunk(chunk);
+//		}
+//}} else { current.loadNeighbors(4, state); }
+//
+//if(add.z >= max.z) {
+//	chunk = getChunk(pos.x, pos.y, add.z);
+//	if(chunk != null && chunk.isInitialized()){
+//		if(chunk.isLoaded()) 
+//			current.loadNeighbors(1, state);
+//		if(!chunk.isAccessible()) {
+//			chunk.loadNeighbors(3, state);
+//			if(chunk.isAccessible()) registerChunk(chunk);
+//		}
+//}} else { current.loadNeighbors(1, state); }

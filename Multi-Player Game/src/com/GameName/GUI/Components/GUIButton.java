@@ -18,10 +18,10 @@ public class GUIButton extends GUIComponent {
 			return;
 		}
 		
-		if(isDown != ENGINE.getPlayer().getAccess().isPointerDown()) {
+		if(isDown != ENGINE.getPlayer().isPointerDown()) {
 			super.update();
 		}
 		
-		isDown = ENGINE.getPlayer().getAccess().isPointerDown();
+		isDown = ENGINE.getPlayer().isPointerDown();
 	}
 }

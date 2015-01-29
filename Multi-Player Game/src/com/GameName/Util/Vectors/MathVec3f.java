@@ -4,7 +4,7 @@ import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
 public class MathVec3f {
-	private float x, y, z;
+	public float x, y, z;
 
 	public MathVec3f(float x, float y, float z) {
 		this.x = x;
@@ -35,7 +35,9 @@ public class MathVec3f {
 		
 		return true;
 	}
-
+	
+	public MathVec3f add(float x, float y, float z) {
+		return add(new MathVec3f(x, y, z));}
 	public MathVec3f add(MathVec3f add) {
 		return new MathVec3f(
 				x + add.getX(),
@@ -55,6 +57,8 @@ public class MathVec3f {
 	public MathVec3f addAndSet(MathVec3f add) {set(add(add)); return this;}
 	public MathVec3f addAndSet(float add) {set(add(add));	   return this;}
 	
+	public MathVec3f subtract(float x, float y, float z) {
+		return subtract(new MathVec3f(x, y, z));}
 	public MathVec3f subtract(MathVec3f subtract) {
 		return new MathVec3f(
 				x - subtract.getX(),
@@ -264,11 +268,15 @@ public class MathVec3f {
 	
 	public boolean greaterThen(MathVec3f then) {return x > then.getX() && y > then.getY() && z > then.getZ();}	
 	public boolean greaterThen(float then) {return x > then && y > then && z > then;}
+	public boolean greaterThenOrEqual(MathVec3f then) {return x >= then.getX() && y >= then.getY() && z >= then.getZ();}
+	public boolean greaterThenOrEqual(float then) {return x >= then && y >= then && z >= then;}
 	
 	public boolean lessThen(MathVec3f then) {return x < then.getX() && y < then.getY() && z < then.getZ();}	
 	public boolean lessThen(float then) {return x < then && y < then && z < then;}
+	public boolean lessThenOrEqual(MathVec3f then) {return x <= then.getX() && y <= then.getY() && z <= then.getZ();}
+	public boolean lessThenlessThenOrEqual(float then) {return x <= then && y <= then && z <= then;}
 	
-	public boolean equaleTo(MathVec3f then) {return x == then.getX() && y == then.getY() && z == then.getZ();}
+	public boolean equalTo(MathVec3f then) {return x == then.getX() && y == then.getY() && z == then.getZ();}
 	public boolean equalTo(float then) {return x == then && y == then && z == then;}
 	
 	public MathVec3f toDegrees() {
@@ -285,7 +293,7 @@ public class MathVec3f {
 		this.z = set.z;
 	}
 	
-	public MathVec3f convert(javax.vecmath.Vector3f other) {
+	public static MathVec3f convert(javax.vecmath.Vector3f other) {
 		return new MathVec3f(other.x, other.y, other.z);
 	}
 	
