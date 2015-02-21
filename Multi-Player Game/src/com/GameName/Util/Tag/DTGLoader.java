@@ -1,165 +1,164 @@
 package com.GameName.Util.Tag;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
-import javax.vecmath.Vector2f;
+import com.GameName.Util.Vectors.Vector3f;
 
-import com.GameName.Util.Vectors.MathVec3f;
-
-public class DTGLoader {
+public class DTGLoader {	
 	
-	public static HashSet<TagGroup> readDTGFile(File f) throws IOException {
-		fileTypeCheck(f);
+	public static OutputStream getOutputStream(File f) throws IOException {
+		if(!f.getAbsolutePath().endsWith(".dtg")) throw new IOException("DTG files must end with \".dtg\"");
+		return new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(f)));
+	}
+	
+	public static InputStream getInputStream(File f) throws IOException {
+		if(!f.getAbsolutePath().endsWith(".dtg")) throw new IOException("DTG files must end with \".dtg\"");
+		return new BufferedInputStream(new GZIPInputStream(new FileInputStream(f)));
+	}
+	
+	/*	5 = Start of TagGroups
+	 *  1 = Start of TagGroup
+	 *  2 = Start of Tag
+	 * 	0 = Information Divider
+	 *  3 = End of Tag
+	 *  4 = End of TagGroup
+	 *  6 = End of TagGroups
+	 */
+	
+	public static ArrayList<TagGroup> readAll(InputStream read) throws IOException {
+		ArrayList<TagGroup> groups = new ArrayList<>();
 		
-		BufferedReader read = new BufferedReader(new FileReader(f));		
-		HashSet<TagGroup> data = new HashSet<TagGroup>();
-		String line = "";
+		byte in = -1; int index = 0;
+		byte[] bytes = new byte[2048];
+		String tagName = null, unprossesedInfo;
 		
-		while((line = read.readLine()) != null) {
-			if(line.trim().equals("")) continue;
+		Tag groupIdTag = null; boolean readingId = false;
+		ArrayList<Tag> tags = new ArrayList<>();
+		
+		while((in = (byte) read.read()) != 6) {
+			switch(in) {
+				case 5: break;
 			
-			Tag idTag = null;
-			HashSet<Tag> temp = new HashSet<Tag>();
+				//Tag Group
+				case 1: tags.clear(); readingId = true; break;
+				case 4: groups.add(new TagGroup(groupIdTag, tags.toArray(new Tag[tags.size()]))); break;
 			
-			for(String tagGroup : split(line, "[")) {	
-				for(String tag : split(tagGroup, " ")) {
-					if(tag.trim().equals("")) continue;
-					if(tag.trim().equals("]")) continue;
+				//Tag
+				case 2: bytes = new byte[2048]; break;
+				case 0: tagName = new String(bytes).trim(); bytes = new byte[2048]; break;
+				case 3: unprossesedInfo = new String(bytes).trim(); 
+					Tag tag = new Tag(tagName, processInfo(unprossesedInfo));
+//					System.out.println(tagName);
 					
-					String[] tagInfo = split(tag, "=");		
-					
-					String tagName = tagInfo[0];
-//					System.out.println(tag);
-					char c = tagInfo[1].toCharArray()[0];					
-					String info = tagInfo[1];
-						
-					Object obj = null;						
-						if(c == '<') {
-							info = removeFirst(removeLast(info));
-							String[] numbers = split(info, ",");
-//							char type = numbers[0].charAt(numbers[0].length() - 1);
-							
-							if(numbers.length == 2) {
-//								if(type == 'd')	obj = new Vector2d(asDouble(numbers[0]), asDouble(numbers[1]));	
-								/*else*/		obj = new Vector2f(asFloat(numbers[0]), asFloat(numbers[1]));
-							} else if(numbers.length == 3) {
-//								if(type == 'd')	obj = new Vector3d(asDouble(numbers[0]), asDouble(numbers[1]), asDouble(numbers[2]));	
-								/*else*/		obj = new MathVec3f(asFloat(numbers[0]), asFloat(numbers[1]), asFloat(numbers[2]));								
-							} else if(numbers.length == 4) {
-//								if(type == 'd')	obj = new Vector4d(asDouble(numbers[0]), asDouble(numbers[1]), asDouble(numbers[2]), asDouble(numbers[3]));	
-//								else			obj = new Vector4f(asFloat(numbers[0]), asFloat(numbers[1]), asFloat(numbers[2]), asFloat(numbers[3]));								
-							}
-							
-						} else if(c == '\'') {
-							info = removeLast(info);
-							obj = new Character(info.charAt(1));
-							
-						} else if(c == '\"') {
-							info = removeLast(info);
-							obj = info.substring(1);
-							
-						} else if(c == '{') {
-							info = removeLast(info);
-							String[] values = split(info.substring(1), ",");
-							char type = values[0].charAt(values[0].length() - 1);
-														
-							if(type == 'f')		  {ArrayList<Float>    array = new ArrayList<Float>(); 		for(String value : values) array.add(new Float(asFloat(value)));     obj = array;}
-							else if(type == 'd')  {ArrayList<Double>   array = new ArrayList<Double>();		for(String value : values) array.add(new Double(asDouble(value)));   obj = array;}
-							else if(type == 'i')  {ArrayList<Integer>  array = new ArrayList<Integer>();	for(String value : values) array.add(new Integer(asInt(value)));     obj = array;}
-							else if(type == 'l')  {ArrayList<Long>     array = new ArrayList<Long>();		for(String value : values) array.add(new Long(asLong(value)));       obj = array;}
-							else if(type == 'b')  {ArrayList<Byte>     array = new ArrayList<Byte>();		for(String value : values) array.add(new Byte(asByte(value)));       obj = array;}
-							else if(type == 's')  {ArrayList<Short>    array = new ArrayList<Short>();	    for(String value : values) array.add(new Short(asShort(value)));     obj = array;}
-							else if(type == '\"') {ArrayList<String>   array = new ArrayList<String>();	    for(String value : values) array.add(new String(value));   		     obj = array;}
-							else if(type == '\'') {ArrayList<Character>array = new ArrayList<Character>();	for(String value : values) array.add(new Character(value.charAt(0)));obj = array;}
-							
-						} else {
-							char type = info.charAt(info.length() - 1);
-							
-							if(type == 'f')		 obj = new Float(asFloat(info));
-							else if(type == 'd') obj = new Double(asDouble(info));
-							else if(type == 'i') obj = new Integer(asInt(info));
-							else if(type == 'l') obj = new Long(asLong(info));
-							else if(type == 'b') obj = new Byte(asByte(info));
-							else if(type == 's') obj = new Short(asShort(info));
-						}
-						
-					if(idTag == null) idTag = new Tag(tagName, obj);
-					else temp.add(new Tag(tagName, obj));
-				}
-			}
-			
-			data.add(new TagGroup(idTag, temp.toArray(new Tag[temp.size()])));
-		}
+					if(readingId) {
+						groupIdTag = tag;
+						readingId = false;
+					} else {
+						tags.add(tag);
+					}
+				break;
 				
-		read.close();
+				default: bytes[index] = in; index ++; break;
+			}	
+		} 
 		
-//		for(TagGroup tag : data) System.out.println(tag);
-		return data;
-	}
-		
-	public static void saveDTGFile(File f, ArrayList<TagGroup> tagLines) throws IOException {
-		fileTypeCheck(f);
-		
-		BufferedWriter writer = new BufferedWriter(new FileWriter(f));
-		
-		for(TagGroup tagLine : tagLines) {
-			writer.write(tagLine.toString());
-			writer.newLine();
-			writer.flush();
-		}
-		
-		writer.close();
-	}
+		return groups;
+	} 
 	
-	private static double asDouble(String as) 	{return Double.parseDouble(removeLast(as));}
-	private static float  asFloat(String as) 	{return Float.parseFloat(removeLast(as));}
-	private static int    asInt(String as) 		{return Integer.parseInt(removeLast(as));}
-	private static short  asShort(String as) 	{return Short.parseShort(removeLast(as));}
-	private static long   asLong(String as) 	{return Long.parseLong(removeLast(as));}
-	private static byte   asByte(String as) 	{return Byte.parseByte(removeLast(as));}
-	
-	protected static String removeLast(String s)  {return s.substring(0, s.length() - 1);}
-	protected static String removeFirst(String s)  {return s.substring(1);}
-	
-	private static String[] split(String toSplit, String spl) {
-		if(!toSplit.contains(spl)) return new String[] {toSplit};
+	public static void writeAll(OutputStream write, ArrayList<TagGroup> groups) throws IOException {
+		write.write((byte) 5);
 		
-		ArrayList<String> splits = new ArrayList<String>();
-		
-		String toAdd = "";
-		char[] check = new char[spl.length()];
-		
-		for(int i = 0; i < toSplit.length(); i ++) {
+		for(TagGroup group : groups) {
+			if(group == null) continue;
 			
-			for(int j = 0; j < check.length; j ++) {
-				check[j] = toSplit.charAt(i + j);
-			}
+			write.write((byte) 1);			
+			writeTag(write, group.getIdTag());
 			
-			if(Arrays.equals(check, spl.toCharArray())) {
-				splits.add(toAdd);
-				toAdd = "";
-				
-				i += spl.length() - 1;
-			} else {
-				toAdd += toSplit.charAt(i);
-			}
-		}
+			for(Tag tag : group.getTags()) {
+				writeTag(write, tag);
+			}		
+			
+			write.write((byte) 4);			
+		}	
 		
-		splits.add(toAdd);		
-		return splits.toArray(new String[splits.size()]);
+		write.write((byte) 6);
 	}
 	
-	private static void fileTypeCheck(File f) throws IOException {
-		String fileType = f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf('.')).toLowerCase();
-		if(fileType.equals("dtg")) 
-				throw new IOException("File " + f + " is a unknown file type " + fileType);
+	public static void writeTag(OutputStream write, Tag tag) throws IOException {
+		if(tag.getInfo() == null || tag == null) return;
+		
+		write.write((byte) 2);
+		write.write(tag.getName().getBytes());
+		write.write((byte) 0);
+		write.write(DTGGenerator.generateTag(tag.getInfo()).getBytes());
+		write.write((byte) 3);
+	}
+	
+	private static Object processInfo(String in) {
+		if(in.isEmpty()) return null;
+		char infoType = in.charAt(0);
+		in = in.substring(1, in.length());
+		if(in.isEmpty()) return null;
+		
+		switch(infoType) {
+			case 'S': return in;
+			
+			case 'b': return Byte.parseByte(in);
+			case 's': return Short.parseShort(in);
+			case 'i': return Integer.parseInt(in);
+			case 'l': return Long.parseLong(in);
+			
+			case 'f': return Float.parseFloat(in);
+			case 'd': return Double.parseDouble(in);
+
+			case 'c': return in.charAt(0);
+			case 'B': return Boolean.parseBoolean(in);
+						
+			case 'A': return processArray(in);
+			case 'V': return processVector(in);
+			
+			default: return null;
+		}
+	}
+	
+	private static Object processArray(String in) {
+		char arrayType = in.charAt(0);
+		in = in.substring(1, in.length());
+		if(in.isEmpty()) return null;
+		
+		String[] elements = in.split(",");	
+		switch(arrayType) {
+			case 'S': return elements;
+			
+			case 'b': Byte[] arrayb = new Byte[elements.length]; 		for(int i = 0; i < elements.length; i ++) arrayb[i] = Byte.parseByte(elements[i]); return arrayb;
+			case 's': Short[] arrays = new Short[elements.length]; 		for(int i = 0; i < elements.length; i ++) arrays[i] = Short.parseShort(elements[i]); return arrays;
+			case 'i': Integer[] arrayi = new Integer[elements.length]; 	for(int i = 0; i < elements.length; i ++) arrayi[i] = Integer.parseInt(elements[i]); return arrayi;
+			case 'l': Long[] arrayl = new Long[elements.length]; 		for(int i = 0; i < elements.length; i ++) arrayl[i] = Long.parseLong(elements[i]); return arrayl;
+			
+			case 'f': Float[] arrayf = new Float[elements.length]; 		for(int i = 0; i < elements.length; i ++) arrayf[i] = Float.parseFloat(elements[i]); return arrayf;  
+			case 'd': Double[] arrayd = new Double[elements.length];	for(int i = 0; i < elements.length; i ++) arrayd[i] = Double.parseDouble(elements[i]); return arrayd;
+			
+			case 'c': Character[] arrayc = new Character[elements.length]; 	for(int i = 0; i < elements.length; i ++) arrayc[i] = in.charAt(0); return arrayc;  
+			case 'B': Boolean[] arrayB = new Boolean[elements.length];		for(int i = 0; i < elements.length; i ++) arrayB[i] = Boolean.parseBoolean(elements[i]); return arrayB;
+			
+			default: return null;
+		}
+	}
+	
+	private static Object processVector(String in) {	
+		if(in.isEmpty()) return null;
+		
+		String[] numbers = in.split(",");		
+		return new Vector3f(Float.parseFloat(numbers[0]), Float.parseFloat(numbers[1]), Float.parseFloat(numbers[2]));
 	}
 }
