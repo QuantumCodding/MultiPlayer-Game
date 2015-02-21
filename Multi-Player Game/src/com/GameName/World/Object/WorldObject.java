@@ -1,26 +1,22 @@
 package com.GameName.World.Object;
 
-import javax.vecmath.Vector3f;
-
-import com.GameName.Physics.Object.PhysicsObject;
-import com.GameName.Util.Vectors.MathVec3f;
+import com.GameName.Physics.Material;
+import com.GameName.Physics.PhysicsObject;
+import com.GameName.Physics.Collision.CollisionShape;
+import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.World;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 
 public abstract class WorldObject extends PhysicsObject {
 
-	private MathVec3f chunk;
-	private MathVec3f renderPos, adjust;
-	private MathVec3f rotation;
-	private World currentWorld;
+	private Vector3f chunk;
+	private Vector3f renderPos, adjust;
 	
-	public WorldObject(RigidBodyConstructionInfo info) {
-		super(info);
+	public WorldObject(CollisionShape shape, Material material) {
+		super(shape, material);
 		
-		chunk = new MathVec3f(0, 0, 0);
-		renderPos = new MathVec3f(0, 0, 0);
-		rotation = new MathVec3f(0, 0, 0);
-		adjust = new MathVec3f(
+		chunk = new Vector3f(0, 0, 0);
+		renderPos = new Vector3f(0, 0, 0);
+		adjust = new Vector3f(
 				(World.SCALE / 10f),
 				(World.SCALE / 10f),
 				(World.SCALE / 10f)
@@ -28,40 +24,18 @@ public abstract class WorldObject extends PhysicsObject {
 	}
 	
 	public void update() {
-		super.update();
 		
-		renderPos = getPos().multiply(adjust);		
-		chunk = getPos().divide(World.CHUNK_SIZE).truncate();
+		renderPos = getPosition().multiply(adjust);		
+		chunk = getPosition().divide(World.CHUNK_SIZE).truncate();
 		
-		if(chunk.x > currentWorld.getChunkX() - 1) chunk.x = currentWorld.getChunkX() - 1; 
+		if(chunk.x > getCurrentWorld().getChunkX() - 1) chunk.x = getCurrentWorld().getChunkX() - 1; 
 		else if(chunk.x < 0) chunk.x = 0;			
-		if(chunk.y > currentWorld.getChunkY() - 1) chunk.y = currentWorld.getChunkY() - 1; 
+		if(chunk.y > getCurrentWorld().getChunkY() - 1) chunk.y = getCurrentWorld().getChunkY() - 1; 
 		else if(chunk.y < 0) chunk.y = 0;		
-		if(chunk.z > currentWorld.getChunkZ() - 1) chunk.z = currentWorld.getChunkZ() - 1; 
+		if(chunk.z > getCurrentWorld().getChunkZ() - 1) chunk.z = getCurrentWorld().getChunkZ() - 1; 
 		else if(chunk.z < 0) chunk.z = 0;
 	}
 	
-	public void applyRotation(Vector3f torque) {
-		applyRotation(MathVec3f.convert(torque));}
-	public void applyRotation(MathVec3f torque) {
-		rotation = rotation.add(torque);
-		rotation = rotation.mod(360);
-	}
-	
-	public void setRotation(Vector3f rotation) {
-		setRotation(MathVec3f.convert(rotation));}
-	public void setRotation(MathVec3f rotation) {
-		this.rotation.set(rotation);
-	}
-	
-	public MathVec3f getRot() {
-		return rotation;
-	}
-
-	public MathVec3f getChunk() { return chunk; }
-	public MathVec3f getRenderPos() { return renderPos; }
-	public World getCurrentWorld() { return currentWorld; }
-	public void setCurrentWorld(World currentWorld) {
-		this.currentWorld = currentWorld;
-	}
+	public Vector3f getChunk() { return chunk; }
+	public Vector3f getRenderPos() { return renderPos; }
 }

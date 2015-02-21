@@ -6,15 +6,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.TreeMap;
 
 import com.GameName.Cube.Cube;
 import com.GameName.Engine.GameEngine;
 import com.GameName.Engine.ResourceManager.Cubes;
-import com.GameName.Util.Vectors.MathVec3f;
+import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Chunk;
 import com.GameName.World.World;
 
@@ -23,7 +21,7 @@ public class DensityGeneration {
 	private int seed, scale;
 	private World world;
 	private Random r;
-	private HashMap<MathVec3f, DensityNode> nodes = new HashMap<>();
+	private HashMap<Vector3f, DensityNode> nodes = new HashMap<>();
 	private GameEngine ENGINE;
 	private Scanner nodeReader;
 	private BufferedWriter nodeWriter;
@@ -55,7 +53,7 @@ public class DensityGeneration {
 			for(int j=y; j<y+2; j++) {
 				for(int k=z; k<z+2; k++) {
 					if(!nodeExists(i, j, k)) {
-						nodes.put(new MathVec3f(i, j, k), new DensityNode(i, j, k, r.nextFloat()));
+						nodes.put(new Vector3f(i, j, k), new DensityNode(i, j, k, r.nextFloat()));
 						addToNodeFile(getNode(i, j, k));
 						System.out.println("Node added at ["+i+","+j+","+k+"]");
 					}
@@ -134,16 +132,16 @@ public class DensityGeneration {
 			yi=nodeReader.nextInt();
 			zi=nodeReader.nextInt();
 			valuei=nodeReader.nextFloat();
-			nodes.put(new MathVec3f(xi, yi, zi), new DensityNode(xi, yi, zi, valuei));
+			nodes.put(new Vector3f(xi, yi, zi), new DensityNode(xi, yi, zi, valuei));
 		}
 		nodeReader.close();
 	}
 	
 	private boolean nodeExists(int x, int y, int z) {
-		return nodes.containsKey(new MathVec3f(x, y, z));
+		return nodes.containsKey(new Vector3f(x, y, z));
 	}
 	
 	private DensityNode getNode(int x, int y, int z) {
-		return nodes.get(new MathVec3f(x, y, z));
+		return nodes.get(new Vector3f(x, y, z));
 	}
 }

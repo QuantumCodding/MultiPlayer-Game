@@ -7,22 +7,21 @@ import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glScalef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
-import javax.vecmath.TexCoord2f;
-
 import com.GameName.Engine.GameEngine;
 import com.GameName.Engine.ResourceManager.Threads;
 import com.GameName.Render.Effects.Shader;
 import com.GameName.Render.Effects.Texture;
-import com.GameName.Util.Vectors.MathVec3f;
+import com.GameName.Util.Vectors.Vector2f;
+import com.GameName.Util.Vectors.Vector3f;
 
 public abstract class Renderable {
 	protected final GameEngine ENGINE;
 	
 	private Shader shader;	
 	private Texture texture;	
-	private MathVec3f color;	
+	private Vector3f color;	
 
-	protected TexCoord2f texCoordsTop, texCoordsBottom;
+	protected Vector2f texCoordsTop, texCoordsBottom;
 	
 	private boolean isVboUpdating;
 	protected boolean vboUpdateNeeded;
@@ -32,10 +31,10 @@ public abstract class Renderable {
 	protected int textureVBO;
 	protected int colorVBO;
 	
-	private MathVec3f center;
-	private MathVec3f rotation;
-	private MathVec3f translation;
-	private MathVec3f scale;
+	private Vector3f center;
+	private Vector3f rotation;
+	private Vector3f translation;
+	private Vector3f scale;
 	
 	protected String name;
 	
@@ -49,10 +48,10 @@ public abstract class Renderable {
 		needsVBOids = true;
 		vboUpdateNeeded = true;
 		
-		center = new MathVec3f(0, 0, 0);
-		translation = new MathVec3f(0, 0, 0);
-		rotation = new MathVec3f(0, 0, 0);
-		scale = new MathVec3f(1, 1, 1);
+		center = new Vector3f(0, 0, 0);
+		translation = new Vector3f(0, 0, 0);
+		rotation = new Vector3f(0, 0, 0);
+		scale = new Vector3f(1, 1, 1);
 		
 		name = "default";
 	}
@@ -124,21 +123,21 @@ public abstract class Renderable {
 	
 	public Shader 	getShader()  {return shader;}	
 	public Texture 	getTexture() {return texture;}
-	public MathVec3f getColor() 	 {return color;}
+	public Vector3f getColor() 	 {return color;}
 
-	public MathVec3f getCenter() {
+	public Vector3f getCenter() {
 		return center;
 	}
 	
-	public MathVec3f getRotation() {
+	public Vector3f getRotation() {
 		return rotation;
 	}
 
-	public MathVec3f getTranslation() {
+	public Vector3f getTranslation() {
 		return translation;
 	}
 
-	public MathVec3f getScale() {
+	public Vector3f getScale() {
 		return scale;
 	}
 	
@@ -154,19 +153,19 @@ public abstract class Renderable {
 		return name;
 	}
 	
-	public void setCenter(MathVec3f center) {
+	public void setCenter(Vector3f center) {
 		this.center = center;
 	}
 
-	public void setRotation(MathVec3f rotation) {
+	public void setRotation(Vector3f rotation) {
 		this.rotation = rotation;
 	}
 
-	public void setTranslation(MathVec3f translation) {
+	public void setTranslation(Vector3f translation) {
 		this.translation = translation;
 	}
 
-	public void setScale(MathVec3f scale) {
+	public void setScale(Vector3f scale) {
 		this.scale = scale;
 	}
 
@@ -183,7 +182,7 @@ public abstract class Renderable {
 		vboUpdateNeeded = true;
 	}
 
-	public void setColor(MathVec3f color) {
+	public void setColor(Vector3f color) {
 		this.color = color;
 		vboUpdateNeeded = true;
 	}

@@ -1,14 +1,10 @@
-package com.GameName.World.Render;
-
-import static org.lwjgl.opengl.GL11.glTranslatef;
+	package com.GameName.World.Render;
 
 import com.GameName.Cube.Render.CubeRenderUtil;
 import com.GameName.Cube.Render.CubeTextureMap;
 import com.GameName.Engine.GameEngine;
-import com.GameName.Engine.Registries.WorldRegistry;
 import com.GameName.Render.Types.Render3D;
 import com.GameName.World.Chunk;
-import com.GameName.World.World;
 
 public class ChunkRender extends Render3D {
 	private Chunk chunk;
@@ -24,7 +20,7 @@ public class ChunkRender extends Render3D {
 	public void draw() {
 		if(!hasCubes) return;
 			
-		glTranslatef(0, -(WorldRegistry.getWorld(chunk.getWorldId()).getSizeY() * (World.SCALE * 0.1f)), 0);
+//		glTranslatef(0, -((WorldRegistry.getWorld(chunk.getWorldId()).getSizeY() - chunk.getY()) * (World.SCALE * 0.1f)), 0);
 		super.draw();			
 	}
 

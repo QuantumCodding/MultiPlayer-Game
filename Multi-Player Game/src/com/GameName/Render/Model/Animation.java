@@ -2,7 +2,7 @@ package com.GameName.Render.Model;
 
 import java.util.ArrayList;
 
-import com.GameName.Util.Vectors.MathVec3f;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class Animation {
 	private String name;
@@ -11,7 +11,7 @@ public class Animation {
 	private int stepIndex;
 	private ArrayList<AnimationStep> steps;
 
-	private MathVec3f translation, rotation, scale;
+	private Vector3f translation, rotation, scale;
 	private boolean resetOnCompletion, isRunning;
 	
 	public Animation(String name, boolean resetOnCompletion, int[] affectedFaces) {
@@ -40,9 +40,9 @@ public class Animation {
 		AnimationStep step = steps.get(stepIndex);
 		
 		switch(step.getType()) {		
-			case Rotation: rotation.addAndSet(step.getStepValue()); break;				
-			case Scale: scale.addAndSet(step.getStepValue()); break;
-			case Translation: translation.addAndSet(step.getStepValue()); break;
+			case Rotation: rotation = rotation.add(step.getStepValue()); break;				
+			case Scale: scale = scale.add(step.getStepValue()); break;
+			case Translation: translation = translation.add(step.getStepValue()); break;
 				
 			default: break;		
 		}
@@ -58,9 +58,9 @@ public class Animation {
 	public void reset() {
 		stepIndex = 0;
 		
-		translation = new MathVec3f(0, 0, 0);
-		rotation = new MathVec3f(0, 0, 0);
-		scale = new MathVec3f(0, 0, 0);
+		translation = new Vector3f(0, 0, 0);
+		rotation = new Vector3f(0, 0, 0);
+		scale = new Vector3f(0, 0, 0);
 	}
 	
 	public void addStep(AnimationStep step) {
@@ -75,20 +75,20 @@ public class Animation {
 		return affectedFaces;
 	}
 
-	protected MathVec3f getTranslation() {
+	protected Vector3f getTranslation() {
 		return translation;
 	}
 
-	protected MathVec3f getRotation() {
+	protected Vector3f getRotation() {
 		return rotation;
 	}
 
-	protected MathVec3f getScale() {
+	protected Vector3f getScale() {
 		return scale;
 	}
 	
-	protected MathVec3f[] getEffects() {
-		return new MathVec3f[] {translation, rotation, scale};
+	protected Vector3f[] getEffects() {
+		return new Vector3f[] {translation, rotation, scale};
 	}
 
 	public void addFace(int face) {
@@ -106,20 +106,20 @@ public class Animation {
 	public class AnimationStep {
 		private Type type;
 		
-		private MathVec3f current;
-		private MathVec3f endValue;
-		private MathVec3f stepValue;
+		private Vector3f current;
+		private Vector3f endValue;
+		private Vector3f stepValue;
 	
-		public AnimationStep(Type type, MathVec3f value) {
+		public AnimationStep(Type type, Vector3f value) {
 			this(type, value, value);
 		}
 		
-		public AnimationStep(Type type, MathVec3f endValue, MathVec3f stepValue) {
+		public AnimationStep(Type type, Vector3f endValue, Vector3f stepValue) {
 			this.type = type;
 			this.endValue = endValue;
 			this.stepValue = stepValue;
 			
-			current = new MathVec3f(0, 0, 0);
+			current = new Vector3f(0, 0, 0);
 		}
 
 		public boolean isDone() {
@@ -134,11 +134,11 @@ public class Animation {
 			return type;
 		}
 
-		public MathVec3f getEndValue() {
+		public Vector3f getEndValue() {
 			return endValue;
 		}
 
-		public MathVec3f getStepValue() {
+		public Vector3f getStepValue() {
 			return stepValue;
 		}
 	}

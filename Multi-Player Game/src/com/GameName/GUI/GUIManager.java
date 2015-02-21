@@ -1,6 +1,5 @@
 package com.GameName.GUI;
 
-import com.GameName.GUI.GUI;
 
 public class GUIManager {
 	

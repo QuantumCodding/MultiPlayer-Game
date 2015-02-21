@@ -22,8 +22,8 @@ import com.GameName.Engine.Threads.PhysicsThread;
 import com.GameName.Engine.Threads.ThreadGroup;
 import com.GameName.Engine.Threads.VBOThread;
 import com.GameName.Engine.Threads.WorldLoadThread;
-import com.GameName.Physics.Object.Material;
-import com.GameName.Physics.Object.Material.Phase;
+import com.GameName.Physics.Material;
+import com.GameName.Physics.Material.Phase;
 import com.GameName.Util.Interfaces.ICommandRegister;
 import com.GameName.Util.Interfaces.ICubeRegister;
 import com.GameName.Util.Interfaces.IEntityRegister;
@@ -74,10 +74,11 @@ public class ResourceManager implements ICubeRegister, ICommandRegister, IEntity
 	}
 	
 	public static final class Materials {
-		public static final Material Stone = new Material(2.3f, 0.72f, Phase.Solid, "Stone");
+//		                                                        0.72f
+		public static final Material Stone = new Material(2.3f, 1.5f, Phase.Solid, "Stone");
 		public static final Material Air = new Material(1.225f/100, 0.0f, Phase.Gas, "Air");
 		public static final Material Human = new Material(1.17f, 1000.0f, Phase.Solid, "Human");
-		//                                                       1.0f
+//		                                                         1.0f
 	}
 	
 	public static final class Worlds {

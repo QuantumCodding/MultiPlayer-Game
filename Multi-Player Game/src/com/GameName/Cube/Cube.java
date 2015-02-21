@@ -5,10 +5,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.security.InvalidParameterException;
-import java.util.HashSet;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
-import javax.vecmath.Vector2f;
 
 import com.GameName.Cube.Collision.DefaultCubeCollisionBox;
 import com.GameName.Cube.Collision.ICubeCollisionBox;
@@ -16,9 +15,10 @@ import com.GameName.Cube.Render.DefaultCubeRender;
 import com.GameName.Cube.Render.ICubeRender;
 import com.GameName.Engine.ResourceManager.Materials;
 import com.GameName.Engine.Registries.CubeRegistry;
-import com.GameName.Physics.Object.Material;
+import com.GameName.Physics.Material;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class Cube {
 	private static DefaultCubeRender defaultCubeRender;
@@ -40,8 +40,8 @@ public class Cube {
 	/** Texture Colors: Frame, Face, Colors */
 	private int[][][] texture;
 	private int frames;
-	private Vector2f sheetPosition;
-	private Vector2f texturesPerLine, textureSpacing;
+	private Vector3f sheetPosition;
+	private Vector3f texturesPerLine, textureSpacing;
 	private int textureSize;
 	private File textureLocation;
 	
@@ -50,6 +50,7 @@ public class Cube {
 	private float[] lightColor;
 	
 	private boolean isSolid;
+	private boolean isLiquid;
 	private boolean isVisable;
 	private float opacity;
 	
@@ -58,6 +59,7 @@ public class Cube {
 		setDisplayName(name);
 		
 		setSolid(true);
+		setLiquid(false);
 		setVisable(true);
 		setOpacity(1f);
 		
@@ -86,47 +88,47 @@ public class Cube {
 		if(!extraInfo.exists()) {
 			textureSize = DEFAULT_TEXTURE_SIZE;
 			textureLocation = new File("res/textures/cubes/" + name + ".png");
-			textureSpacing = new Vector2f(1, 1);
-			texturesPerLine = new Vector2f(6, 1);
-			sheetPosition = new Vector2f(0, 0);
+			textureSpacing = new Vector3f(1, 1, 0);
+			texturesPerLine = new Vector3f(6, 1, 0);
+			sheetPosition = new Vector3f(0, 0, 0);
 			frames = 1;
 			
 			return;
 		}
 		
 		try {
-			HashSet<TagGroup> info = DTGLoader.readDTGFile(extraInfo);
+			ArrayList<TagGroup> info = DTGLoader.readAll(DTGLoader.getInputStream(extraInfo));
 			
 			for(TagGroup group : info) {
-				if(group.getIdTag().getTagInfo().equals("textureData")) {
+				if(group.getIdTag().getInfo().equals("textureData")) {
 					
 					if(group.containsTag("textureSize")) {
-						textureSize = (Integer) group.getTagByName("textureSize").getTagInfo();
+						textureSize = (Integer) group.getTagByName("textureSize").getInfo();
 					}				
 					if(group.containsTag("textureSpacing")) {
-						textureSpacing = (Vector2f) group.getTagByName("textureSpacing").getTagInfo();
+						textureSpacing = (Vector3f) group.getTagByName("textureSpacing").getInfo();
 					}				
 					if(group.containsTag("texturesPerLine")) {
-						texturesPerLine = (Vector2f) group.getTagByName("texturesPerLine").getTagInfo();
+						texturesPerLine = (Vector3f) group.getTagByName("texturesPerLine").getInfo();
 					}
 					
-				} else if(group.getIdTag().getTagInfo().equals("textureSheet")) {
+				} else if(group.getIdTag().getInfo().equals("textureSheet")) {
 					
 					if(group.containsTag("sheetPosition")) {
-						sheetPosition = (Vector2f) group.getTagByName("sheetPosition").getTagInfo();
+						sheetPosition = (Vector3f) group.getTagByName("sheetPosition").getInfo();
 					}					
 					if(group.containsTag("sheetName")) {
 						textureLocation = new File(
 								"res/textures/cubes/" + 
-								(String) group.getTagByName("sheetName").getTagInfo()
+								(String) group.getTagByName("sheetName").getInfo()
 								+ ".png"
 						);
 					}
 					
-				} else if(group.getIdTag().getTagInfo().equals("textureAnimation")) {
+				} else if(group.getIdTag().getInfo().equals("textureAnimation")) {
 					
 					if(group.containsTag("frames")) {
-						frames = (Integer) group.getTagByName("frames").getTagInfo();
+						frames = (Integer) group.getTagByName("frames").getInfo();
 					}
 					
 				}
@@ -138,8 +140,8 @@ public class Cube {
 					"Cube " + name + " is using a texture sheet, but was not given a sheet position"); 
 			if(textureLocation == null) textureLocation = new File("res/textures/cubes/" + name + ".png");
 			
-			if(textureSpacing == null) textureSpacing = new Vector2f(1, 1);
-			if(texturesPerLine == null) texturesPerLine = new Vector2f(6, 1);
+			if(textureSpacing == null) textureSpacing = new Vector3f(1, 1, 0);
+			if(texturesPerLine == null) texturesPerLine = new Vector3f(6, 1, 0);
 			
 			if(frames == 0) frames = 1;
 			
@@ -291,6 +293,14 @@ public class Cube {
 	public boolean isSolid(int metadata) {
 		return isSolid;
 	}
+	
+	/**
+	 * Returns if this cube is a liquid
+	 * @param metadata The metadata of the cube	
+	 */
+	public boolean isLiquid(int metadata) {
+		return isLiquid;
+	}
 
 	/**
 	 * Returns if this cube can be rendered
@@ -382,6 +392,13 @@ public class Cube {
 	 */	
 	protected void setSolid(boolean isSolid) {
 		this.isSolid = isSolid;
+	}
+	
+	/**
+	 * 	Sets whether or not this cube is a liquid (Used for Physics)
+	 */	
+	protected void setLiquid(boolean isLiquid) {
+		this.isLiquid = isLiquid;
 	}
 
 	/**

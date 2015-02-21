@@ -4,7 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import com.GameName.Util.Vectors.MathVec3f;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class PacketPlayerLocation extends Packet {
 	public static final int id = 1;	
@@ -13,7 +13,7 @@ public class PacketPlayerLocation extends Packet {
 	
 	public PacketPlayerLocation() {}
 	
-	public PacketPlayerLocation(int playerID, MathVec3f pos) {
+	public PacketPlayerLocation(int playerID, Vector3f pos) {
 		this.playerID = playerID;
 		
 		this.x = pos.getX();
@@ -53,7 +53,7 @@ public class PacketPlayerLocation extends Packet {
 		return z;
 	}
 
-	public MathVec3f getPos() {
-		return new MathVec3f(x, y ,z);
+	public Vector3f getPos() {
+		return new Vector3f(x, y ,z);
 	}
 }

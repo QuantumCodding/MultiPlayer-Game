@@ -17,12 +17,11 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
-import javax.vecmath.TexCoord2f;
-
 import com.GameName.Engine.GameEngine;
 import com.GameName.Render.Types.Renderable;
 import com.GameName.Util.BufferUtil;
-import com.GameName.Util.Vectors.MathVec3f;
+import com.GameName.Util.Vectors.Vector2f;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class ModelRender extends Renderable {
 	private String name;
@@ -31,7 +30,7 @@ public class ModelRender extends Renderable {
 	private ArrayList<Animation> animations;
 	private ArrayList<Animation> animationsPlaying;
 	
-	private ArrayList<MathVec3f[]> effects;
+	private ArrayList<Vector3f[]> effects;
 
 	private int[] vertexVBOs;
 	private int[] textureVBOs;
@@ -59,7 +58,7 @@ public class ModelRender extends Renderable {
 
 	public void draw() {
 		for(int i = 0; i < vertexVBOs.length; i ++) {
-			MathVec3f[] effect = effects.get(i);
+			Vector3f[] effect = effects.get(i);
 			
 			glPushMatrix();
 				glTranslatef(effect[0].getX(), effect[0].getY(), effect[0].getZ());
@@ -102,8 +101,8 @@ public class ModelRender extends Renderable {
 		ArrayList<Float> textureCoords = new ArrayList<Float>();
 		ArrayList<Float> normals = new ArrayList<Float>();
 		
-		MathVec3f vertex, normal;
-		TexCoord2f textCoord;
+		Vector3f vertex, normal;
+		Vector2f textCoord;
 		
 		for(Face face : modelData.getFaces()) {
 			for(int index : face.getVertexIndices()) {
@@ -130,7 +129,7 @@ public class ModelRender extends Renderable {
 			}	
 			
 			for(int j = 0; j < face.getVertexIndices().length; j ++) {
-				effects.add(new MathVec3f[] {new MathVec3f(0, 0, 0), new MathVec3f(0, 0, 0), new MathVec3f(0, 0, 0)});
+				effects.add(new Vector3f[] {new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(0, 0, 0)});
 			}
 		}
 	
@@ -148,15 +147,15 @@ public class ModelRender extends Renderable {
 			.addBufferBind(normalBuffer, GL_ARRAY_BUFFER, normalVBOs[i], GL_DYNAMIC_DRAW, 'f');
 	}
 	
-	public void updatePartEffects(int[] is, MathVec3f[] effects) {
+	public void updatePartEffects(int[] is, Vector3f[] effects) {
 		for(int i : is) {
 			updatePartEffect(i, effects);
 		}
 	}
 	
-	public void updatePartEffect(int i, MathVec3f[] effect) {
-		MathVec3f[] currentEffects = effects.get(i);
-		effects.set(i, new MathVec3f[] {
+	public void updatePartEffect(int i, Vector3f[] effect) {
+		Vector3f[] currentEffects = effects.get(i);
+		effects.set(i, new Vector3f[] {
 				currentEffects[0].add(effect[0]),
 				currentEffects[1].add(effect[1]),
 				currentEffects[2].add(effect[2]),

@@ -2,10 +2,9 @@ package com.GameName.Cube.Render;
 
 import java.util.HashMap;
 
-import javax.vecmath.Vector2f;
-
 import com.GameName.Cube.Cube;
 import com.GameName.Render.Effects.Texture;
+import com.GameName.Util.Vectors.Vector2f;
 
 public class CubeTextureMap {
 	private Texture texture;

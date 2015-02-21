@@ -1,7 +1,7 @@
 package com.GameName.World;
 
 import com.GameName.Cube.Cube;
-import com.GameName.Util.Vectors.MathVec3f;
+import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Object.WorldObject;
 
 public class LoadedWorldAccess {
@@ -20,7 +20,7 @@ public class LoadedWorldAccess {
 		return Cube.getCubeByID(chunk.getCube(indexX, indexY, indexZ));
 	}
 	
-	public Cube getCube(MathVec3f cord) {
+	public Cube getCube(Vector3f cord) {
 		return getCube(cord.getX(), cord.getY(), cord.getZ());
 	}
 	
@@ -33,15 +33,15 @@ public class LoadedWorldAccess {
 		return chunk.getMetadata(indexX, indexY, indexZ);
 	}
 	
-	public int getMetadata(MathVec3f pos) {
+	public int getMetadata(Vector3f pos) {
 		return getMetadata(pos.getX(), pos.getY(), pos.getZ());
 	}
 	
 	public Chunk getChunk(int x, int y, int z) {
-		return getChunk(new MathVec3f(x, y, z));
+		return getChunk(new Vector3f(x, y, z));
 	}
 	
-	public Chunk getChunk(MathVec3f pos) {
+	public Chunk getChunk(Vector3f pos) {
 		return world.chunkLoader.getChunk(pos);
 	}
 	
@@ -63,7 +63,7 @@ public class LoadedWorldAccess {
 		return groundHeight;
 	}
 	
-	public float getGroundHeight(MathVec3f pos) {
+	public float getGroundHeight(Vector3f pos) {
 		return getGroundHeight(pos.getX(), pos.getY(), pos.getZ());
 	}
 	
@@ -99,15 +99,15 @@ public class LoadedWorldAccess {
 		return true;
 	}
 	
-	public boolean checkChunk(MathVec3f pos) {
+	public boolean checkChunk(Vector3f pos) {
 		return checkChunk(pos.getX(), pos.getY(), pos.getZ());
 	}
 	
 	public Cube[] getSurroundingCubes(float x, float y, float z) {
 		Cube[] cubes = new Cube[6];
 		
-		MathVec3f minPos = getCenter().subtract(getRenderRadius()).multiply(World.CHUNK_SIZE).capMin(0);		
-		MathVec3f maxPos = getCenter().add(getRenderRadius()).multiply(World.CHUNK_SIZE)
+		Vector3f minPos = getCenter().subtract(getLoadRadius()).multiply(World.CHUNK_SIZE).capMin(0);		
+		Vector3f maxPos = getCenter().add(getLoadRadius()).multiply(World.CHUNK_SIZE)
 				.capMax(world.world.getSizeAsVector()).subtract(1);
 			
 		try {
@@ -118,7 +118,7 @@ public class LoadedWorldAccess {
 			if(y < maxPos.getY()) cubes[4] = getCube(x, y + 1, z); // 4 +y					C				 c
 			if(y > minPos.getY()) cubes[5] = getCube(x, y - 1, z); // 5 -y					5				-y
 		} catch(NullPointerException e) {
-			System.err.println(new MathVec3f(x, y, z));
+			System.err.println(new Vector3f(x, y, z));
 			
 			System.err.println(e.toString());
 			e.printStackTrace(System.err);
@@ -126,7 +126,7 @@ public class LoadedWorldAccess {
 		return cubes;	
 	}
 	
-	public Cube[] getSurroundingCubes(MathVec3f pos) {
+	public Cube[] getSurroundingCubes(Vector3f pos) {
 		return getSurroundingCubes(pos.getX(), pos.getY(), pos.getZ());
 	}
 	
@@ -134,15 +134,15 @@ public class LoadedWorldAccess {
 		return world.chunkLoader;
 	}
 	
-	public MathVec3f getCenter() {
+	public Vector3f getCenter() {
 		return world.chunkLoader.getCenter();
 	}
 	
-	public static int getRenderRadius() {
+	public static int getLoadRadius() {
 		return LoadedWorld.loadRadius;
 	}
 	
-	public void setCenter(MathVec3f center) {
+	public void setCenter(Vector3f center) {
 		world.center = center;
 		getChunkLoaded().setCenter(center);
 	}
@@ -155,7 +155,7 @@ public class LoadedWorldAccess {
 		getChunk(chunkCoordX, chunkCoordY, chunkCoordZ).setCube(indexX, indexY, indexZ, Cube.getCubeByID(cubeId));
 	}
 	
-	public void setCube(MathVec3f pos, int cubeId) {
+	public void setCube(Vector3f pos, int cubeId) {
 		setCube(pos.getX(), pos.getY(), pos.getZ(), cubeId);
 	}
 	
@@ -167,7 +167,7 @@ public class LoadedWorldAccess {
 		getChunk(chunkCoordX, chunkCoordY, chunkCoordZ).setMetadata(indexX, indexY, indexZ, metadata);
 	}
 	
-	public void setMetadata(MathVec3f pos, int metadata) {
+	public void setMetadata(Vector3f pos, int metadata) {
 		setMetadata(pos.getX(), pos.getY(), pos.getZ(), metadata);
 	}
 	
@@ -179,7 +179,7 @@ public class LoadedWorldAccess {
 		getChunk(chunkCoordX, chunkCoordY, chunkCoordZ).setCubeWithMetadata(indexX, indexY, indexZ, Cube.getCubeByID(cube), metadata);
 	}
 
-	public void setCubeWithMetadata(MathVec3f pos, int cube, int metadata) {
+	public void setCubeWithMetadata(Vector3f pos, int cube, int metadata) {
 		setCubeWithMetadata(pos.getX(), pos.getY(), pos.getZ(), cube, metadata);
 	}
 }

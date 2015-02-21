@@ -3,7 +3,6 @@ package com.GameName.World.Generation;
 import java.util.Random;
 
 import com.GameName.Engine.GameEngine;
-import com.GameName.Engine.ResourceManager.Cubes;
 import com.GameName.World.Chunk;
 import com.GameName.World.World;
 

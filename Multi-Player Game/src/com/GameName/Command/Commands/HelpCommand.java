@@ -1,9 +1,9 @@
 package com.GameName.Command.Commands;
 
 import com.GameName.Command.Command;
+import com.GameName.Console.Base.Logger;
 import com.GameName.Engine.GameEngine;
 import com.GameName.Engine.Registries.CommandRegistry;
-import com.GameName.Main.Debugging.Logger;
 
 public class HelpCommand extends Command {
 
@@ -17,22 +17,22 @@ public class HelpCommand extends Command {
 			boolean swap = false;
 			for(Command command : CommandRegistry.getCommands()) {
 				if(swap)
-					Logger.print(command.getName() + " " + command.getInfo()).setType("").end();
+					Logger.addLine(command.getName() + " " + command.getInfo());
 				else
-					Logger.print(command.getName() + " " +  command.getInfo()).setType("").setBold().end();
+					Logger.addLine(command.getName() + " " +  command.getInfo());
 				swap = !swap;
 			}
 			
-			Logger.print("").setType("").end();
+			Logger.addLine("");
 			return true;
 		} else {
 			for(Command command : CommandRegistry.getCommands()) {
 				if(command.getName().equals(parm[0])) {
-					Logger.print("<b>"+command.getName()+":</b>" +
+					Logger.addLine("<b>"+command.getName()+":</b>" +
 							command.getDescription() + "\n"
-						).setType("").end();
+						);
 					
-					Logger.print("\n" + command.getParm()).setType("Parm").end();
+					Logger.addLine("\n" + command.getParm());;
 					return true;
 				}
 			}

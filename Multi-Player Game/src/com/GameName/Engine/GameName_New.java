@@ -9,13 +9,15 @@ import javax.imageio.ImageIO;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 
+import com.GameName.Console.Base.ConsoleWindow;
+import com.GameName.Engine.ResourceManager.Materials;
+import com.GameName.Engine.ResourceManager.Threads;
+import com.GameName.Engine.ResourceManager.Worlds;
 import com.GameName.Engine.Registries.CommandRegistry;
 import com.GameName.Engine.Registries.CubeRegistry;
 import com.GameName.Engine.Registries.EntityRegistry;
 import com.GameName.Engine.Registries.ThreadRegistry;
 import com.GameName.Engine.Registries.WorldRegistry;
-import com.GameName.Engine.ResourceManager.Threads;
-import com.GameName.Engine.ResourceManager.Worlds;
 import com.GameName.Engine.Threads.GameThread;
 import com.GameName.Entity.EntityPlayer;
 import com.GameName.Input.Control;
@@ -79,6 +81,8 @@ public class GameName_New implements ISetup {
 	}
 	
 	public void init() {
+		Materials.Human.setElasticity(0.000001f);
+		Materials.Stone.setElasticity(0.000001f);
 		engine = new GameEngine(this);
 		ResourceManager.registerAll(engine);	
 		
@@ -114,7 +118,7 @@ public class GameName_New implements ISetup {
 		engine.getPlayer().resetCam();
 		
 		Threads.EntityThread.addEntity(engine.getPlayer());
-		Threads.PhysicsThread.setEngine(engine.getPhysics());
+		Threads.PhysicsThread.setPhysicsEngine(engine.getPhysics());
 		engine.add(engine.getPlayer());
 		
 		Threads.WorldLoadThread.setWorld(Worlds.MainWorld);
@@ -128,9 +132,9 @@ public class GameName_New implements ISetup {
 		isRunning = true;
 		Worlds.MainWorld.getLoadedWorld().getAccess().getChunkLoaded().update();
 		
-		engine.getThreads().addAll(engine.getDebugWindow());
+		engine.getThreads().addAll(engine.getConsole().getThread());
 		engine.getThreads().startAll(); FPS_Thread.start();
-		engine.getDebugWindow().start(engine.getDebugWindow());
+		ConsoleWindow.start(engine.getConsole());
 		
 		engine.getPlayer().reset();
 		
@@ -140,7 +144,6 @@ public class GameName_New implements ISetup {
 			
 			Control.tick();
 //			GameName.guiManager.update();
-			engine.getDebugWindow().update();
 			
 			for(GameThread thread : engine.getThreads().getThreads()) {
 				thread.getTracker().update();

@@ -23,7 +23,9 @@ public class Start_New {
 		gameName.preInit();
 		gameName.init();
 		gameName.postInit();
+		
 		System.out.println("OpenGL Version: " + Window.getOpenGLVersion());
+		System.out.println("GLSL Version: " + Window.getGLSLVersion());
 				
 		try {
 			gameName.run();

@@ -15,12 +15,10 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.vecmath.TexCoord2f;
-import javax.vecmath.Vector2f;
-
 import com.GameName.Engine.GameEngine;
 import com.GameName.Render.Effects.ShaderRegistry;
 import com.GameName.Util.BufferUtil;
+import com.GameName.Util.Vectors.Vector2f;
 
 public abstract class Render2D extends Renderable {
 	private Vector2f pos;
@@ -132,12 +130,12 @@ public abstract class Render2D extends Renderable {
 		forceVBOUpdate();
 	}
 	
-	public void setTexCoordsTop(TexCoord2f texCoordsTop) {
+	public void setTexCoordsTop(Vector2f texCoordsTop) {
 		this.texCoordsTop = texCoordsTop;
 		forceVBOUpdate();
 	}
 
-	public void setTexCoordsBottom(TexCoord2f texCoordsBottom) {
+	public void setTexCoordsBottom(Vector2f texCoordsBottom) {
 		this.texCoordsBottom = texCoordsBottom;
 		forceVBOUpdate();
 	}

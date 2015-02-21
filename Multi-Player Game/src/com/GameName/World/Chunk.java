@@ -10,13 +10,11 @@ import com.GameName.Cube.Render.CubeRenderUtil;
 import com.GameName.Cube.Render.CubeTextureMap;
 import com.GameName.Engine.GameEngine;
 import com.GameName.Engine.Registries.WorldRegistry;
-import com.GameName.Physics.Object.ChunkCollisionShapeBuilder;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.Tag;
 import com.GameName.Util.Tag.TagGroup;
-import com.GameName.Util.Vectors.MathVec3f;
+import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Render.ChunkRender;
-import com.bulletphysics.dynamics.RigidBody;
 
 public class Chunk {
 	private final float MINIMUM_LIGHT_DEFUTION = 0.5f;
@@ -32,7 +30,6 @@ public class Chunk {
 	private final int x, y, z;
 	
 	private ChunkRender render;
-	private RigidBody rigidBody;
 	private HashSet<Cube> typesOfCubes;
 	
 	private int[] cubes;
@@ -239,10 +236,6 @@ public class Chunk {
 			
 		}}}
 		
-		if(true){//isCubeVisable(x, y, z)) {		TODO: Fix when world loading is fixed		
-			rigidBody = ChunkCollisionShapeBuilder.build(this);
-		}
-		
 		updateTextureMap();
 		render.setHasCubes(hasCubes);		
 		render.forceVBOUpdate();
@@ -268,8 +261,8 @@ public class Chunk {
 		World world = WorldRegistry.getWorld(worldId);
 		LoadedWorldAccess access = world.getLoadedWorld().getAccess();
 		
-		MathVec3f minPos = access.getCenter().subtract(LoadedWorldAccess.getRenderRadius()).capMin(0);		
-		MathVec3f maxPos = access.getCenter().add(LoadedWorldAccess.getRenderRadius())
+		Vector3f minPos = access.getCenter().subtract(LoadedWorldAccess.getLoadRadius()).capMin(0);		
+		Vector3f maxPos = access.getCenter().add(LoadedWorldAccess.getLoadRadius())
 				.capMax(world.getChunkSizeAsVector().subtract(1));
 		
 		if(isPosOnEdge(x, y, z)) {
@@ -324,7 +317,7 @@ public class Chunk {
 	public void save(String fileLoc) {
 		try {
 			File saveLoc =  new File(fileLoc + getX() + " x " + getY() + " x " + getZ() + ".dtg");
-			DTGLoader.saveDTGFile(saveLoc, getTagGroup());
+			DTGLoader.writeAll(DTGLoader.getOutputStream(saveLoc), getTagGroup());
 			
 		} catch(IOException e) {
 			System.err.println("Failed to save Chunk " + getPos().valuesToString() + " in World " + WorldRegistry.getWorld(worldId));
@@ -358,8 +351,8 @@ public class Chunk {
 		return z;
 	}
 	
-	public MathVec3f getPos() {
-		return new MathVec3f(x, y, z);
+	public Vector3f getPos() {
+		return new Vector3f(x, y, z);
 	}
 
 	public boolean isInitialized() {
@@ -386,7 +379,7 @@ public class Chunk {
 			
 			tagLines.add(new TagGroup(new Tag("type", "cube"), new Tag[] {
 				new Tag("cubeId", cube),
-				new Tag("pos", new MathVec3f(x, y, z))
+				new Tag("pos", new Vector3f(x, y, z))
 			}));
 		}}}
 		
@@ -451,11 +444,7 @@ public class Chunk {
 	public HashSet<Cube> getTypesOfCubes() {
 		return typesOfCubes;
 	}
-	
-	public RigidBody getRigidBody() {
-		return rigidBody;
-	}
-	
+
 	public int getCubeCount() {
 		return cubeCount;
 	}

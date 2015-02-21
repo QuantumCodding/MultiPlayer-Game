@@ -2,15 +2,15 @@ package com.GameName.World;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import com.GameName.Cube.Cube;
 import com.GameName.Engine.GameEngine;
 import com.GameName.Engine.ResourceManager.Cubes;
-import com.GameName.Engine.ResourceManager.Worlds;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
-import com.GameName.Util.Vectors.MathVec3f;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class ChunkLoader {
 	private String fileLoc;
@@ -18,7 +18,7 @@ public class ChunkLoader {
 	private HashSet<Chunk> unloadedChunks;
 	private HashSet<Chunk> loadedChunks;
 	
-	private MathVec3f center;
+	private Vector3f center;
 	private int loadRadius;
 	
 	private World world;
@@ -33,12 +33,12 @@ public class ChunkLoader {
 		unloadedChunks = new HashSet<Chunk>();
 		loadedChunks = new HashSet<Chunk>();
 		
-		center = new MathVec3f(0, 0, 0);
+		center = new Vector3f(0, 0, 0);
 		fileLoc = world.getFileLoc() + "/chunks/";
 	}
 	
 	public void update() {
-		if(center == null) center = new MathVec3f(0, 0, 0);
+		if(center == null) center = new Vector3f(0, 0, 0);
 		
 		findUnloadedChunks();
 		unloadChunks();
@@ -46,8 +46,8 @@ public class ChunkLoader {
 	}
 	
 	public void findUnloadedChunks() {
-		MathVec3f minPos = center.subtract(loadRadius).capMin(0);
-		MathVec3f maxPos = center.add(loadRadius).capMax(world.getChunkSizeAsVector()).subtract(1);
+		Vector3f minPos = center.subtract(loadRadius).capMin(0);
+		Vector3f maxPos = center.add(loadRadius).capMax(world.getChunkSizeAsVector()).subtract(1);
 		
 		for(Chunk chunk : getLoadedChunks()) {//int i = 0; i < getLoadedChunks().size(); i ++) { //Chunk chunk : getLoadedChunks()
 //			Chunk chunk = getLoadedChunks().get(i);
@@ -69,7 +69,6 @@ public class ChunkLoader {
 			updateNeighbors(chunk, false);
 			
 			chunk.setIsLoaded(false);
-			ENGINE.getPhysics().removeObject(chunk.getRigidBody());
 			ENGINE.getRender().remove(chunk.getRender());
 			chunk.getRender().cleanUp();
 			unloadedChunks.remove(chunk);//.remove(i);
@@ -87,7 +86,7 @@ public class ChunkLoader {
 				if(x < 0 || y < 0 || z < 0) continue;
 				if(x > world.getChunkX() || y > world.getChunkY() || z > world.getChunkZ()) continue;
 				
-				MathVec3f loadPos = new MathVec3f(x, y, z).add(center).capMax(world.getChunkSizeAsVector().subtract(1)).capMin(0);
+				Vector3f loadPos = new Vector3f(x, y, z).add(center).capMax(world.getChunkSizeAsVector().subtract(1)).capMin(0);
 				Chunk chunk = getChunk(loadPos);
 				
 				if(chunk == null) {
@@ -103,14 +102,14 @@ public class ChunkLoader {
 					+ ".dtg");
 				
 				try {
-					HashSet<TagGroup> tags = DTGLoader.readDTGFile(loadFile);
-					MathVec3f pos; int id;
+					ArrayList<TagGroup> tags = DTGLoader.readAll(DTGLoader.getInputStream(loadFile));
+					Vector3f pos; int id;
 					
 					for(TagGroup group : tags) {
-						if(!(((String) group.getIdTag().getTagInfo()).equals("cube"))) continue;
+						if(!(((String) group.getIdTag().getInfo()).equals("cube"))) continue;
 						
-						pos = (MathVec3f) group.getTagByName("pos").getTagInfo();					
-						id = ((Integer) group.getTagByName("cubeId").getTagInfo()).intValue();
+						pos = (Vector3f) group.getTagByName("pos").getInfo();					
+						id = ((Integer) group.getTagByName("cubeId").getInfo()).intValue();
 						
 						chunk.setCubeWithoutUpdate(
 							(int) pos.getX(), (int) pos.getY(), (int) pos.getZ(), Cube.getCubeByID(id)
@@ -119,13 +118,21 @@ public class ChunkLoader {
 					
 				} catch(IOException e) {
 					System.out.println("Generateing: [" + x + ", " + y + ", " + z + "]");
-					chunk = new Chunk(ENGINE, World.CHUNK_SIZE, Worlds.MainWorld.getId(), x, y, z);//world.getEnvironmentGen().generate(World.CHUNK_SIZE, world, x, y, z, 10);
+					chunk = new Chunk(ENGINE, World.CHUNK_SIZE, world.getId(), x, y, z); //world.getEnvironmentGen().generate(World.CHUNK_SIZE, world, x, y, z, 10);
 					
 					for(int x_ = 0; x_ < chunk.getSize(); x_ ++) {
 					for(int y_ = 0; y_ < chunk.getSize(); y_ ++) {
 					for(int z_ = 0; z_ < chunk.getSize(); z_ ++) {
-						if(x_ + y_ + z_ < 10) {
-							chunk.setCube(x_, y_, z_, x+y+z == 0 ? Cubes.ColorfulTestCube : Cubes.TestCube);
+						if(x_ + x * chunk.getSize() == 90 || x_ + x * chunk.getSize() == 10) {
+							chunk.setCube(x_, y_, z_, y_ == 0 || z_ == 0 ? Cubes.ColorfulTestCube : Cubes.StoneCube);
+						}
+						
+						if(y_ + y * chunk.getSize() == 90 || y_ + y * chunk.getSize() == 10) {
+							chunk.setCube(x_, y_, z_, x_ == 0 || z_ == 0 ? Cubes.ColorfulTestCube : Cubes.StoneCube);
+						}
+						
+						if(z_ + z * chunk.getSize() == 90 || z_ + z * chunk.getSize() == 10) {
+							chunk.setCube(x_, y_, z_, y_ == 0 || x_ == 0 ? Cubes.ColorfulTestCube : Cubes.StoneCube);
 						}
 					}}}
 				}
@@ -138,9 +145,9 @@ public class ChunkLoader {
 	}
 	
 	private void updateNeighbors(Chunk current, boolean state) {
-		MathVec3f min = center.subtract(loadRadius).capMin(0);
-		MathVec3f max = center.add(loadRadius).capMax(world.getChunkSizeAsVector()).subtract(1);
-		MathVec3f pos = current.getPos().clone(); 
+		Vector3f min = center.subtract(loadRadius).capMin(0);
+		Vector3f max = center.add(loadRadius).capMax(world.getChunkSizeAsVector()).subtract(1);
+		Vector3f pos = current.getPos().clone(); 
 				
 		if(pos.lessThen(min) || pos.greaterThen(max)) return;
 		
@@ -153,7 +160,7 @@ public class ChunkLoader {
 		updateNeighbor(pos.add(0, 0, 1), current, min, max, true, 3, state);
 	}
 	
-	public void updateNeighbor(MathVec3f pos, Chunk current, MathVec3f min, MathVec3f max, boolean greater, int side, boolean state) {
+	public void updateNeighbor(Vector3f pos, Chunk current, Vector3f min, Vector3f max, boolean greater, int side, boolean state) {
 		int oppSide = side == 4 ? 5 : side == 5 ? 4 : (side + 2) % 4;		
 		if((pos.lessThenOrEqual(max) && greater) || (pos.greaterThenOrEqual(min) && !greater)) {
 			Chunk chunk = getChunk(pos);
@@ -181,7 +188,6 @@ public class ChunkLoader {
 		chunk.handelMassUpdate();
 		chunk.updateTextureMap();
 		
-		ENGINE.add(chunk.getRigidBody());
 		ENGINE.add(chunk.getRender()); 
 		chunk.forceVBOUpdate();
 	}
@@ -223,8 +229,8 @@ public class ChunkLoader {
 	}
 		
 	public Chunk getChunk(float x, float y, float z) {
-		return getChunk(new MathVec3f(x, y, z));}
-	public Chunk getChunk(MathVec3f pos) {		
+		return getChunk(new Vector3f(x, y, z));}
+	public Chunk getChunk(Vector3f pos) {		
 		for(Chunk chunk : getLoadedChunks()) {//int i = 0; i < getLoadedChunks().size(); i ++) { //Chunk chunk : getLoadedChunks()
 //			Chunk chunk = getLoadedChunks().get(i);
 			
@@ -236,7 +242,7 @@ public class ChunkLoader {
 		return null;
 	}
 
-	public MathVec3f getCenter() {
+	public Vector3f getCenter() {
 		return center;
 	}
 
@@ -244,7 +250,7 @@ public class ChunkLoader {
 		return loadRadius;
 	}
 
-	public void setCenter(MathVec3f center) {
+	public void setCenter(Vector3f center) {
 		this.center = center;
 	}
 

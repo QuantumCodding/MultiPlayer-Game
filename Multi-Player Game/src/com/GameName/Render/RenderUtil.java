@@ -10,7 +10,7 @@ import java.util.List;
 import com.GameName.Cube.Cube;
 import com.GameName.Engine.GameEngine;
 import com.GameName.Util.BufferUtil;
-import com.GameName.Util.Vectors.MathVec3f;
+import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.World;
 
 public class RenderUtil {
@@ -133,13 +133,13 @@ public class RenderUtil {
 		return lightValue;
 	}
 		
-	public static MathVec3f calculatePolygonNormal(MathVec3f... vertices) {
-		MathVec3f normal = new MathVec3f(0, 0, 0);
+	public static Vector3f calculatePolygonNormal(Vector3f... vertices) {
+		Vector3f normal = new Vector3f(0, 0, 0);
 		
 		for(int i = 0; i < vertices.length; i ++) {
-			MathVec3f current = vertices[i], next = vertices[(i + 1) % vertices.length];
+			Vector3f current = vertices[i], next = vertices[(i + 1) % vertices.length];
 			
-			normal.addAndSet(new MathVec3f(
+			normal = normal.add(new Vector3f(
 					(current.getY() - next.getY()) * (current.getZ() + next.getZ()), 
 					(current.getZ() - next.getZ()) * (current.getX() + next.getX()), 
 					(current.getX() - next.getX()) * (current.getY() + next.getY())					

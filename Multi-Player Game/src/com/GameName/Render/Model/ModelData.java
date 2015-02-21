@@ -9,16 +9,15 @@ import static org.lwjgl.opengl.GL11.glShadeModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.vecmath.TexCoord2f;
-
-import com.GameName.Util.Vectors.MathVec3f;
+import com.GameName.Util.Vectors.Vector2f;
+import com.GameName.Util.Vectors.Vector3f;
 
 
 public class ModelData {
 
-    private ArrayList<MathVec3f> vertices;
-    private ArrayList<TexCoord2f> textureCoordinates;
-    private ArrayList<MathVec3f> normals;
+    private ArrayList<Vector3f> vertices;
+    private ArrayList<Vector2f> textureCoordinates;
+    private ArrayList<Vector3f> normals;
     
     private ArrayList<Face> faces;
     
@@ -56,15 +55,15 @@ public class ModelData {
         return getNormals().size() > 0;
     }
 
-    public ArrayList<MathVec3f> getVertices() {
+    public ArrayList<Vector3f> getVertices() {
         return vertices;
     }
 
-    public ArrayList<TexCoord2f> getTextureCoordinates() {
+    public ArrayList<Vector2f> getTextureCoordinates() {
         return textureCoordinates;
     }
 
-    public ArrayList<MathVec3f> getNormals() {
+    public ArrayList<Vector3f> getNormals() {
         return normals;
     }
 

@@ -2,28 +2,28 @@ package com.GameName.Engine;
 
 import com.GameName.Audio.SoundEngine;
 import com.GameName.Audio.SoundEvent;
+import com.GameName.Console.Console;
 import com.GameName.Engine.Threads.GameThread;
 import com.GameName.Engine.Threads.ThreadGroup;
 import com.GameName.Entity.EntityPlayer;
-import com.GameName.Main.Debugging.DebugWindow;
 import com.GameName.Networking.Client;
 import com.GameName.Networking.Server;
-import com.GameName.Physics.PhysicsWorld;
-import com.GameName.Physics.Object.PhysicsObject;
+import com.GameName.Physics.PhysicsEngine;
+import com.GameName.Physics.PhysicsObject;
+import com.GameName.Physics.Dispatch.AABBCollisionDispacher;
 import com.GameName.Render.GLContextThread;
 import com.GameName.Render.RenderEngine;
 import com.GameName.Render.Types.Renderable;
 import com.GameName.World.World;
-import com.bulletphysics.dynamics.RigidBody;
 
 public class GameEngine {
 	private GameName_New gameName;
 	
-	private DebugWindow debugWindow;
+	private Console console;
 	private GLContextThread glContextThread;
 	private ThreadGroup threads;
 	
-	private PhysicsWorld physics;
+	private PhysicsEngine physics;
 	private RenderEngine render;
 	private SoundEngine sound;
 	
@@ -38,14 +38,14 @@ public class GameEngine {
 	}
 	
 	public GameEngine init(World world) {
-		debugWindow = new DebugWindow(this);
+		console = new Console(this);
 		glContextThread = new GLContextThread();
 		threads = new ThreadGroup();		
 
 		currentWorld = world;
 		player = new EntityPlayer(this);
 		
-		physics = new PhysicsWorld();
+		physics = new PhysicsEngine(new AABBCollisionDispacher());
 		render = new RenderEngine(this);
 		sound = new SoundEngine(this);
 		
@@ -55,16 +55,16 @@ public class GameEngine {
 		return this;
 	}
 	
-	public DebugWindow getDebugWindow() {return debugWindow;}
+	public Console getConsole() {return console;}
 	public GLContextThread getGLContext() {return glContextThread;}	
 	public ThreadGroup getThreads() {return threads;}
 	public void addThread(GameThread thread) {threads.addThread(thread);}
 	
-	public void add(RigidBody obj) {physics.addObject(obj);}
+	public void add(PhysicsObject obj) {physics.add(obj);}
 	public void add(Renderable obj) {render.add(obj);}
 	public void add(SoundEvent obj) {sound.add(obj);}
 
-	public PhysicsWorld getPhysics() {return physics;}	
+	public PhysicsEngine getPhysics() {return physics;}	
 	public RenderEngine getRender() {return render;}	
 	public SoundEngine getSound() {return sound;}
 

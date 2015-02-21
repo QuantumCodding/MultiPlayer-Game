@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.GameName.Cube.Cube;
 import com.GameName.Render.RenderUtil;
-import com.GameName.Util.Vectors.MathVec3f;
+import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.World;
 
 public class DefaultCubeRender implements ICubeRender {
@@ -14,7 +14,7 @@ public class DefaultCubeRender implements ICubeRender {
 		
 		for(int i = 0; i < DEFAULT_CUBE.length; i ++) {
 			if(visableFaces[i / 4]) {
-				MathVec3f pos = DEFAULT_CUBE[i].add(new MathVec3f(x, y, z)).multiply(World.CUBE_SIZE);
+				Vector3f pos = DEFAULT_CUBE[i].add(new Vector3f(x, y, z)).multiply(World.CUBE_SIZE);
 				
 				vertices.add(pos.getX());
 				vertices.add(pos.getY());
@@ -81,19 +81,19 @@ public class DefaultCubeRender implements ICubeRender {
 		ArrayList<Float> normals = new ArrayList<Float>();
 		ArrayList<Float> vertices = getVertices(0, 0, 0, new boolean[] {true, true, true, true, true, true});		
 		
-		ArrayList<MathVec3f> faceNormals = new ArrayList<MathVec3f>();		
+		ArrayList<Vector3f> faceNormals = new ArrayList<Vector3f>();		
 		for(int i = 0; i < 6; i ++) {
 			int index = i * 4 - 1;
 			
 			faceNormals.add(RenderUtil.calculatePolygonNormal(
-					new MathVec3f(vertices.get(++index), vertices.get(++index), vertices.get(++index)),
-					new MathVec3f(vertices.get(++index), vertices.get(++index), vertices.get(++index)),
-					new MathVec3f(vertices.get(++index), vertices.get(++index), vertices.get(++index)),
-					new MathVec3f(vertices.get(++index), vertices.get(++index), vertices.get(++index))
+					new Vector3f(vertices.get(++index), vertices.get(++index), vertices.get(++index)),
+					new Vector3f(vertices.get(++index), vertices.get(++index), vertices.get(++index)),
+					new Vector3f(vertices.get(++index), vertices.get(++index), vertices.get(++index)),
+					new Vector3f(vertices.get(++index), vertices.get(++index), vertices.get(++index))
 				));
 		}
 		
-		ArrayList<MathVec3f> vertexNormals = new ArrayList<MathVec3f>();
+		ArrayList<Vector3f> vertexNormals = new ArrayList<Vector3f>();
 		for(int i = 0; i < 8; i ++) {
 			vertexNormals.add(
 					faceNormals.get(i % 4).add(faceNormals.get((i + 1) % 4)).add(faceNormals.get((i / 4) + 4))
@@ -118,7 +118,7 @@ public class DefaultCubeRender implements ICubeRender {
 					default: break;				
 				}
 				
-				MathVec3f normal = vertexNormals.get(index);
+				Vector3f normal = vertexNormals.get(index);
 				normals.add(normal.getX()); normals.add(normal.getY()); normals.add(normal.getZ());
 			}
 		}

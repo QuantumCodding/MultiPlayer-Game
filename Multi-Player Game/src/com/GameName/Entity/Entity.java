@@ -1,10 +1,10 @@
 package com.GameName.Entity;
 
-import javax.vecmath.Vector3f;
-
 import com.GameName.Engine.GameEngine;
+import com.GameName.Physics.Material;
+import com.GameName.Physics.Collision.CollisionShape;
+import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Object.WorldObject;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 
 public abstract class Entity extends WorldObject {
 	protected int mana, hunger, health;
@@ -18,8 +18,8 @@ public abstract class Entity extends WorldObject {
 	 *    Sets max health and max mana to 10 
 	 *    Sets max hunger to 100
 	 */
-	public Entity(RigidBodyConstructionInfo info, GameEngine eng) {
-		super(info);
+	public Entity(CollisionShape shape, Material material, GameEngine eng) {
+		super(shape, material);
 		ENGINE = eng;
 		
 		maxHealth = 10;        health = maxHealth;
@@ -40,22 +40,22 @@ public abstract class Entity extends WorldObject {
 	
 	
 	public void moveX(float amount) {
-		applyForce(new Vector3f((float) (amount * Math.cos(Math.toRadians(getRot().y)) * -1), 
-				0, (float) (amount * Math.sin(Math.toRadians(getRot().y)) * -1)));
+		applyForce(new Vector3f((float) (amount * Math.cos(Math.toRadians(getRotation().y)) * -1), 
+				0, (float) (amount * Math.sin(Math.toRadians(getRotation().y)) * -1)));
 	}
 	
 	public void moveZ(float amount) {
-		applyForce(new Vector3f((float) (amount * Math.cos(Math.toRadians(getRot().y + 90)) * -1), 
-				0, (float) (amount * Math.sin(Math.toRadians(getRot().y + 90)) * -1)));
+		applyForce(new Vector3f((float) (amount * Math.cos(Math.toRadians(getRotation().y + 90)) * -1), 
+				0, (float) (amount * Math.sin(Math.toRadians(getRotation().y + 90)) * -1)));
 	}
 	
 	public void moveY(float amount) {
 		applyForce(new Vector3f(0, amount, 0));
 	}
 	
-	public void rotateX(float amount) {applyRotation(new Vector3f(amount, 0, 0));}
-	public void rotateY(float amount) {applyRotation(new Vector3f(0, amount, 0));}
-	public void rotateZ(float amount) {applyRotation(new Vector3f(0, 0, amount));}
+	public void rotateX(float amount) {applyTorque(new Vector3f(amount, 0, 0));}
+	public void rotateY(float amount) {applyTorque(new Vector3f(0, amount, 0));}
+	public void rotateZ(float amount) {applyTorque(new Vector3f(0, 0, amount));}
 
 	public int getHealth() 	{ return health; }
 	public int getHunger() 	{ return hunger; }

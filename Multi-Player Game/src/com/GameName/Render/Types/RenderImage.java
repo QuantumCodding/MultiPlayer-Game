@@ -10,10 +10,9 @@ import static org.lwjgl.opengl.GL11.glTexCoord2f;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex2f;
 
-import javax.vecmath.TexCoord2f;
-
 import com.GameName.Engine.GameEngine;
 import com.GameName.Render.Effects.Texture;
+import com.GameName.Util.Vectors.Vector2f;
 
 public class RenderImage extends Render2D {
 	private Texture image;
@@ -31,8 +30,8 @@ public class RenderImage extends Render2D {
 		setColor(null);
 		setTexture(null);
 		
-		setTexCoordsTop(new TexCoord2f(0, 0));
-		setTexCoordsBottom(new TexCoord2f(1, 1));
+		setTexCoordsTop(new Vector2f(0, 0));
+		setTexCoordsBottom(new Vector2f(1, 1));
 	}
 
 	protected void renderForground() {

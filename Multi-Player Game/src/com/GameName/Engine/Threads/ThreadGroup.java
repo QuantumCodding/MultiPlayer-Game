@@ -2,8 +2,8 @@ package com.GameName.Engine.Threads;
 
 import java.util.ArrayList;
 
+import com.GameName.Console.ThreadStatusTab;
 import com.GameName.Engine.GameEngine;
-import com.GameName.Main.Debugging.DebugWindow;
 
 public class ThreadGroup {
 	public static final int DEFAULT_TICK_RATE = 60;
@@ -19,9 +19,9 @@ public class ThreadGroup {
 		threads.add(thread); return this;
 	}
 	
-	public void setEngine(GameEngine eng) {
+	public void setEngine(GameEngine engine) {
 		for(GameThread thread : threads) {
-			thread.setEngine(eng);
+			thread.setENGINE(engine);
 		}
 	}
 	
@@ -37,9 +37,9 @@ public class ThreadGroup {
 		}
 	}
 	
-	public void addAll(DebugWindow window) {
+	public void addAll(ThreadStatusTab tab) {
 		for(GameThread thread : threads) {
-			window.addPanel(thread.getTracker());
+			tab.addThread(thread.getTracker());
 		}
 	}
 	

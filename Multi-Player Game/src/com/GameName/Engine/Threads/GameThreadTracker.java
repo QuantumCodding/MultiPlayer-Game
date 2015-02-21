@@ -1,98 +1,36 @@
 package com.GameName.Engine.Threads;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.JToggleButton;
 
-import com.GameName.Main.Debugging.DebugPanel;
-
-public class GameThreadTracker extends DebugPanel {	
-	private static final long serialVersionUID = 1L;
-
-	private static final int CHART_OFFSET = 20;
-	private static final int CHART_WIDTH = 360;
-	private static final int CHART_AMOUNT = 360;
-	private static final int TICK_SIZE = Math.round((float) CHART_WIDTH / (float) CHART_AMOUNT);
+public class GameThreadTracker extends JPanel {	
+	private static final long serialVersionUID = -7026024720212863950L;
+	
+	public static final int CHART_OFFSET_X = 3;// 20;
+	public static final int CHART_OFFSET_Y = 3;// 20;
+	
 	private static final int TICK_CHECK_TIME = 1;
+
+	private int chartWidth, chartHeight, chartAmount;
+	private int tickSize;
 	
-	private JLabel nameLabel;
-	private JTextField tpsLabel;
-	private JToggleButton pauseButton;
-	private JButton restartButton;
-	
-	private GameThread gameThread;
+	private JTextField tpsLabel;	
+	private GameThread thread;
 	
 	private int count;
 	private int[] pastTPS;
 	private int[] pastColors;
 	private int avgTPS;
 	
-	public GameThreadTracker(final GameThread gameThread) {
-		super(gameThread.getName());
+	public GameThreadTracker(GameThread thread) {
+		this.thread = thread;
 		
-		this.gameThread = gameThread;
-		Font font = new Font("", 0, 15);
-		Font font2 = new Font("", 0, 20);
-		
-		pastTPS = new int[CHART_AMOUNT];
+		pastTPS = new int[chartAmount];
 		pastColors = new int[pastTPS.length];
 		avgTPS = 0;
-		
-		nameLabel = new JLabel(gameThread.getName());	nameLabel.setFont(font2);	nameLabel.setAlignmentX(Box.LEFT_ALIGNMENT);
-		tpsLabel = new JTextField();					tpsLabel.setFont(font2);	tpsLabel.setAlignmentX(Box.LEFT_ALIGNMENT);
-		pauseButton = new JToggleButton("Pause");		pauseButton.setFont(font);	pauseButton.setAlignmentX(Box.RIGHT_ALIGNMENT);
-		restartButton = new JButton("Restart");			restartButton.setFont(font);restartButton.setAlignmentX(Box.LEFT_ALIGNMENT);
-		
-		pauseButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(pauseButton.isSelected()) {
-					try {
-						gameThread.pause();
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
-				} else {
-					gameThread.resume();
-				}
-			}
-		});
-		
-		restartButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				gameThread.restart();
-			}
-		});
-		
-		tpsLabel.setEditable(false);
-				
-		add(nameLabel); add(tpsLabel); add(pauseButton); add(restartButton);		
-		update();
-	}
-	
-	public void update() {
-		float tpsDiv = (float) gameThread.getTPS() / (float) gameThread.getTickRate();
-		
-		tpsLabel.setForeground(gameThread.isPaused() ? Color.BLUE : 
-			tpsDiv > 0.5 ? Color.GREEN : tpsDiv > 0.25 ? Color.YELLOW : Color.RED
-		);
-		
-		if(gameThread.getTickRate() != ThreadGroup.UNCAPED_TICK_RATE) 
-			tpsLabel.setText(gameThread.getTPS() + " / " + gameThread.getTickRate());
-		else
-			tpsLabel.setText(gameThread.getTPS() + "");
-		
-		if(++ count > TICK_CHECK_TIME) {
-			updateChart();
-			count = 0;
-		}
 	}
 	
 	private void updateChart() {
@@ -105,30 +43,55 @@ public class GameThreadTracker extends DebugPanel {
 			preTotal += pastTPS[i - 1];
 		}
 		
-		pastTPS[pastTPS.length - 1] = gameThread.isLive() ? gameThread.getTPS() : 0; 
-		pastColors[pastColors.length - 1] = tpsLabel.getForeground().getRGB();//
+		if(tpsLabel != null && pastTPS.length != 0) { //TODO: Temporary?
+			pastTPS[pastTPS.length - 1] = thread.isLive() ? thread.getTPS() : 0; 
+			pastColors[pastColors.length - 1] = tpsLabel.getForeground().getRGB();//
+			preTotal += pastTPS[pastTPS.length - 1]; avgTPS = preTotal / pastTPS.length;
+		}
+	}
+	
+	public void update() {
+		float tpsDiv = (float) thread.getTPS() / (float) thread.getTickRate();
 		
-		preTotal += pastTPS[pastTPS.length - 1]; avgTPS = preTotal / pastTPS.length;
+		if(tpsLabel != null) {
+			tpsLabel.setForeground(thread.isPaused() ? Color.BLUE : 
+				tpsDiv > 0.75 ? Color.GREEN : tpsDiv > 0.50 ? Color.YELLOW : Color.RED
+			);
+			
+			if(thread.getTickRate() != ThreadGroup.UNCAPED_TICK_RATE) 
+				tpsLabel.setText(thread.getTPS() + " / " + thread.getTickRate());
+			else
+				tpsLabel.setText(thread.getTPS() + "");
+		}
+		
+		if(++ count > TICK_CHECK_TIME) {
+			updateChart();
+			count = 0;
+		}
 	}
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
-		g.setColor(gameThread.isLive() ? gameThread.isPaused() ? Color.BLUE : Color.DARK_GRAY : Color.RED);
-		g.fillRect(CHART_OFFSET - 3, 50 - 3, CHART_WIDTH + 6, 40 + 6);
+		g.fillRect(CHART_OFFSET_X - 3, CHART_OFFSET_Y - 3, chartWidth + 6, chartHeight + 6);
 
 		g.setColor(new Color(150, 150, 150));
-		g.fillRect(CHART_OFFSET, 50, CHART_WIDTH, 40);
+		g.fillRect(CHART_OFFSET_X, CHART_OFFSET_Y, chartWidth, chartHeight);
 		
-		float ratio = 40 / ((float) gameThread.getTickRate() + 5f);
+		float ratio = chartHeight / ((float) thread.getTickRate() + 3f);
 		
 		for(int i = 0; i < pastTPS.length; i ++) {
 			g.setColor(new Color(pastColors[i]));
-			g.fillRect(i * TICK_SIZE + CHART_OFFSET, 90, TICK_SIZE, (int) -(ratio * pastTPS[i]));
+			g.fillRect(i * tickSize + CHART_OFFSET_X, CHART_OFFSET_Y + chartHeight, tickSize, (int) -(ratio * pastTPS[i]));
 		}
 		
 //		g.setColor(Color.ORANGE);//(int) (Math.random() * 10 * 5 + 10)
 //		g.drawLine(CHART_OFFSET, 90 - (int) (ratio * avgTPS), CHART_WIDTH + CHART_OFFSET, 90 - (int) (ratio * avgTPS));
+		
+		int alfa = 100;
+		g.setColor(thread.isLive() ? thread.isPaused() ? new Color(0, 255, 255, alfa) : 
+			new Color(255, 255, 255, 0) : new Color(255, 0, 0, alfa));
+		g.fillRect(CHART_OFFSET_X, CHART_OFFSET_Y, chartWidth, chartHeight);
 		
 		try {
 			Thread.sleep(10);
@@ -136,11 +99,53 @@ public class GameThreadTracker extends DebugPanel {
 			e.printStackTrace();
 		}
 		
-//		update();
+		update();
 		repaint();
 	}
 
 	public int getAvgTPS() {
 		return avgTPS;
+	}
+
+	public void pause() throws InterruptedException {
+		thread.pause();
+	}
+
+	public void resume() {
+		thread.resume();
+	}
+
+	public void restart() {
+		thread.restart();
+	}
+	
+	public boolean isPaused() {
+		return thread.isPaused();
+	}
+
+	public String getName() {
+		return thread.getName();
+	}
+	
+	public void setTPSLabel(JTextField field) {
+		tpsLabel = field;
+	}
+
+	public int getChartWidth() { return chartWidth; }
+	public int getChartHeight() { return chartHeight; }
+	public int getChartAmount() { return chartAmount; }
+
+	public void setChartHeight(int chartHeight) { 
+		this.chartHeight = chartHeight;
+	}
+	
+	public void setChartWidth(int chartWidth) { 
+		this.chartWidth = chartWidth;
+		this.chartAmount = chartWidth;
+		tickSize = Math.round((float) chartWidth / (float) chartAmount);
+		
+		if(chartWidth <= 0) return;
+		pastTPS = new int[chartAmount];
+		pastColors = new int[pastTPS.length];
 	}
 }

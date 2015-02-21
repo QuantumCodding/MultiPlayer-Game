@@ -1,20 +1,19 @@
 package com.GameName.Engine.Threads;
 
-import com.GameName.Main.Debugging.Logger;
-import com.GameName.Util.Vectors.MathVec3f;
+import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.World;
 
 public class WorldLoadThread extends GameThread {
 
 	private World world;
-	private MathVec3f lastChunk;
+	private Vector3f lastChunk;
 	
 	public WorldLoadThread(int tickRate) {
 		super(tickRate, "World Load Thread");
 	}
 
 	void init() {
-		lastChunk = new MathVec3f(-1, -1, -1);
+		lastChunk = new Vector3f(-1, -1, -1);
 	}
 
 	void tick() {

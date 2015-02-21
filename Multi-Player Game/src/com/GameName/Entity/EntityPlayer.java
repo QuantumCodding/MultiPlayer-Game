@@ -7,29 +7,25 @@ import static org.lwjgl.openal.AL10.alListener3f;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-
-import javax.vecmath.Vector2f;
-import javax.vecmath.Vector3f;
 
 import org.lwjgl.opengl.Display;
 
+import com.GameName.Console.Base.Logger;
 import com.GameName.Engine.GameEngine;
 import com.GameName.Engine.ResourceManager.Materials;
 import com.GameName.Input.Control;
 import com.GameName.Items.ItemStack;
-import com.GameName.Main.Debugging.Logger;
 import com.GameName.Networking.Client;
 import com.GameName.Networking.Packets.PacketPlayerInventorySize;
 import com.GameName.Networking.Packets.PacketPlayerInventorySlot;
 import com.GameName.Networking.Packets.PacketPlayerLocation;
 import com.GameName.Networking.Packets.PacketPlayerStats;
-import com.GameName.Physics.Object.PhysicsObject;
+import com.GameName.Physics.Collision.BoxShape;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
-import com.GameName.Util.Vectors.MathVec3f;
-import com.bulletphysics.collision.shapes.BoxShape;
+import com.GameName.Util.Vectors.Vector2f;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class EntityPlayer extends Entity {
 	private ItemStack[] inv;
@@ -46,27 +42,25 @@ public class EntityPlayer extends Entity {
 	private int jumpsLeft;
 	
 	private int maxReach;
-	private MathVec3f selectedCube;
+	private Vector3f selectedCube;
 	
 	private Vector2f pointerPos;
 	private boolean isPointerDown;
 	
 	public EntityPlayer(GameEngine eng) {
-		super(new PhysicsObject.Builder().setMaterial(Materials.Human)
-				.setShape(new BoxShape(new Vector3f(0.5f, 1.5f, 0.5f)))
-				.setPosition(20, 200, 20).buildInfo(), eng
-			);
+		super(new BoxShape(new Vector3f(0, 0, 0), new Vector3f(0.5f, 0.5f, 0.5f)), Materials.Human, eng);
+		setNoClip(true);
 	}
 	
 	protected void init() {
 		resetCam();
 		resetPlayer();
 		
-		alListener3f(AL_POSITION, getPos().x, getPos().y, getPos().z);
+		alListener3f(AL_POSITION, getPosition().x, getPosition().y, getPosition().z);
 	}
 	
 	public void resetCam() {//                                                       0.3f
-		cam = new Camera(70, (float)Display.getWidth() / (float)Display.getHeight(), 0.5f, renderDistance);
+		cam = new Camera(70, (float)Display.getWidth() / (float)Display.getHeight(), 0.3f, renderDistance);
 		if(ENGINE.getRender() != null) {
 			ENGINE.getRender().setUpPerspectives();
 		}
@@ -74,7 +68,7 @@ public class EntityPlayer extends Entity {
 	
 	public void resetPlayer() {
 		super.reset();
-		Logger.print("Player Reseting").setType("Setup").end();
+		Logger.addLine("Player Reseting", Logger.SETUP);
 		
 		pointerPos = new Vector2f(0, 0);
 		
@@ -86,7 +80,7 @@ public class EntityPlayer extends Entity {
 		jumpsLeft = maxJumps;		
 		
 		maxReach = 50;
-		selectedCube = new MathVec3f(0, 0, 0);
+		selectedCube = new Vector3f(0, 0, 0);
 		
 		playerMove(true);
 		
@@ -103,24 +97,24 @@ public class EntityPlayer extends Entity {
 		
 		checkControls();
 		
-		cam.x = getRenderPos().x; cam.rotX = getRot().x;
-		cam.y = getRenderPos().y; cam.rotY = getRot().y;
-		cam.z = getRenderPos().z; cam.rotZ = getRot().z;
+		cam.x = getRenderPos().x; cam.rotX = getRotation().x;
+		cam.y = getRenderPos().y; cam.rotY = getRotation().y;
+		cam.z = getRenderPos().z; cam.rotZ = getRotation().z;
 	}
 	
 	private void checkControls() {				
-		MathVec3f oldPos = (MathVec3f) getPos().clone();
+		Vector3f oldPos = (Vector3f) getPosition().clone();
 		
 		for(Control ctr : controls) {
 			if(ctr.isActive() != 0.0){
 				
 				switch(ctr.control) {
-					case "forward": if(!lockMovement) moveZ((float) /*(ctr.isActive() / speed)*/ 300); 	break;						
-					case "back": 	if(!lockMovement) moveZ((float)-/*(ctr.isActive() / speed)*/ 300); 	break;		
-					case "left": 	if(!lockMovement) moveX((float)-/*(ctr.isActive() / speed)*/ 300); 	break;
-					case "right":   if(!lockMovement) moveX((float) /*(ctr.isActive() / speed)*/ 300);  break;
-					case "up": 		if(!lockMovement) moveY((float) /*(ctr.isActive() / speed)*/ 300); 	break;		
-					case "down": 	if(!lockMovement) moveY((float)-/*(ctr.isActive() / speed)*/ 300); 	break;
+					case "forward": if(!lockMovement) moveZ((float) /*(ctr.isActive() / speed)*/ 15); break;						
+					case "back": 	if(!lockMovement) moveZ((float)-/*(ctr.isActive() / speed)*/ 15); break;		
+					case "left": 	if(!lockMovement) moveX((float)-/*(ctr.isActive() / speed)*/ 15); break;
+					case "right":   if(!lockMovement) moveX((float) /*(ctr.isActive() / speed)*/ 15); break;
+					case "up": 		if(!lockMovement) moveY((float) /*(ctr.isActive() / speed)*/ 15); break;		
+					case "down": 	if(!lockMovement) moveY((float)-/*(ctr.isActive() / speed)*/ 15); break;
 					
 					case "lookUp": 	if(!lockMovement)  /*if(entityPhisics(0))*/ rotateX((float) (ctr.isActive() / 1f)); break;				
 					case "lookDown": if(!lockMovement) /*if(entityPhisics(0))*/ rotateX((float) (ctr.isActive() / 1f)); break;			
@@ -142,6 +136,12 @@ public class EntityPlayer extends Entity {
 					case "pointerRight": 	pointerPos.x += (float) ctr.isActive(); break;
 					case "click": 			isPointerDown = true; break;
 					
+					case "showLog": 
+						ENGINE.getConsole().setVisible(true);
+						ENGINE.getConsole().setTab(ENGINE.getConsole().getLog());
+						ENGINE.getConsole().toFront(); ENGINE.getConsole().repaint();
+						ENGINE.getConsole().getLog().focusOnInputField();
+					break;
 //					case "toggle": if(!lockMovement) { GameName.guiManager.toggle("Test"); GameName.guiManager.toggle("Pause"); } break;
 					
 //					case "placeTest": currentWorld.setCube(selectedCube.add(PhysicsUtil.getPosNextToFace(PhysicsUtil.getDirection(rot))), Cube.ColorfulTestCube.getId()); break;
@@ -159,24 +159,24 @@ public class EntityPlayer extends Entity {
 				}
 			}
 						
-			if(!oldPos.equals(getPos())) {
+			if(!oldPos.equals(getPosition())) {
 				playerMove(true);
 			}
 		}
 	}
 		
 	public void playerMove(boolean send) {
-		alListener3f(AL_POSITION, getPos().x, getPos().y, getPos().z);
-		alListener3f(AL_ORIENTATION, getRot().x, getRot().y, getRot().z);
+		alListener3f(AL_POSITION, getPosition().x, getPosition().y, getPosition().z);
+		alListener3f(AL_ORIENTATION, getRotation().x,getRotation().y, getRotation().z);
 		
 		if(!send) return;		
 		Client clt = ENGINE.getClient();			
 		if(clt != null && clt.isOnServer()) {
-			clt.sendPacket(new PacketPlayerLocation(clt.getID(), getPos()));
+			clt.sendPacket(new PacketPlayerLocation(clt.getID(), getPosition()));
 		}	
 	}
 	
-	public MathVec3f getSelectedCube() { return selectedCube; }
+	public Vector3f getSelectedCube() { return selectedCube; }
 	public Vector2f getPointerPos() { return pointerPos; }	
 	public boolean isPointerDown() { return isPointerDown; }
 	public Camera getCamera() { return cam; }	
@@ -246,7 +246,7 @@ public class EntityPlayer extends Entity {
 		List<Control> controlls = new ArrayList<Control>();
 		
 		try {
-			HashSet<TagGroup> groups = DTGLoader.readDTGFile(f);
+			ArrayList<TagGroup> groups = DTGLoader.readAll(DTGLoader.getInputStream(f));
 			
 			for(TagGroup group : groups) {
 				controlls.add(Control.getControlFormTagGroup(group));
@@ -259,13 +259,13 @@ public class EntityPlayer extends Entity {
 	}
 	
 	public File saveControls(File f) throws IOException {
-		ArrayList<TagGroup> tagLines = new ArrayList<TagGroup>();
+		ArrayList<TagGroup> tagLines = new ArrayList<>();
 		
 		for(Control control : controls) {
 			tagLines.add(control.getTagGroup());
 		}
 		
-		DTGLoader.saveDTGFile(f, tagLines);		
+		DTGLoader.writeAll(DTGLoader.getOutputStream(f), tagLines);		
 		return f;
 	}
 }

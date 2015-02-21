@@ -162,13 +162,13 @@ public class Control {
 	public static Control getControlFormTagGroup(TagGroup group) {
 		Control control = new Control();
 		
-		control.control = (String) group.getIdTag().getTagInfo();
-		control.deadZone = (Double) group.getTagByName("deadzone").getTagInfo();
-		control.forward = (Integer) group.getTagByName("forward").getTagInfo() == 1;
-		control.id = (Integer) group.getTagByName("id").getTagInfo();
-		control.isAxis = (Integer) group.getTagByName("isAxis").getTagInfo() == 1;
-		control.onlyOnce = (Integer) group.getTagByName("onlyOnce").getTagInfo() == 1;
-		control.type = (Integer) group.getTagByName("type").getTagInfo();
+		control.control = (String) group.getIdTag().getInfo();
+		control.deadZone = (Double) group.getTagByName("deadzone").getInfo();
+		control.forward = (Boolean) group.getTagByName("forward").getInfo();
+		control.id = (Integer) group.getTagByName("id").getInfo();
+		control.isAxis = (Boolean) group.getTagByName("isAxis").getInfo();
+		control.onlyOnce = (Boolean) group.getTagByName("onlyOnce").getInfo();
+		control.type = (Integer) group.getTagByName("type").getInfo();
 //		control.c = GameName.c;
 		
 		return control;		

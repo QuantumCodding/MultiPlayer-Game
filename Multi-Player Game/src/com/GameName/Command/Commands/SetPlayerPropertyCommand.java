@@ -23,7 +23,9 @@ public class SetPlayerPropertyCommand extends Command {
 			case "maxHunger": ENGINE.getPlayer().setMaxHunger(Integer.parseInt(parm[1])); return true;
 			
 			case "reset": ENGINE.getPlayer().resetPlayer(); return true;
+			
 			case "noClip": ENGINE.getPlayer().setNoClip(Boolean.parseBoolean(parm[1])); return true;
+			case "flying": ENGINE.getPlayer().setFlying(Boolean.parseBoolean(parm[1])); return true;
 			
 			default: return false;
 		}

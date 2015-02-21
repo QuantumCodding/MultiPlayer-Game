@@ -1,4 +1,4 @@
-package com.GameName.Physics.Object;
+package com.GameName.Physics;
 
 public class Material {
 	private float density;		

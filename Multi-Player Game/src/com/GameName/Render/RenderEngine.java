@@ -56,8 +56,8 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.UnicodeFont;
 import org.newdawn.slick.font.effects.ColorEffect;
 
+import com.GameName.Console.Base.Logger;
 import com.GameName.Engine.GameEngine;
-import com.GameName.Main.Debugging.Logger;
 import com.GameName.Render.Effects.Shader;
 import com.GameName.Render.Effects.ShaderRegistry;
 import com.GameName.Render.Types.Render2D;
@@ -204,15 +204,15 @@ public class RenderEngine implements IEngine<Renderable> {
 		glPushMatrix();
 		
 //			glBegin(GL_QUADS);
-//				for(Vector3f vec : ICubeRender.DEFAULT_CUBE) {
+//				for(MathVec3f vec : ICubeRender.DEFAULT_CUBE) {
 //					glColor3f((float) Math.random() * 10 % 10 / 10, (float) Math.random() * 10 % 10 / 10, (float) Math.random() * 10 % 10 / 10);
 //					glVertex3f(vec.getX() * 100, vec.getY() * 100, vec.getZ() * 100);
 //				}			
 //			glEnd();
-		
 			
-			
-			glRotatef(180, 0, 1, 0);
+
+			glRotatef(180, 0, 0, 1);
+			glRotatef(90, 0, 1, 0);
 //	    	glScalef(World.SCALE, World.SCALE, World.SCALE);
 	    	
 //			glEnableVertexAttribArray(0); // Position
@@ -258,9 +258,9 @@ public class RenderEngine implements IEngine<Renderable> {
 			glEnableVertexAttribArray(1); // Texture Data
 			
 			//TODO: Remove Test Code
-			float x = oneDecimal(ENGINE.getPlayer().getPos().getX());
-			float y = oneDecimal(ENGINE.getPlayer().getPos().getY());
-			float z = oneDecimal(ENGINE.getPlayer().getPos().getZ());
+			float x = oneDecimal(ENGINE.getPlayer().getPosition().getX());
+			float y = oneDecimal(ENGINE.getPlayer().getPosition().getY());
+			float z = oneDecimal(ENGINE.getPlayer().getPosition().getZ());
 			
 			glTranslatef(0, 540, 0);
 			
@@ -268,7 +268,7 @@ public class RenderEngine implements IEngine<Renderable> {
 			
 	        font.drawString(0, 0, "FPS: " + ENGINE.getGameName().getFPS() + ", " + ENGINE.getPlayer().getSelectedCube().getX() + " " + ENGINE.getPlayer().getSelectedCube().getY() + " " + ENGINE.getPlayer().getSelectedCube().getZ(), col); // 
 	        font.drawString(0, 20, x + "," + y + "," + z, col);
-	        font.drawString(0, 40, oneDecimal(ENGINE.getPlayer().getRot().x) + "," + oneDecimal(ENGINE.getPlayer().getRot().y) + "," + oneDecimal(ENGINE.getPlayer().getRot().z), col);
+	        font.drawString(0, 40, oneDecimal(ENGINE.getPlayer().getRotation().x) + "," + oneDecimal(ENGINE.getPlayer().getRotation().y) + "," + oneDecimal(ENGINE.getPlayer().getRotation().z), col);
 
 		glPopMatrix();
 
@@ -313,7 +313,7 @@ public class RenderEngine implements IEngine<Renderable> {
 	public void add(Renderable obj) {
 		if(obj instanceof Render2D) render2D.add((Render2D) obj);
 		else if(obj instanceof Render3D) render3D.add((Render3D) obj);
-		else Logger.print("Unknown Type: " + obj).setType("ERROR").end();
+		else Logger.addLine("Unknown Type: " + obj, Logger.ERROR);
 	}
 
 	public void remove(Renderable obj) {

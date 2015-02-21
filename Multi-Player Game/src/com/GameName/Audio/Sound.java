@@ -1,8 +1,8 @@
 package com.GameName.Audio;
 
 import static org.lwjgl.openal.AL10.alBufferData;
-import static org.lwjgl.openal.AL10.alGenBuffers;
 import static org.lwjgl.openal.AL10.alDeleteBuffers;
+import static org.lwjgl.openal.AL10.alGenBuffers;
 
 import java.io.BufferedInputStream;
 import java.io.File;

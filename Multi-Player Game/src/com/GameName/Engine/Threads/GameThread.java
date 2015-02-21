@@ -3,8 +3,8 @@ package com.GameName.Engine.Threads;
 import com.GameName.Engine.GameEngine;
 import com.GameName.Util.Time;
 
+
 public abstract class GameThread implements Runnable {
-	GameEngine ENGINE;	
 	private GameThreadTracker tracker;
 	
 	private double tickTime;
@@ -19,6 +19,7 @@ public abstract class GameThread implements Runnable {
 	private int id;
 	
 	private Thread thread;
+	protected GameEngine ENGINE;
 	
 	public GameThread(int tickRate, String name) {	
 		tickTime = 1.0 / (double) tickRate;	
@@ -69,7 +70,7 @@ public abstract class GameThread implements Runnable {
 	public void run() {	
 		init();
 
-		long lastTime = Time.getTime();
+		long lastTime = Time.getSystemTime();
 		double unprocessedTime = 0;
 		
 		int frames = 0;
@@ -78,21 +79,21 @@ public abstract class GameThread implements Runnable {
 		while(isRunning) {			
 			boolean tick = false;
 
-			long startTime = Time.getTime();
+			long startTime = Time.getSystemTime();
 			long passedTime = startTime - lastTime;
 			lastTime = startTime;
 			
-			unprocessedTime += passedTime / (double) Time.getSECONDS();
+			unprocessedTime += passedTime / (double) Time.SECONDS;
 			frameCounter += passedTime;
 			
-			while(unprocessedTime > (isPaused ? 0 : tickTime)) {
+			while(unprocessedTime > tickTime) {
 				tick = true;
 				
-				unprocessedTime -= (isPaused ? 0 : tickTime);
+				unprocessedTime -= tickTime;
 				
 				if(isStopRequested)	try { stop(); } catch (InterruptedException e) { e.printStackTrace(); }
 
-				if(frameCounter >= Time.getSECONDS()) {
+				if(frameCounter >= Time.SECONDS) {
 					TPS = frames;
 					
 					frames = 0;
@@ -101,12 +102,14 @@ public abstract class GameThread implements Runnable {
 			}
 			
 			if(tick) {
-				timeSinceLastTick = (float) (((double) Time.getTime() - (double) lastTick) / Time.getSECONDS());
-				lastTick = Time.getTime();
+				timeSinceLastTick = (float) (((double) Time.getSystemTime() - (double) lastTick) / Time.SECONDS);
+				lastTick = Time.getSystemTime();
 				
-				tick();		
+				if(!isPaused)
+					tick();		
 				frames ++;
-							
+				
+//				tracker.update();
 			} else {				
 				try	{
 					Thread.sleep(1);
@@ -161,7 +164,7 @@ public abstract class GameThread implements Runnable {
 		this.id = id;
 	}
 	
-	public void setEngine(GameEngine eng) {
-		ENGINE = eng;
+	public void setENGINE(GameEngine ENGINE) {
+		this.ENGINE = ENGINE;
 	}
 }
