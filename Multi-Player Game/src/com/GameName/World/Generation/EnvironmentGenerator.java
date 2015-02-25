@@ -3,6 +3,7 @@ package com.GameName.World.Generation;
 import java.util.Random;
 
 import com.GameName.Engine.GameEngine;
+import com.GameName.Engine.ResourceManager.Cubes;
 import com.GameName.World.Chunk;
 import com.GameName.World.World;
 
@@ -23,25 +24,27 @@ public class EnvironmentGenerator {
 		ENGINE = eng;
 	}
 	
-//	public Chunk generate(int scale, World world, int x, int y, int z, int seed) {
-//		Chunk out = new Chunk(ENGINE, scale, world.getId(), x, y, z);
-//		for(int i=0; i<World.CHUNK_SIZE; i++) {
-//			for(int j=0; j<World.CHUNK_SIZE; j++) {
-//				ran=r.nextInt(10);
-//				for(int k=0; k<World.CHUNK_SIZE; k++) {
-//					if(y*World.CHUNK_SIZE+k <= 20+ran)
-//						out.setCubeWithoutUpdate(i, k, j, Cubes.StoneCube);
-//					else
-//						out.setCubeWithoutUpdate(i, k, j, Cubes.Air);
-//				}
-//			}
-//		}
-//		
-//		return out;
-//	}
-	
 	public Chunk generate(int scale, World world, int x, int y, int z, int seed) {
-		return test.generate(scale, x, y, z);
+		Chunk out = new Chunk(ENGINE, World.CHUNK_SIZE, world.getId(), x, y, z);
+		
+		for(int xi=0; xi<World.CHUNK_SIZE; xi++) {
+			for(int zi=0; zi<World.CHUNK_SIZE; zi++) {
+				double elevation = SimplexNoise.noise((double)(x*World.CHUNK_SIZE+xi)/World.CHUNK_SIZE/8, (double)(z*World.CHUNK_SIZE+zi)/World.CHUNK_SIZE/8);
+//				double roughness = SimplexNoise.noise((double)(x*World.CHUNK_SIZE+xi)/World.CHUNK_SIZE/4, (double)(z*World.CHUNK_SIZE+zi)/World.CHUNK_SIZE/4)*2;
+//				double detail = SimplexNoise.noise((double)(x*World.CHUNK_SIZE+xi)/World.CHUNK_SIZE, (double)(z*World.CHUNK_SIZE+zi)/World.CHUNK_SIZE);
+				double h = elevation;
+				h = (h/2)*World.CHUNK_SIZE;
+				for(int yi=0; yi<World.CHUNK_SIZE; yi++) {
+					
+					if(y*World.CHUNK_SIZE+yi<h+world.getSizeY())
+						out.setCubeWithoutUpdate(xi, yi, zi, Cubes.StoneCube);
+					else
+						out.setCubeWithoutUpdate(xi, yi, zi, Cubes.Air);
+				}
+			}
+		}
+		
+		return out;
 	}
 	
 	
