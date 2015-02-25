@@ -11,7 +11,7 @@ public class EnvironmentGenerator {
 
 	int seed;
 	World world;
-	private DensityGeneration test;
+	private SimplexNoiseSeedable noiseGenerator;
 	Random r = new Random();
 	private GameEngine ENGINE;
 	int ran = 0;
@@ -20,7 +20,7 @@ public class EnvironmentGenerator {
 	public EnvironmentGenerator(GameEngine eng, int seedI, World worldI) {
 		seed = seedI;
 		world = worldI;
-		test = new DensityGeneration(eng, seed, (int)World.SCALE, world);
+		noiseGenerator = new SimplexNoiseSeedable(seedI);
 		ENGINE = eng;
 	}
 	
@@ -29,7 +29,7 @@ public class EnvironmentGenerator {
 		
 		for(int xi=0; xi<World.CHUNK_SIZE; xi++) {
 			for(int zi=0; zi<World.CHUNK_SIZE; zi++) {
-				double elevation = SimplexNoise.noise((double)(x*World.CHUNK_SIZE+xi)/World.CHUNK_SIZE/8, (double)(z*World.CHUNK_SIZE+zi)/World.CHUNK_SIZE/8);
+				double elevation = noiseGenerator.noise((double)(x*World.CHUNK_SIZE+xi)/World.CHUNK_SIZE/8, (double)(z*World.CHUNK_SIZE+zi)/World.CHUNK_SIZE/8);
 //				double roughness = SimplexNoise.noise((double)(x*World.CHUNK_SIZE+xi)/World.CHUNK_SIZE/4, (double)(z*World.CHUNK_SIZE+zi)/World.CHUNK_SIZE/4)*2;
 //				double detail = SimplexNoise.noise((double)(x*World.CHUNK_SIZE+xi)/World.CHUNK_SIZE, (double)(z*World.CHUNK_SIZE+zi)/World.CHUNK_SIZE);
 				double h = elevation;
@@ -37,7 +37,7 @@ public class EnvironmentGenerator {
 				for(int yi=0; yi<World.CHUNK_SIZE; yi++) {
 					
 					if(y*World.CHUNK_SIZE+yi<h+world.getSizeY())
-						out.setCubeWithoutUpdate(xi, yi, zi, Cubes.StoneCube);
+						out.setCubeWithoutUpdate(xi, yi, zi, Math.random() * 10 > 7 ? Cubes.StoneCube : Cubes.ColorfulTestCube);
 					else
 						out.setCubeWithoutUpdate(xi, yi, zi, Cubes.Air);
 				}
