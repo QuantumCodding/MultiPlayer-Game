@@ -1,8 +1,6 @@
 package com.GameName.World;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import com.GameName.Cube.Cube;
@@ -10,9 +8,6 @@ import com.GameName.Cube.Render.CubeRenderUtil;
 import com.GameName.Cube.Render.CubeTextureMap;
 import com.GameName.Engine.GameEngine;
 import com.GameName.Engine.Registries.WorldRegistry;
-import com.GameName.Util.Tag.DTGLoader;
-import com.GameName.Util.Tag.Tag;
-import com.GameName.Util.Tag.TagGroup;
 import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Render.ChunkRender;
 
@@ -22,6 +17,7 @@ public class Chunk {
 	
 	private boolean isInitialized;
 	private boolean isAccessible;
+	private boolean isModified;
 	private boolean hasCubes, isLoaded;
 	private boolean[] loadedNeighbors;
 	private int cubeCount;
@@ -32,13 +28,12 @@ public class Chunk {
 	private ChunkRender render;
 	private HashSet<Cube> typesOfCubes;
 	
-	private int[] cubes;
-	private int[] cubeMetadata;
+	private int[] cubeMap;
+	private int[] lightMap;
+	private int[] extraDataMap;
 	private final int size;
 	
-	private float[][] lightColorMap;
-	private float[]   lightValueMap;
-	private float 	  ambiantLight = (float) ((1d / (double) World.MAX_LIGHT) * World.AMBIANT_LIGHT);
+	private float ambiantLight = (float) ((1d / (double) World.MAX_LIGHT) * World.AMBIANT_LIGHT);
 	
 	public Chunk(GameEngine eng, int size, int worldId, int x, int y, int z) { 
 		ENGINE = eng;
@@ -47,15 +42,19 @@ public class Chunk {
 		this.x = x; this.y = y; this.z = z;
 		
 		this.size = size;
-		cubes = new int[size * size * size];
-		cubeMetadata = new int[size * size * size];
 		
-		lightColorMap = new float[size * size * size][3];
-		lightValueMap = new float[size * size * size];
+		int sizeCubed = size * size * size;
+		cubeMap = new int[sizeCubed];
+		lightMap = new int[sizeCubed];
+		extraDataMap = new int[sizeCubed];
 		
-		for(int i = 0; i < size * size * size; i ++) {
-			lightColorMap[i] = new float[] {1.0f, 1.0f, 1.0f};
-			lightValueMap[i] = ambiantLight;
+		for(int i = 0; i < sizeCubed; i ++) {
+			int V = colorScale(ambiantLight) << 24 & 0xFF000000;
+			int R = colorScale(1.0f) << 16 & 0x00FF0000;
+			int G = colorScale(1.0f) << 8  & 0x0000FF00;
+			int B = colorScale(1.0f) << 0  & 0x000000FF;
+			
+			lightMap[i] = V | R | G | B;
 		}
 		
 		loadedNeighbors = new boolean[]{false, false, false, false, false, false};
@@ -86,8 +85,8 @@ public class Chunk {
 			return;
 		}
 
-		float lastIntensity = lightValueMap[x + (y * size) + (z * size * size)];
-		float[] lastColor = lightColorMap[x + (y * size) + (z * size * size)];	
+		float lastIntensity = getLightValue(x, y, z);
+		float[] lastColor = getLightColor(x, y, z);
 		
 		float[] newColor = {
 				(lastColor[0] * lastIntensity) + (color[0] * intensity), 
@@ -97,8 +96,8 @@ public class Chunk {
 		
 		float newIntensity = Math.min(intensity + lastIntensity, 1);
 		
-		lightColorMap[x + (y * size) + (z * size * size)] = newColor;
-		lightValueMap[x + (y * size) + (z * size * size)] = newIntensity;
+		setLightColor(x, y, z, newColor);
+		setLightValue(x, y, z, newIntensity);
 		
 		intensity -= ((1 / intensity) * Cube.getCubeByID(getCube(x, y, z)).getOpacity(getMetadata(x, y, z))) + MINIMUM_LIGHT_DEFUTION;
 		
@@ -112,32 +111,95 @@ public class Chunk {
 		updateLightMap(x, y, z + 1, color, intensity);
 	}	
 	
+	private void setLightValue(int x, int y, int z, float value) {
+		int lightColor = lightMap[x + (size * y) + (size * size * z)] & 0x00FFFFFF;
+		int lightValue = colorScale(value) << 24 & 0xFF000000;
+		lightMap[x + (size * y) + (size  * size * z)] = lightValue | lightColor;
+	}
+	
+	private void setLightColor(int x, int y, int z, float[] value) {
+		int lightValue = lightMap[x + (size * y) + (size * size * z)] & 0xFF000000;
+		
+		int R = colorScale(value[0]) << 16 & 0x00FF0000;
+		int G = colorScale(value[1]) << 8  & 0x0000FF00;
+		int B = colorScale(value[2]) << 0  & 0x000000FF;
+		
+		lightMap[x + (size * y) + (size * size * z)] = lightValue | R | G | B; 
+	}
+	
+	public int colorScale(float in) {
+		return Math.min(Math.round((in * 255)), 255);
+	}
+	
+	public int getRawCubeMap(int x, int y, int z) {
+		return cubeMap[x + (y * size) + (z * size * size)];
+	}
+	
+	public int getRawLightMap(int x, int y, int z) {
+		return cubeMap[x + (y * size) + (z * size * size)];
+	}
+	
+	public int getRawExtraData(int x, int y, int z) {
+		return cubeMap[x + (y * size) + (z * size * size)];
+	}
+	
+	public int getDamage(int x, int y, int z) {
+		return extraDataMap[x + (y * size) + (z * size * size)] >> 26 & 0x0000003F;
+	}
+	
+	public boolean isNatural(int x, int y, int z) {
+		return (extraDataMap[x + (y * size) + (z * size * size)] >> 25 & 0x00000001) == 1;
+	}
+	
+	public int getStructureId(int x, int y, int z) {
+		return extraDataMap[x + (y * size) + (z * size * size)] >> 8 & 0x0000FFFF;
+	}
+	
+	public int getSunlight(int x, int y, int z) {
+		return extraDataMap[x + (y * size) + (z * size * size)] & 0x000000FF;
+	}
+	
+	public void makeUnnatural(int x, int y, int z) {
+		extraDataMap[x + (y * size) + (z * size * size)] = 
+			(extraDataMap[x + (y * size) + (z * size * size)] & 0xFFFFFEFF)
+			| (1 << 25 & 0x02000000); 
+	}
+	
 	public int getCube(int x, int y, int z) {
-		return cubes[x + (y * size) + (z * size * size)];
+		return cubeMap[x + (y * size) + (z * size * size)] >> 16 & 0x0000FFFF;
 	}
 	
 	public int getMetadata(int x, int y, int z) {
-		return cubeMetadata[x + (y * size) + (z * size * size)];
+		return cubeMap[x + (y * size) + (z * size * size)] & 0x0000FFFF;
 	}
 	
 	public void setCubeWithoutUpdate(int x, int y, int z, Cube cube) {
-		cubes[x + (y * size) + (z * size * size)] = cube.getId();
+		cubeMap[x + (y * size) + (z * size * size)] = 
+				(cube.getId() << 16 & 0xFFFF0000) | getMetadata(x, y, z);
+		makeUnnatural(x, y, z); isModified = true;
 	}
 	
 	public void setMetadataWithoutUpdate(int x, int y, int z, int metadata) {
-		cubeMetadata[x + (y * size) + (z * size * size)] = metadata;
+		cubeMap[x + (y * size) + (z * size * size)] = metadata | 
+			(cubeMap[x + (y * size) + (z * size * size)] & 0xFFFF0000);
+		makeUnnatural(x, y, z); isModified = true;
+	}
+	
+	public void loadCube(int pos, int c, int l, int e) {
+		cubeMap[pos] = c; lightMap[pos] = l;
+				extraDataMap[pos] = e;
 	}
 	
 	public void setCube(int x, int y, int z, Cube cube) {
 		Cube lastCube = Cube.getCubeByID(getCube(x, y, z));
-		cubes[x + (y * size) + (z * size * size)] = cube.getId();
+		setCubeWithoutUpdate(x, y, z, cube);
 		
 		handelUpdate(x, y, z, lastCube, getMetadata(x, y, z));
 	}
 	
 	public void setMetadata(int x, int y, int z, int metadata) {
 		int lastMetadata = getMetadata(x, y, z);
-		cubeMetadata[x + (y * size) + (z * size * size)] = metadata;
+		setMetadataWithoutUpdate(x, y, z, metadata);
 		
 		handelUpdate(x, y, z, Cube.getCubeByID(getCube(x, y, z)), lastMetadata);
 	}
@@ -146,8 +208,8 @@ public class Chunk {
 		Cube lastCube = Cube.getCubeByID(getCube(x, y, z));
 		int lastMetadata = getMetadata(x, y, z);
 
-		cubes[x + (y * size) + (z * size * size)] = cube.getId();
-		cubeMetadata[x + (y * size) + (z * size * size)] = metadata;
+		setCubeWithoutUpdate(x, y, z, cube);
+		setMetadataWithoutUpdate(x, y, z, metadata);
 		
 		handelUpdate(x, y, z, lastCube, lastMetadata);
 	}
@@ -315,9 +377,11 @@ public class Chunk {
 	}
 	
 	public void save(String fileLoc) {
+		if(!isModified) return;
+		
 		try {
-			File saveLoc =  new File(fileLoc + getX() + " x " + getY() + " x " + getZ() + ".dtg");
-			DTGLoader.writeAll(DTGLoader.getOutputStream(saveLoc), getTagGroup());
+			ChunkIO.saveChunk(this);
+			isModified = false;
 			
 		} catch(IOException e) {
 			System.err.println("Failed to save Chunk " + getPos().valuesToString() + " in World " + WorldRegistry.getWorld(worldId));
@@ -327,12 +391,19 @@ public class Chunk {
 	
 	public float[] getLightColor(int x, int y, int z) {
 		if(!isInitialized) return new float[] {1.0f, 1.0f, 1.0f};
-		return lightColorMap[x + (y * size) + (z * size * size)];
+		int value = lightMap[x + (y * size) + (z * size * size)];
+		float multiplier = (1.0f / 255.0f);
+		
+		return new float[] {
+				(value >> 16 & 0x000000FF) * multiplier, 
+				(value >> 8  & 0x000000FF) * multiplier, 
+				(value >> 0  & 0x000000FF) * multiplier
+			};
 	}
 	
 	public float getLightValue(int x, int y, int z) {
 		if(!isInitialized) return ambiantLight;
-		return lightValueMap[x + (y * size) + (z * size * size)];
+		return lightMap[x + (y * size) + (z * size * size)] >> 24;
 	}
 
 	public int getWorldId() {
@@ -367,25 +438,6 @@ public class Chunk {
 		return hasCubes;
 	}
 
-	public ArrayList<TagGroup> getTagGroup() {
-		ArrayList<TagGroup> tagLines = new ArrayList<TagGroup>();
-		
-		for(int z = 0; z < size; z ++) {
-		for(int y = 0; y < size; y ++) {
-		for(int x = 0; x < size; x ++) {
-			
-			int cube = getCube(x, y, z);
-			if(cube == 0) continue;
-			
-			tagLines.add(new TagGroup(new Tag("type", "cube"), new Tag[] {
-				new Tag("cubeId", cube),
-				new Tag("pos", new Vector3f(x, y, z))
-			}));
-		}}}
-		
-		return tagLines;
-	}
-
 	public ChunkRender getRender() {
 		return render;
 	}
@@ -399,8 +451,8 @@ public class Chunk {
 	}
 	
 	public boolean doesChunkContainCube(int cube) {
-		for(int cubeId : cubes) {
-			if(cubeId == cube) {
+		for(int cubeId : cubeMap) {
+			if(cubeId >> 16 == cube) {
 				return true;
 			}
 		}
@@ -422,6 +474,10 @@ public class Chunk {
 	
 	public boolean isAccessible() {
 		return isAccessible;
+	}
+	
+	public boolean isModified() {
+		return isModified;
 	}
 	
 	public boolean[] getLoadedNeighbors() {

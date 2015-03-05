@@ -1,15 +1,9 @@
 package com.GameName.World;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 
-import com.GameName.Cube.Cube;
 import com.GameName.Engine.GameEngine;
-import com.GameName.Engine.ResourceManager.Cubes;
-import com.GameName.Util.Tag.DTGLoader;
-import com.GameName.Util.Tag.TagGroup;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class ChunkLoader {
@@ -97,44 +91,29 @@ public class ChunkLoader {
 				
 				if(chunk.isLoaded()) continue;
 				
-				File loadFile = new File(fileLoc +
-						(int) (loadPos.getX()) + " x " + (int) (loadPos.getY()) + " x " + (int) (loadPos.getZ())
-					+ ".dtg");
-				
 				try {
-					ArrayList<TagGroup> tags = DTGLoader.readAll(DTGLoader.getInputStream(loadFile));
-					Vector3f pos; int id;
-					
-					for(TagGroup group : tags) {
-						if(!(((String) group.getIdTag().getInfo()).equals("cube"))) continue;
-						
-						pos = (Vector3f) group.getTagByName("pos").getInfo();					
-						id = ((Integer) group.getTagByName("cubeId").getInfo()).intValue();
-						
-						chunk.setCubeWithoutUpdate(
-							(int) pos.getX(), (int) pos.getY(), (int) pos.getZ(), Cube.getCubeByID(id)
-						);
-					}
+					chunk = ChunkIO.loadChunk(chunk);
 					
 				} catch(IOException e) {
 					System.out.println("Generateing: [" + x + ", " + y + ", " + z + "]");
-					chunk = new Chunk(ENGINE, World.CHUNK_SIZE, world.getId(), x, y, z); //world.getEnvironmentGen().generate(World.CHUNK_SIZE, world, x, y, z, 10);
+					chunk = world.getEnvironmentGen().generate(World.CHUNK_SIZE, world, x, y, z, 10);
 					
-					for(int x_ = 0; x_ < chunk.getSize(); x_ ++) {
-					for(int y_ = 0; y_ < chunk.getSize(); y_ ++) {
-					for(int z_ = 0; z_ < chunk.getSize(); z_ ++) {
-						if(x_ + x * chunk.getSize() == 90 || x_ + x * chunk.getSize() == 10) {
-							chunk.setCube(x_, y_, z_, y_ == 0 || z_ == 0 ? Cubes.ColorfulTestCube : Cubes.StoneCube);
-						}
-						
-						if(y_ + y * chunk.getSize() == 90 || y_ + y * chunk.getSize() == 10) {
-							chunk.setCube(x_, y_, z_, x_ == 0 || z_ == 0 ? Cubes.ColorfulTestCube : Cubes.StoneCube);
-						}
-						
-						if(z_ + z * chunk.getSize() == 90 || z_ + z * chunk.getSize() == 10) {
-							chunk.setCube(x_, y_, z_, y_ == 0 || x_ == 0 ? Cubes.ColorfulTestCube : Cubes.StoneCube);
-						}
-					}}}
+//					chunk = new Chunk(ENGINE, World.CHUNK_SIZE, world.getId(), x, y, z);
+//					for(int x_ = 0; x_ < chunk.getSize(); x_ ++) {
+//					for(int y_ = 0; y_ < chunk.getSize(); y_ ++) {
+//					for(int z_ = 0; z_ < chunk.getSize(); z_ ++) {
+//						if(x_ + x * chunk.getSize() == 90 || x_ + x * chunk.getSize() == 10) {
+//							chunk.setCubeWithoutUpdate(x_, y_, z_, y_ == 0 || z_ == 0 ? Cubes.ColorfulTestCube : Cubes.StoneCube);
+//						}
+//						
+//						if(y_ + y * chunk.getSize() == 90 || y_ + y * chunk.getSize() == 10) {
+//							chunk.setCubeWithoutUpdate(x_, y_, z_, x_ == 0 || z_ == 0 ? Cubes.ColorfulTestCube : Cubes.StoneCube);
+//						}
+//						
+//						if(z_ + z * chunk.getSize() == 90 || z_ + z * chunk.getSize() == 10) {
+//							chunk.setCubeWithoutUpdate(x_, y_, z_, y_ == 0 || x_ == 0 ? Cubes.ColorfulTestCube : Cubes.StoneCube);
+//						}
+//					}}}
 				}
 				
 				chunk.setIsLoaded(true);

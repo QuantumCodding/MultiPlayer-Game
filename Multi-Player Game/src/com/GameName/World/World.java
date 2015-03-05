@@ -186,7 +186,7 @@ public class World {
 	
 	public void saveWorld() {
 		for(Chunk chunk : loadedWorld.getAccess().getChunkLoaded().getLoadedChunks()) {
-			chunk.save(getFileLoc().getAbsolutePath());
+			chunk.save(getFileLoc() + "/chunks/");
 		}
 	}
 	
