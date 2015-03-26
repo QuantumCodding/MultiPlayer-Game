@@ -5,7 +5,6 @@ package com.GameName.Main;
 
 import com.GameName.Engine.GameName_New;
 import com.GameName.Render.Effects.ShaderRegistry;
-import com.GameName.Render.Effects.TextureRegistry;
 import com.GameName.Render.Window.Window;
 
 /**
@@ -42,7 +41,6 @@ public class Start_New {
 		try {
 			gameName.cleanUp();
 			
-			TextureRegistry.cleanUp();
 			ShaderRegistry.cleanUp();
 			
 		} catch(NullPointerException e) {

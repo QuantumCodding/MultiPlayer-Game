@@ -1,120 +1,123 @@
 package com.GameName.World.Render;
 
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
+import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import com.GameName.Cube.Cube;
 import com.GameName.Engine.GameEngine;
-import com.GameName.Engine.ResourceManager.Cubes;
+import com.GameName.Render.Effects.RenderProperties;
 import com.GameName.Util.BufferUtil;
+import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Chunk;
 import com.GameName.World.World;
 
 public class ChunkRenderGenerator {
 	
-	public static int[] generateChunk(GameEngine ENGINE, Chunk c, int[] chunkData) {
+	public static ArrayList<ChunkRenderSection> generateChunkSectors(GameEngine ENGINE, Chunk c) {
+		HashMap<RenderProperties, ArrayList<Vector3f>> sectionsMap = new HashMap<>();
 		
+		for(int x = 0; x < c.getSize(); x ++) {
+		for(int y = 0; y < c.getSize(); y ++) {
+		for(int z = 0; z < c.getSize(); z ++) {
+			if(!c.isAccessible()) continue;
+			
+			Cube cube = Cube.getCubeByID(c.getCube(x, y, z));					
+			int metadata = c.getMetadata(x, y, z);			
+			if(!cube.isVisable(metadata)) continue;	
+			
+			RenderProperties key = cube.getRenderProperties(metadata);
+			ArrayList<Vector3f> simillarCubes = sectionsMap.get(key);
+			if(simillarCubes == null)
+				simillarCubes = new ArrayList<>();
+			simillarCubes.add(new Vector3f(x, y, z));
+			sectionsMap.put(key, simillarCubes);
+		}}}
+		
+		ArrayList<ChunkRenderSection> sections = new ArrayList<>();
+		for(RenderProperties properties : sectionsMap.keySet()) {
+			sections.add(generateSector(ENGINE, c, properties, sectionsMap.get(properties)));
+		}
+		
+		return sections;
+	}
+	
+	public static ChunkRenderSection generateSector(GameEngine ENGINE, Chunk c, RenderProperties properties, ArrayList<Vector3f> cubes) {
 		ArrayList<Float> chunkVertices = new ArrayList<>();		
 		ArrayList<Float> chunkTexData = new ArrayList<>();
 		ArrayList<Float> chunklightValues = new ArrayList<>();
-		ArrayList<Float> chunkNormals = new ArrayList<>();			
-				
+		ArrayList<Float> chunkNormals = new ArrayList<>();
+
 		int vertexCount = 0;
-		int xPos, yPos, zPos;		
+		int xPos, yPos, zPos;	
 		
-		for(int x = 0; x < c.getSize(); x ++) {
-			for(int y = 0; y < c.getSize(); y ++) {
-				for(int z = 0; z < c.getSize(); z ++) {
-					if(!c.isAccessible()) continue;
-					
-					xPos = x + (c.getX() * World.CHUNK_SIZE);
-					yPos = y + (c.getY() * World.CHUNK_SIZE);
-					zPos = z + (c.getZ() * World.CHUNK_SIZE);
-					
-					Cube cube = Cube.getCubeByID(c.getCube(x, y, z));					
-					int metadata = c.getMetadata(x, y, z);			
-					boolean[] visableFaces = getVisableFaces(x, y, z, c); //new boolean[] {true, true, true, true, true, true}; //
-						
-					if(cube == Cubes.Air) continue;	
-					
-					chunkVertices.addAll(cube.getRender(metadata).getVertices(xPos, yPos, zPos, visableFaces));
-					chunkTexData.addAll(cube.getRender(metadata).getTextureCoords(cube.getId(), metadata, c.getTextureMap(), visableFaces));
-					chunkNormals.addAll(cube.getRender(metadata).getNormals(cube.getId(), metadata, visableFaces));				
-					chunklightValues.addAll(getLightValue(x, y, z, cube, metadata, visableFaces, c));
-					
-					vertexCount += cube.getRender(metadata).getVerticeCount(visableFaces);
-				}
-			}
+		for(Vector3f pos : cubes) {
+			int x = (int) pos.x, y = (int) pos.y, z = (int) pos.z;
+			if(!c.isAccessible()) continue;
+			
+			xPos = x + (c.getX() * World.CHUNK_SIZE);
+			yPos = y + (c.getY() * World.CHUNK_SIZE);
+			zPos = z + (c.getZ() * World.CHUNK_SIZE);
+			
+			Cube cube = Cube.getCubeByID(c.getCube(x, y, z));					
+			int metadata = c.getMetadata(x, y, z);
+			boolean[] visableFaces = cube.getRender(metadata).getVisableFaces(x, y, z, c);
+			
+			if(!cube.isVisable(metadata)) continue;	
+			
+			chunkVertices.addAll(cube.getRender(metadata).getVertices(xPos, yPos, zPos, visableFaces));
+			chunkTexData.addAll(cube.getRender(metadata).getTextureCoords(cube.getId(), metadata, c.getTextureMap(), visableFaces));
+			chunkNormals.addAll(cube.getRender(metadata).getNormals(cube.getId(), metadata, visableFaces));				
+			chunklightValues.addAll(getLightValue(x, y, z, cube, metadata, visableFaces, c));
+			
+			vertexCount += cube.getRender(metadata).getVerticeCount(visableFaces);
 		}
 		
 		FloatBuffer verticeBuffer = BufferUtil.createFillipedFloatBuffer(chunkVertices);
 		FloatBuffer texDataBuffer = BufferUtil.createFillipedFloatBuffer(chunkTexData);
 		FloatBuffer lightBuffer = BufferUtil.createFillipedFloatBuffer(chunklightValues);
 		FloatBuffer normalBuffer = BufferUtil.createFillipedFloatBuffer(chunkNormals);
-				
-		if(chunkData.length < 5) {
-			int[] chunkData2 = new int[chunkData.length + 1];
-			
-			for(int i = 0; i < chunkData.length; i ++) {
-				chunkData2[i] = chunkData[i];
-			}
-			
-			chunkData2[chunkData.length] = 0;
-			chunkData = chunkData2.clone();
-		}
+		
+		ChunkRenderSection renderSection = new ChunkRenderSection(ENGINE, properties, (ChunkRender) c.getRender());
+		renderSection.generateBufferIds();
+		
+		int[] bufferIDs = renderSection.getBufferIds();
 		
 		ENGINE.getGLContext()
-			.addBufferBind(verticeBuffer, GL_ARRAY_BUFFER, chunkData[0], GL_DYNAMIC_DRAW, 'f');
+			.addBufferBind(verticeBuffer, GL_ARRAY_BUFFER, bufferIDs[0], GL_STATIC_DRAW, 'f');
 		
 		ENGINE.getGLContext()
-			.addBufferBind(texDataBuffer, GL_ARRAY_BUFFER, chunkData[1], GL_DYNAMIC_DRAW, 'f');
+			.addBufferBind(texDataBuffer, GL_ARRAY_BUFFER, bufferIDs[1], GL_STATIC_DRAW, 'f');
 
 		ENGINE.getGLContext()
-			.addBufferBind(lightBuffer, GL_ARRAY_BUFFER, chunkData[2], GL_DYNAMIC_DRAW, 'f');
+			.addBufferBind(lightBuffer, GL_ARRAY_BUFFER, bufferIDs[2], GL_STATIC_DRAW, 'f');
 		
 		ENGINE.getGLContext()
-			.addBufferBind(normalBuffer, GL_ARRAY_BUFFER, chunkData[3], GL_DYNAMIC_DRAW, 'f');
+			.addBufferBind(normalBuffer, GL_ARRAY_BUFFER, bufferIDs[3], GL_STATIC_DRAW, 'f');
 	    
-	    chunkData[4] = vertexCount;
+		bufferIDs[4] = vertexCount;
 	    
-	    return chunkData;
-	}
-
-	private static boolean[] getVisableFaces(int x, int y, int z, Chunk c) {
-		boolean[] visableFaces = new boolean[6];		
-		int metadata = c.getMetadata(x, y, z);
-		
-		if(!Cube.getCubeByID(c.getCube(x, y, z)).isVisable(metadata)) {
-			return visableFaces;
-		}
-		
-		Cube[] surroundingCubes = c.getSurroundingCubes(x, y, z);
-			
-		visableFaces[0] = surroundingCubes[2] != null ? !surroundingCubes[2].isVisable(metadata) : true; // 0 -x			1				z
-		visableFaces[1] = surroundingCubes[3] != null ? !surroundingCubes[3].isVisable(metadata) : true; // 1 +z		0	C	2		-x	c	x
-		visableFaces[2] = surroundingCubes[0] != null ? !surroundingCubes[0].isVisable(metadata) : true; // 2 +x			3			   -z
-		visableFaces[3] = surroundingCubes[1] != null ? !surroundingCubes[1].isVisable(metadata) : true; // 3 -z					4			+y
-		visableFaces[4] = surroundingCubes[5] != null ? !surroundingCubes[5].isVisable(metadata) : true; // 4 +y					C			 c
-		visableFaces[5] = surroundingCubes[4] != null ? !surroundingCubes[4].isVisable(metadata) : true; // 5 -y					5			-y
-				
-		return visableFaces;
+	    return renderSection;
 	}
 	
 	protected static List<Float> getLightValue(int x, int y, int z, Cube cube, int metadata, boolean[] visableFaces, Chunk c) {
 		List<Float> lightValue = new ArrayList<Float>();
 		List<Float> cubeColor = cube.getRender(metadata).getColors(cube.getId(), metadata, visableFaces);
 		
-		float[] color = c.getLightColor(x, y, z);
-		float value = c.getLightValue(x, y, z);
+//		float[] colordasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasanidasani = c.getLightColor(x, y, z);
+//		float value = c.getLightValue(x, y, z);
 		
 		for(int i = 0; i < cubeColor.size(); i += 3) {
-			lightValue.add((color[0] + cubeColor.get(i + 0)) * value);
-			lightValue.add((color[1] + cubeColor.get(i + 1)) * value);
-			lightValue.add((color[2] + cubeColor.get(i + 2)) * value);
+			lightValue.add(1f); lightValue.add(1f); lightValue.add(1f);
+			
+//			lightValue.add((color[0] + cubeColor.get(i + 0)) * value);
+//			lightValue.add((color[1] + cubeColor.get(i + 1)) * value);
+//			lightValue.add((color[2] + cubeColor.get(i + 2)) * value);
+			lightValue.add(1f);
 		}
 		
 		return lightValue;

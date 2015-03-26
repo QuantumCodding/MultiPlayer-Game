@@ -40,17 +40,21 @@ import com.GameName.Render.Effects.Texture;
 public class Window {
 	public static final int DEFAULT_WIDTH = 800;
 	public static final int DEFAULT_HEIGHT = 600;
+	public static final int DEFAULT_FPS = 60;
 		
+	private int fps;
 	private String title;
 	private ByteBuffer[] icon;
 	private Texture splash;
 	
 	public Window() {}
 	
-	public void initDisplay() throws LWJGLException {initDisplay(DEFAULT_WIDTH, DEFAULT_HEIGHT);}
-	public void initDisplay(int width, int height) throws LWJGLException {
+	public void initDisplay() throws LWJGLException {
+		initDisplay(DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_FPS);}
+	public void initDisplay(int width, int height, int fps) throws LWJGLException {
 		if(Display.isCreated()) { destroy(); }
 		
+		this.fps = fps;
 		Display.setDisplayMode(new DisplayMode(width, height));
 		Display.setTitle(title);
 		Display.setIcon(icon);
@@ -60,6 +64,11 @@ public class Window {
 		Mouse.create();
 		Keyboard.create();
 		Controllers.create();
+	}
+	
+	public void update() {
+		Display.update();
+		Display.sync(fps);
 	}
 	
 	public void setupOpenGL(GameEngine ENGINE) {
@@ -76,6 +85,7 @@ public class Window {
 
 	public void setFullscreen(boolean fullscreen) throws LWJGLException {Display.setFullscreen(fullscreen);}
 	public void setTitle(String title) {this.title = title;}
+	public void setFPS(int fps) {this.fps = fps;}
 	public void setIcon(BufferedImage image) {
 		icon = IconLoader.load(image);
 	}
@@ -84,6 +94,7 @@ public class Window {
 	public boolean isFullscreen() {return Display.isFullscreen();}	
 	public int getWidth() {return Display.getWidth();}
 	public int getHeight() {return Display.getHeight();}
+	public int getFPS() {return fps;}
 	
 	public static String getOpenGLVersion() {
 		return glGetString(GL_VERSION);

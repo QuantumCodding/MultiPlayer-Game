@@ -159,6 +159,18 @@ public class LoadedWorldAccess {
 		setCube(pos.getX(), pos.getY(), pos.getZ(), cubeId);
 	}
 	
+	public void setCubeWithoutUpdate(float x, float y, float z, int cubeId) {		
+		int ix = (int) x, chunkCoordX = ix / World.CHUNK_SIZE, indexX = ix % World.CHUNK_SIZE;
+		int iy = (int) y, chunkCoordY = iy / World.CHUNK_SIZE, indexY = iy % World.CHUNK_SIZE;
+		int iz = (int) z, chunkCoordZ = iz / World.CHUNK_SIZE, indexZ = iz % World.CHUNK_SIZE;
+
+		getChunk(chunkCoordX, chunkCoordY, chunkCoordZ).setCubeWithoutUpdate(indexX, indexY, indexZ, Cube.getCubeByID(cubeId));
+	}
+	
+	public void setCubeWithoutUpdate(Vector3f pos, int cubeId) {
+		setCubeWithoutUpdate(pos.getX(), pos.getY(), pos.getZ(), cubeId);
+	}
+	
 	public void setMetadata(float x, float y, float z, int metadata) {
 		int ix = (int) x, chunkCoordX = ix / World.CHUNK_SIZE, indexX = ix % World.CHUNK_SIZE;
 		int iy = (int) y, chunkCoordY = iy / World.CHUNK_SIZE, indexY = iy % World.CHUNK_SIZE;
@@ -168,6 +180,18 @@ public class LoadedWorldAccess {
 	}
 	
 	public void setMetadata(Vector3f pos, int metadata) {
+		setMetadata(pos.getX(), pos.getY(), pos.getZ(), metadata);
+	}
+	
+	public void setMetadataWithoutUpdate(float x, float y, float z, int metadata) {
+		int ix = (int) x, chunkCoordX = ix / World.CHUNK_SIZE, indexX = ix % World.CHUNK_SIZE;
+		int iy = (int) y, chunkCoordY = iy / World.CHUNK_SIZE, indexY = iy % World.CHUNK_SIZE;
+		int iz = (int) z, chunkCoordZ = iz / World.CHUNK_SIZE, indexZ = iz % World.CHUNK_SIZE;
+
+		getChunk(chunkCoordX, chunkCoordY, chunkCoordZ).setMetadataWithoutUpdate(indexX, indexY, indexZ, metadata);
+	}
+	
+	public void setMetadataWithoutUpdate(Vector3f pos, int metadata) {
 		setMetadata(pos.getX(), pos.getY(), pos.getZ(), metadata);
 	}
 	

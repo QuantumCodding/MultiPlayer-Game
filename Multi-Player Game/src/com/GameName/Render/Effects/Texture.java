@@ -1,45 +1,30 @@
 package com.GameName.Render.Effects;
 
-import static org.lwjgl.opengl.GL11.GL_NEAREST;
-import static org.lwjgl.opengl.GL11.GL_NEAREST_MIPMAP_NEAREST;
-import static org.lwjgl.opengl.GL11.GL_REPEAT;
-import static org.lwjgl.opengl.GL11.GL_RGBA;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_1D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.glBindTexture;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glGenTextures;
-import static org.lwjgl.opengl.GL11.glIsEnabled;
-import static org.lwjgl.opengl.GL11.glTexImage2D;
-import static org.lwjgl.opengl.GL11.glTexParameteri;
+import static org.lwjgl.opengl.GL12.GL_TEXTURE_3D;
 import static org.lwjgl.opengl.GL15.glDeleteBuffers;
-import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
-import org.lwjgl.BufferUtils;
-import org.newdawn.slick.opengl.TextureLoader;
+import javax.imageio.ImageIO;
 
-public class Texture {
-	private String textureName;
-	private int textureId;
-	private int width, height;
+import com.GameName.Util.Vectors.Vector3f;
+
+public abstract class Texture implements IRenderEffect {
+	protected int textureId;
+	protected Vector3f size;
 	
 	/**
 	 * Creates a new Texture for a file location and without MipMapping 
 	 * 
 	 * @param location The textures location as a String
+	 * @throws IOException 
 	 */
-	public Texture(String location) { 
+	public Texture(String location) throws IOException { 
 		this(location, false); 
 	}
 	
@@ -48,41 +33,20 @@ public class Texture {
 	 * 
 	 * @param location The textures location as a String
 	 * @param useMipmap Whether or not the texture should use MipMapping
+	 * 
+	 * @throws IOException 
 	 */
-	public Texture(String location, boolean useMipmap) {
-		this(location, useMipmap, "PNG");
+	public Texture(String location, boolean useMipmap) throws IOException {
+		this(ImageIO.read(new File(location)), useMipmap);
 	}
 	
 	/**
-	 * Creates a new Texture from a file location and whether or not to use MipMapping
+	 * Takes a BufferedImage and converts it into a Texture in RGBA format
 	 * 
-	 * @param location The textures location as a String
-	 * @param useMipmap Whether or not the texture should use MipMapping
-	 * @param fileType What the file extension is
+	 * @param image The BufferedImage to convert into a texture
+	 * @param useMipmap
 	 */
-	public Texture(String location, boolean useMipmap, String fileType) {
-		textureName = location.contains("/") ? location.substring(location.lastIndexOf("/") + 1) : 
-					location.contains("\\") ? location.substring(location.lastIndexOf("\\") + 1) : location;
-					
-		textureName = textureName.contains(".") ? textureName.substring(0, textureName.lastIndexOf(".")) : textureName;	
-		location = location.contains(".") ? location.substring(0, location.lastIndexOf(".")) : location;
-		
-		try {
-			org.newdawn.slick.opengl.Texture slickTexture = getTexture(location, fileType);
-			
-			textureId = slickTexture.getTextureID();
-			width = slickTexture.getTextureWidth();
-			height = slickTexture.getTextureHeight();
-			
-			
-			setToDefaultProperties();
-			if(useMipmap) setupMipMaping();
-			
-		} catch (IOException e) {
-			System.err.println("Texture " + location + " failed to load");			
-			e.printStackTrace();
-		}
-	}
+	public Texture(BufferedImage image, boolean useMipmap) {}
 	
 	/**
 	 * Creates a Texture from a preload texture
@@ -92,118 +56,46 @@ public class Texture {
 	 * @param width  The width of the Texture
 	 * @param height The height of the Texture
 	 */
-	public Texture(int textureId, String textureName, int width, int height) {
+	public Texture(int textureId, Vector3f size) {
 		this.textureId = textureId;
-		this.textureName = textureName;
-		
-		this.width = width;
-		this.height = height;
+		this.size = size;
 	}
 	
-	/**
-	 * Takes a BufferedImage and converts it into a Texture in RGBA format
-	 * 
-	 * @param image The BufferedImage to convert into a texture
-	 * @param useMipmap
-	 */
-	public Texture(BufferedImage image, String name, boolean useMipmap) {	
-		this.textureName = name;
-		
-		int[] pixels = new int[image.getWidth() * image.getHeight()];
-        image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());		
-		ByteBuffer buffer = BufferUtils.createByteBuffer(image.getWidth() * image.getHeight() * 4); // 4 Because of RGBA
-		
-		 for(int y = 0; y < image.getHeight(); y ++) {
-            for(int x = 0; x < image.getWidth(); x ++) {	            	
-                int pixel = pixels[y * image.getWidth() + x];
-                
-                buffer.put((byte) ((pixel >> 16) & 0xFF));     // Red component
-                buffer.put((byte) ((pixel >> 8) & 0xFF));      // Green component
-                buffer.put((byte) (pixel & 0xFF));             // Blue component
-                buffer.put((byte) ((pixel >> 24) & 0xFF));     // Alpha component. Only for RGBA
-            }
-        }
-
-	    buffer.flip();		
-	    textureId = glGenTextures();	    		
-	    
-	    boolean GL_Texture_2D_state = glIsEnabled(GL_TEXTURE_2D);
-	    if(!GL_Texture_2D_state) glEnable(GL_TEXTURE_2D);
-	    
-	    bind();
-	    	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.getWidth(), image.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-		unbind();
-	    
-		width = image.getWidth();
-		height = image.getHeight();
-		
-		setToDefaultProperties();
-		if(useMipmap) setupMipMaping();
-
-	    if(!GL_Texture_2D_state) glDisable(GL_TEXTURE_2D);
-	}
+	protected Texture() {}
 	
-	private org.newdawn.slick.opengl.Texture getTexture(String fileLocation, String fileType) throws IOException {
-		File location = new File(fileLocation + "." + fileType.toLowerCase());
-		
-		switch(fileType.toUpperCase()) {
-			case "PNG": 
-			case "JPG":
-			case "BMP":
-				return TextureLoader.getTexture(fileType, new FileInputStream(location));
-			
-			default: System.err.println(fileType.toUpperCase() + " is not supported"); return null;
-		}
-	}
+	protected abstract void setToDefaultProperties();	
+	protected abstract void setupMipMaping();
+	public abstract TextureType getType();
 	
-	private void setToDefaultProperties() {
-		bind();
-		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		
-		unbind();
-	}
+	public int getTextureId() { return textureId; }
 	
-	private void setupMipMaping() {
-		bind();
-		
-		glGenerateMipmap(GL_TEXTURE_2D);
-		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-		
-		unbind();
-	}
-	
-	public void bind() {
-		glBindTexture(GL_TEXTURE_2D, textureId);
-	}
+	public int getWidth() { return (int) size.x; }
+	public int getHeight() { return (int) size.y; }
+	public int getDepth() { return (int) size.z; }
 	
 	public static void unbind() {
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-
-	protected String getTextureName() {
-		return textureName;
-	}
-
-	public int getTextureId() {
-		return textureId;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public int getHeight() {
-		return height;
+		for(TextureType type : TextureType.values()) {
+			glBindTexture(type.glType(), 0);
+		}
 	}
 	
 	public void cleanUp() {
 		glDeleteBuffers(textureId);
+	}
+	
+	public static enum TextureType {
+		Texture1D(GL_TEXTURE_1D, 1), 
+		Texture2D(GL_TEXTURE_2D, 2), 
+		Texture3D(GL_TEXTURE_3D, 3);
+		
+		private int glId, cordCount;
+		private TextureType(int glId, int cordCount) {
+			this.glId = glId;
+			this.cordCount = cordCount;
+		}
+		
+		public int glType() { return glId; }
+		public int getCoordCount() { return cordCount; }
+		
 	}
 }

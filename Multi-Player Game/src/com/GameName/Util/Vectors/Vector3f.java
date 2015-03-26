@@ -16,6 +16,10 @@ public class Vector3f {
 		this.z = z;
 	}
 	
+	public Vector3f(float value) {
+		this(value, value, value);
+	}
+	
 	public Vector3f(Vector2f clone) {
 		this(clone.x, clone.y, 0);
 	}

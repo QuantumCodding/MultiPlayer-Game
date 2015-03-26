@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.Display;
 
 import com.GameName.Console.Base.ConsoleWindow;
 import com.GameName.Engine.ResourceManager.Materials;
@@ -22,7 +21,7 @@ import com.GameName.Engine.Threads.GameThread;
 import com.GameName.Entity.EntityPlayer;
 import com.GameName.Input.Control;
 import com.GameName.Render.Effects.ShaderRegistry;
-import com.GameName.Render.Effects.Texture;
+import com.GameName.Render.Effects.Texture2D;
 import com.GameName.Render.Window.Window;
 import com.GameName.Util.Interfaces.ISetup;
 
@@ -65,7 +64,7 @@ public class GameName_New implements ISetup {
 			File[] files = new File("res/textures/Splash Screen").listFiles();
 			File splashImage = files[(int) (Math.random() * 100) % files.length];
 			
-			window.setSplash(new Texture(ImageIO.read(splashImage), "Unspell + Names", false));
+			window.setSplash(new Texture2D(ImageIO.read(splashImage), false));
 			window.drawSplash();
 		} catch(IOException | LWJGLException e) { e.printStackTrace(); }		
 
@@ -150,8 +149,7 @@ public class GameName_New implements ISetup {
 			}
 			
 			FPSTicks ++;
-			Display.update();
-			Display.sync(60);
+			window.update();
 		}		
 
 		FPS_Thread.interrupt();

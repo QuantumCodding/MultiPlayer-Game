@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import com.GameName.Render.Effects.Texture;
+import javax.imageio.ImageIO;
+
+import com.GameName.Render.Effects.Texture2D;
 import com.GameName.Util.Vectors.Vector2f;
 import com.GameName.Util.Vectors.Vector3f;
 
@@ -69,9 +71,8 @@ public class OBJLoader {
 	                        parseMaterial.getDiffuseColour()[2] = Float.valueOf(rgb[3]);
 	                        
 	                    } else if (materialLine.startsWith("map_Kd")) {
-	                        parseMaterial.setTexture(new Texture(
-	                        		f.getParentFile().getAbsolutePath() + "/" + materialLine.split(" ")[1], 
-	                        		false, "PNG"
+	                        parseMaterial.setTexture(new Texture2D(
+	                        		ImageIO.read(new File(f.getParentFile().getAbsolutePath() + "/" + materialLine.split(" ")[1])), false
 	                        	));
 	                        
 	                    } else {

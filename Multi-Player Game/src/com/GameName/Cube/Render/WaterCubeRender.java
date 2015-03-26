@@ -10,7 +10,7 @@ import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Chunk;
 import com.GameName.World.World;
 
-public class DefaultCubeRender implements ICubeRender {
+public class WaterCubeRender implements ICubeRender {
 
 	public ArrayList<Float> getVertices(float x, float y, float z, boolean[] visableFaces) {
 		ArrayList<Float> vertices = new ArrayList<Float>();

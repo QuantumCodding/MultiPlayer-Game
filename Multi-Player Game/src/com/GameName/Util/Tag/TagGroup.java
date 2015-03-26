@@ -4,7 +4,7 @@ public class TagGroup {
 	private Tag idTag;
 	private Tag[] tags;
 	
-	public TagGroup(Tag idTag, Tag[] tags) {
+	public TagGroup(Tag idTag, Tag... tags) {
 		this.idTag = idTag;
 		this.tags = tags;
 	}

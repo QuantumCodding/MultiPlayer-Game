@@ -580,21 +580,21 @@ public class TagEditorTab extends ConsoleTab implements ActionListener, ListSele
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				currentFile = fileChoser.getSelectedFile();
 				System.out.println(currentFile);
-			}
-			
-			try {
-				InputStream read = DTGLoader.getInputStream(currentFile);
 				
-				for(TagGroup group : DTGLoader.readAll(read)) {
-					addGroup(group);
-					System.out.println("Group: " + group.getIdTag().getInfo());				
+				try {
+					InputStream read = DTGLoader.getInputStream(currentFile);
+					
+					for(TagGroup group : DTGLoader.readAll(read)) {
+						addGroup(group);
+						System.out.println("Group: " + group.getIdTag().getInfo());				
+					}
+					
+					read.close();
+				} catch(IOException e) {
+					e.printStackTrace();
+					JOptionPane.showMessageDialog(null, "Failed to Load Groups", "Error", JOptionPane.ERROR_MESSAGE);
 				}
-				
-				read.close();
-			} catch(IOException e) {
-				JOptionPane.showMessageDialog(null, "Failed to Load Groups", "Error", JOptionPane.ERROR_MESSAGE);
 			}
-			
 		}
 	}	
 

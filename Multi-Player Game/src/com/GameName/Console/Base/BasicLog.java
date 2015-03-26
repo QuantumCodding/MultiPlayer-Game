@@ -220,11 +220,11 @@ public class BasicLog extends ConsoleTab implements ActionListener {
 			scroller.isLocked = scrollLockCheckBox.isSelected();
 		
 		} else if(event.getSource() == inputField) {
-			inputs.add(inputField.getText());
-			addLine(inputField.getText(), "input"); lastImput = inputs.size();
-			boolean result = evaluateInput(inputField.getText());
+			String input = inputField.getText();
+			inputField.setText(""); inputs.add(input);
+			addLine(input, "input"); lastImput = inputs.size();
+			boolean result = evaluateInput(input);
 			if(!result) invalidCommand();
-			inputField.setText("");
 		}
 	}	
 

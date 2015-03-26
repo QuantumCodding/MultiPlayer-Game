@@ -159,8 +159,14 @@ public class World {
 	public void setCube(int x, int y, int z, int cubeId)  {loadedWorld.getAccess().setCube(x, y, z, cubeId);}
 	public void setCube(Vector3f pos, int cubeId) 		  {loadedWorld.getAccess().setCube(pos, cubeId);}
 	
+	public void setCubeWithoutUpdate(int x, int y, int z, int cubeId)  {loadedWorld.getAccess().setCubeWithoutUpdate(x, y, z, cubeId);}
+	public void setCubeWithoutUpdate(Vector3f pos, int cubeId) 		  {loadedWorld.getAccess().setCubeWithoutUpdate(pos, cubeId);}
+	
 	public void setCubeMetadata(int x, int y, int z, int metadata)  {loadedWorld.getAccess().setMetadata(x, y, z, metadata);}
 	public void setCubeMetadata(Vector3f pos, int metadata) 		  {loadedWorld.getAccess().setMetadata(pos, metadata);}
+	
+	public void setCubeMetadataWithoutUpdate(int x, int y, int z, int metadata)  {loadedWorld.getAccess().setMetadataWithoutUpdate(x, y, z, metadata);}
+	public void setCubeMetadataWithoutUpdate(Vector3f pos, int metadata) 		  {loadedWorld.getAccess().setMetadataWithoutUpdate(pos, metadata);}
 	
 	public void setCubWitheMetadata(int x, int y, int z, int cubeId, int metadata)  {loadedWorld.getAccess().setCubeWithMetadata(x, y, z, cubeId, metadata);}
 	public void setCubeWithMetadata(Vector3f pos, int cubeId, int metadata) 		{loadedWorld.getAccess().setCubeWithMetadata(pos, cubeId, metadata);}

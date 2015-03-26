@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 
@@ -16,17 +17,34 @@ import com.GameName.Cube.Render.ICubeRender;
 import com.GameName.Engine.ResourceManager.Materials;
 import com.GameName.Engine.Registries.CubeRegistry;
 import com.GameName.Physics.Material;
+import com.GameName.Render.Effects.RenderProperties;
+import com.GameName.Render.Effects.RenderProperties.RenderPropertiesBuilder;
+import com.GameName.Render.Effects.Texture;
+import com.GameName.Render.Effects.Texture2D;
+import com.GameName.Render.Effects.Texture3D;
+import com.GameName.Render.Effects.Texture3D.Texture3DLoader;
+import com.GameName.Util.Side;
 import com.GameName.Util.Tag.DTGLoader;
 import com.GameName.Util.Tag.TagGroup;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class Cube {
 	private static DefaultCubeRender defaultCubeRender;
-	private final int DEFAULT_TEXTURE_SIZE = 10;
+	private static RenderProperties defaultRenderProperties;
+	private static final int DEFAULT_TEXTURE_SIZE = 10;
+	private static final BufferedImage DEFAULT_TEXTURE;
 	private static int nextId;
 	
 	static {
 		defaultCubeRender = new DefaultCubeRender();
+		defaultRenderProperties = new RenderPropertiesBuilder().enableTexture3D().build();
+		DEFAULT_TEXTURE = new BufferedImage(DEFAULT_TEXTURE_SIZE, DEFAULT_TEXTURE_SIZE, BufferedImage.TYPE_4BYTE_ABGR);
+		
+		int i = 0;
+		for(int x = 0; x < DEFAULT_TEXTURE_SIZE; x ++) {
+		for(int y = 0; y < DEFAULT_TEXTURE_SIZE; y ++) {
+			DEFAULT_TEXTURE.setRGB(x, y, i ++ % 2 == 0 ? Color.BLACK.getRGB() : Color.ORANGE.getRGB());
+		}}
 	}
 	
 	private String name;
@@ -36,13 +54,18 @@ public class Cube {
 	private Material material;
 	private ICubeRender render;
 	private ICubeCollisionBox collisionBox;
+	private RenderProperties renderProperties;
 	
-	/** Texture Colors: Frame, Face, Colors */
-	private int[][][] texture;
+	/** Texture Colors: Frame, Face */
+	private Texture[][] texture;
+	private int textureLayers, textureDimentions;
 	private int frames;
-	private Vector3f sheetPosition;
-	private Vector3f texturesPerLine, textureSpacing;
+
 	private int textureSize;
+	private Vector3f sheetPosition;
+	private Vector3f textureLoop, textureSpacing;
+	private int texturesPerLine;
+	private boolean textureUseMipmap;
 	private File textureLocation;
 	
 	private boolean isLightSorce;
@@ -69,9 +92,10 @@ public class Cube {
 		setCollisionBox(getCollisionBox());
 		setMaterial(Materials.Stone);
 		setRender(getDefaultRender());
+		setRenderProperties(getDefaultRenderProperties());
 		
 		loadExtraInfo();
-		texture = loadTextures(frames);
+		texture = loadTextures();
 	}
 
 	/**
@@ -80,21 +104,25 @@ public class Cube {
 	private void loadExtraInfo() {
 		File extraInfo = new File("res/textures/cubes/info/" + name + ".dtg");
 		//TODO: Add animated Textures	 -- Needs testing
-		//TODO: Add multi-layer Textures -- Not Started
+		//TODO: Add multi-layer Textures -- Needs testing
 		//TODO: Add texture sheet loader -- Needs testing
 		
-		textureSize = 0; textureLocation = null; textureSpacing = null; frames = 0;
+		textureUseMipmap = false; texturesPerLine = 6;
+		textureSize = 0; textureLocation = null; textureSpacing = null;
+		frames = 0; textureDimentions = 2; textureLayers = 1;
 		
 		if(!extraInfo.exists()) {
 			textureSize = DEFAULT_TEXTURE_SIZE;
 			textureLocation = new File("res/textures/cubes/" + name + ".png");
 			textureSpacing = new Vector3f(1, 1, 0);
-			texturesPerLine = new Vector3f(6, 1, 0);
+			textureLoop = new Vector3f(6, 1, 0);
 			sheetPosition = new Vector3f(0, 0, 0);
 			frames = 1;
 			
 			return;
 		}
+		
+		boolean usingTextureSheetAndSizeDefinded = false;
 		
 		try {
 			ArrayList<TagGroup> info = DTGLoader.readAll(DTGLoader.getInputStream(extraInfo));
@@ -102,14 +130,20 @@ public class Cube {
 			for(TagGroup group : info) {
 				if(group.getIdTag().getInfo().equals("textureData")) {
 					
-					if(group.containsTag("textureSize")) {
+					if(group.containsTag("textureSize") && textureSize == 0) {
 						textureSize = (Integer) group.getTagByName("textureSize").getInfo();
 					}				
 					if(group.containsTag("textureSpacing")) {
 						textureSpacing = (Vector3f) group.getTagByName("textureSpacing").getInfo();
 					}				
 					if(group.containsTag("texturesPerLine")) {
-						texturesPerLine = (Vector3f) group.getTagByName("texturesPerLine").getInfo();
+						texturesPerLine = (Integer) group.getTagByName("texturesPerLine").getInfo();
+					}
+					if(group.containsTag("textureLoop")) {
+						textureLoop = (Vector3f) group.getTagByName("textureLoop").getInfo();
+					}
+					if(group.containsTag("useMipmap")) {
+						textureUseMipmap = (Boolean) group.getTagByName("useMipmap").getInfo();
 					}
 					
 				} else if(group.getIdTag().getInfo().equals("textureSheet")) {
@@ -123,6 +157,18 @@ public class Cube {
 								(String) group.getTagByName("sheetName").getInfo()
 								+ ".png"
 						);
+					}
+					if(group.containsTag("sheetTextureSize")) {
+						textureSize = (Integer) group.getTagByName("sheetTextureSize").getInfo();
+						usingTextureSheetAndSizeDefinded = true;
+					}
+					
+				} else if(group.getIdTag().getInfo().equals("textureRenderInfo")) {
+					if(group.containsTag("textureDimentions")) {
+						textureDimentions = (Integer) group.getTagByName("textureDimentions").getInfo();
+					}
+					if(group.containsTag("textureLayers")) {
+						textureLayers = (Integer) group.getTagByName("textureLayers").getInfo();
 					}
 					
 				} else if(group.getIdTag().getInfo().equals("textureAnimation")) {
@@ -138,10 +184,12 @@ public class Cube {
 			
 			if(sheetPosition == null && textureLocation != null) throw new InvalidParameterException(
 					"Cube " + name + " is using a texture sheet, but was not given a sheet position"); 
+			if(!usingTextureSheetAndSizeDefinded && textureLocation != null) throw new InvalidParameterException(
+					"Cube " + name + " is using a texture sheet, but sheet did not have a TextuerSize"); 
 			if(textureLocation == null) textureLocation = new File("res/textures/cubes/" + name + ".png");
 			
 			if(textureSpacing == null) textureSpacing = new Vector3f(1, 1, 0);
-			if(texturesPerLine == null) texturesPerLine = new Vector3f(6, 1, 0);
+			if(textureLoop == null) textureLoop = new Vector3f(6, 1, 0);
 			
 			if(frames == 0) frames = 1;
 			
@@ -151,56 +199,78 @@ public class Cube {
 	}
 
 	/**
-	 * 	Loads the textures for this cube
-	 * 	@param frames How many different frames the cube has
+	 * 	Loads the textures for this cube (CubesFaces, AnimationFrames, ex.)
 	 */	
-	private int[][][] loadTextures(int frames) {
-		int[][][] textures = new int[frames][6][textureSize * textureSize];
-		
-		try {						
-			BufferedImage fullTexture = ImageIO.read(textureLocation);
-			
-			if(fullTexture == null) throw new IOException("Texture == NULL");
-
-			int xStart = (int) ((sheetPosition.x * textureSize) + (sheetPosition.x * textureSpacing.x));
-			int yStart = (int) ((sheetPosition.y * textureSize) + (sheetPosition.y * textureSpacing.y));	
-			
-			for(int frame = 0; frame < frames; frame ++) {
-				for(int i = 0; i < textures[frame].length; i ++) {					
+	private Texture[][] loadTextures() {
+		try {
+			if(textureDimentions == 3) {
+				Texture3D[][] textures = new Texture3D[frames][1];
+				BufferedImage fullTexture = ImageIO.read(textureLocation);
+				ArrayList<BufferedImage> layers = new ArrayList<>();
+				
+				if(fullTexture == null) throw new IOException("Texture == NULL");
+	
+				int xStart = (int) ((sheetPosition.x * textureSize) + (sheetPosition.x * textureSpacing.x));
+				int yStart = (int) ((sheetPosition.y * textureSize) + (sheetPosition.y * textureSpacing.y));	
+				
+				for(int frame = 0; frame < frames; frame ++) {
+					for(int i = 0; i < textureLayers; i ++) {
+						int x = i % (int) texturesPerLine, y = (int) (i / texturesPerLine);
+									x %= textureLoop.x;	y %= textureLoop.y;
+						
+						int xOffset = (x * textureSize) + (x * (int) textureSpacing.x);
+						int yOffset = (y * textureSize) + (y * (int) textureSpacing.y);
+						
+						layers.add(fullTexture.getSubimage(xStart + xOffset, yStart + yOffset, textureSize, textureSize));			
+					}
 					
-					int x = i % (int) texturesPerLine.x, y = (int) (i / texturesPerLine.x);					
+					Vector3f size = new Vector3f(textureSize);
+					ByteBuffer buffer = new Texture3DLoader(size)
+					.loadLayeredTexture(layers.toArray(new BufferedImage[layers.size()]));					
+					textures[frame][0] = new Texture3D(buffer, size, textureUseMipmap);	
+					
+					layers.clear();
+				}
+				
+				fullTexture.flush();			
+				return textures;
+				
+			} else {
+				Texture2D[][] textures = new Texture2D[frames][6];
+				BufferedImage fullTexture = ImageIO.read(textureLocation);
+				
+				if(fullTexture == null) throw new IOException("Texture == NULL");
+	
+				int xStart = (int) ((sheetPosition.x * textureSize) + (sheetPosition.x * textureSpacing.x));
+				int yStart = (int) ((sheetPosition.y * textureSize) + (sheetPosition.y * textureSpacing.y));	
+				
+				for(int frame = 0; frame < frames; frame ++) {
+				for(int i = 0; i < Side.values().length; i ++) {
+					int x = i % (int) texturesPerLine, y = (int) (i / texturesPerLine);	
+								x %= textureLoop.x;	y %= textureLoop.y;
+					
 					int xOffset = (x * textureSize) + (x * (int) textureSpacing.x);
 					int yOffset = (y * textureSize) + (y * (int) textureSpacing.y);
 					
-					for(int posX = 0; posX < textureSize; posX ++) {
-					for(int posY = 0; posY < textureSize; posY ++) {
-						textures[frame][i][posX + (posY * textureSize)] =
-							fullTexture.getRGB(xStart + xOffset + posX, yStart + yOffset + posY);
-					}}					
-				}
+					textures[frame][Side.values()[i].index()] = new Texture2D(
+							fullTexture.getSubimage(xStart + xOffset, yStart + yOffset, textureSize, textureSize), textureUseMipmap
+						);
+				}}
+				
+				fullTexture.flush();			
+				return textures;		
 			}
-			
-			fullTexture = null;
-			
-			return textures;			
-			
-		} catch (IOException e) {
+		} catch(IOException e) {
 			System.err.println("The cube texture " + name + " was not found or successfully loaded");
+			Texture2D[][] textures = new Texture2D[frames][6];
 			
-			for(int i = 0; i < textures.length; i ++) {
-				int[] toAdd = new int[textureSize * textureSize];
-				
-				for(int j = 0; j < textureSize * textureSize; j ++) {
-					toAdd[j] = j < textureSize || j > textureSize * 2 ? new Color(0, 0, 100).getRGB() : new Color(100, 0, 0).getRGB();
-				}
-				
-				for(int frame = 0; frame < frames; frame ++) {
-					textures[frame][i] = toAdd;
-				}
-			}
+			for(int frame = 0; frame < frames; frame ++) {
+			for(int i = 0; i < Side.values().length; i ++) {
+				textures[frame][Side.values()[i].index()] = new Texture2D(DEFAULT_TEXTURE, false);
+			}}
+			
+			return textures;
 		}
-		
-		return null;
 	}
 	
 	/**
@@ -215,6 +285,13 @@ public class Cube {
 	 */
 	private ICubeRender getDefaultRender() {
 		return defaultCubeRender;
+	}
+	
+	/**
+	 *  Generates the default RenderProperties for a Cube
+	 */
+	private RenderProperties getDefaultRenderProperties() {
+		return defaultRenderProperties;
 	}
 	
 	/**
@@ -256,9 +333,9 @@ public class Cube {
 
 	/**
 	 * Returns all the possible textures of this cube <br>
-	 * 			Frame, Face, Colors
+	 * 			Frame, Face
 	 */
-	public int[][][] getTextures() {
+	public Texture[][] getTextures() {
 		return texture;
 	}
 
@@ -339,7 +416,7 @@ public class Cube {
 	 * @param metadata The metadata of the cube
 	 */
 	public int getFrameFromMetadata(int metadata) {
-		return metadata;
+		return 0;
 	}
 	
 	/**
@@ -356,6 +433,14 @@ public class Cube {
 	 */
 	public ICubeRender getRender(int metadata) {
 		return render;
+	}
+	
+	/**
+	 * Returns the RenderProperties for this cube
+	 * @param metadata The metadata of the cube
+	 */
+	public RenderProperties getRenderProperties(int metadata) {
+		return renderProperties;
 	}
 	
 	/**
@@ -441,6 +526,13 @@ public class Cube {
 	 */
 	protected void setRender(ICubeRender render) {
 		this.render = render;
+	}
+	
+	/**
+	 *  Sets the RenderProperties for this cube
+	 */
+	protected void setRenderProperties(RenderProperties renderProperties) {
+		this.renderProperties = renderProperties;
 	}
 	
 	/**

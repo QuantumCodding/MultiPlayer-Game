@@ -4,14 +4,16 @@ import java.io.IOException;
 import java.util.HashSet;
 
 import com.GameName.Cube.Cube;
-import com.GameName.Cube.Render.CubeRenderUtil;
-import com.GameName.Cube.Render.CubeTextureMap;
 import com.GameName.Engine.GameEngine;
 import com.GameName.Engine.Registries.WorldRegistry;
+import com.GameName.Render.Effects.TextureMap;
+import com.GameName.Render.Types_2.IRenderable;
+import com.GameName.Render.Types_2.Render;
+import com.GameName.Util.Side;
 import com.GameName.Util.Vectors.Vector3f;
 import com.GameName.World.Render.ChunkRender;
 
-public class Chunk {
+public class Chunk implements IRenderable {
 	private final float MINIMUM_LIGHT_DEFUTION = 0.5f;
 	private final GameEngine ENGINE;
 	
@@ -102,7 +104,7 @@ public class Chunk {
 		intensity -= ((1 / intensity) * Cube.getCubeByID(getCube(x, y, z)).getOpacity(getMetadata(x, y, z))) + MINIMUM_LIGHT_DEFUTION;
 		
 		if(intensity <= ambiantLight){
-			render.forceVBOUpdate(); return; 
+			render.requestRenderRebuild(); return; 
 		}
 		
 		updateLightMap(x - 1, y, z, color, intensity);
@@ -227,13 +229,11 @@ public class Chunk {
 		
 		if(cube != lastCube) {
 			if(!doesChunkContainCube(lastCube.getId())) {
-				updateTextureMap();
 				typesOfCubes.remove(lastCube);
 			}
 					
-			if(!doesSetContainCube(cube)) {
-				updateTextureMap();
-				typesOfCubes.add(cube);
+			if(typesOfCubes.add(cube)) {
+				render.addCubes(cube);
 			}
 		}
 		
@@ -257,17 +257,16 @@ public class Chunk {
 		if(ENGINE.getGameName().isRunning() && WorldRegistry.getWorld(worldId).isGenerated() && isPosOnEdge(x, y, z)) {
 			Chunk chunk;
 			
-			if(x == 0) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x - 1, this.y, this.z); if(chunk != null && chunk.isAccessible()) chunk.forceVBOUpdate();}
-			if(y == 0) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y - 1, this.z); if(chunk != null && chunk.isAccessible()) chunk.forceVBOUpdate();}
-			if(z == 0) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y, this.z - 1); if(chunk != null && chunk.isAccessible()) chunk.forceVBOUpdate();}
+			if(x == 0) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x - 1, this.y, this.z); if(chunk != null && chunk.isAccessible()) chunk.requestRenderRebuild();}
+			if(y == 0) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y - 1, this.z); if(chunk != null && chunk.isAccessible()) chunk.requestRenderRebuild();}
+			if(z == 0) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y, this.z - 1); if(chunk != null && chunk.isAccessible()) chunk.requestRenderRebuild();}
 
-			if(x == size - 1) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x + 1, this.y, this.z); if(chunk != null && chunk.isAccessible()) chunk.forceVBOUpdate();}
-			if(y == size - 1) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y + 1, this.z); if(chunk != null && chunk.isAccessible()) chunk.forceVBOUpdate();}
-			if(z == size - 1) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y, this.z + 1); if(chunk != null && chunk.isAccessible()) chunk.forceVBOUpdate();}
+			if(x == size - 1) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x + 1, this.y, this.z); if(chunk != null && chunk.isAccessible()) chunk.requestRenderRebuild();}
+			if(y == size - 1) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y + 1, this.z); if(chunk != null && chunk.isAccessible()) chunk.requestRenderRebuild();}
+			if(z == size - 1) {chunk = WorldRegistry.getWorld(worldId).getChunk(this.x, this.y, this.z + 1); if(chunk != null && chunk.isAccessible()) chunk.requestRenderRebuild();}
 		}
 		
-		render.setHasCubes(hasCubes);		
-		render.forceVBOUpdate();
+		render.requestRenderRebuild();
 	}
 	
 	/**
@@ -294,13 +293,12 @@ public class Chunk {
 				hasCubes = true;
 			}
 			
-			typesOfCubes.add(cube);
+			if(typesOfCubes.add(cube));
 			
 		}}}
 		
-		updateTextureMap();
-		render.setHasCubes(hasCubes);		
-		render.forceVBOUpdate();
+		render.addCubes(typesOfCubes.toArray(new Cube[typesOfCubes.size()]));
+		render.requestRenderRebuild();
 	}
 	
 	public boolean isCubeVisable(int x, int y, int z) {
@@ -369,11 +367,55 @@ public class Chunk {
 		return Cube.getCubesByID(cubes);	
 	}
 	
-	/**
-	 * Regenerates the CubeTextureMap for this chunk
-	 */
-	public void updateTextureMap() {
-		render.setTextureMap(CubeRenderUtil.generateTexturMap(ENGINE, typesOfCubes));
+	public int[] getSurroundingCubesMetadata(int x, int y, int z) {
+		int[] metadata = {-2, -2, -2, -2, -2, -2};
+		World world = WorldRegistry.getWorld(worldId);
+		LoadedWorldAccess access = world.getLoadedWorld().getAccess();
+		
+		Vector3f minPos = access.getCenter().subtract(LoadedWorldAccess.getLoadRadius()).capMin(0);		
+		Vector3f maxPos = access.getCenter().add(LoadedWorldAccess.getLoadRadius())
+				.capMax(world.getChunkSizeAsVector().subtract(1));
+		
+		if(isPosOnEdge(x, y, z)) {
+			if(x == 0) {
+				if(this.x == minPos.getX())	metadata[Side.LeftFace.index()] = -1;
+				else metadata[Side.LeftFace.index()] = world.getChunk(this.x - 1, this.y, this.z).getMetadata(size - 1, y, z);
+			}  
+			
+			if(y == 0) {
+				if(this.y == minPos.getY())	metadata[Side.BottomFace.index()] = -1;
+				else metadata[Side.BottomFace.index()] = world.getChunk(this.x, this.y - 1, this.z).getMetadata(x, size - 1, z);
+			}  
+			
+			if(z == 0) {
+				if(this.z == minPos.getZ())	metadata[Side.BackFace.index()] = -1;
+				else metadata[Side.BackFace.index()] = world.getChunk(this.x, this.y, this.z - 1).getMetadata(x, y, size - 1);
+			}  
+			
+			if(x == size - 1) {
+				if(this.x == maxPos.getX())	metadata[Side.RightFace.index()] = -1;
+				else metadata[Side.RightFace.index()] = world.getChunk(this.x + 1, this.y, this.z).getMetadata(0, y, z);
+			}  
+
+			if(y == size - 1) {
+				if(this.y == maxPos.getY())	metadata[Side.TopFace.index()] = -1;
+				else metadata[Side.TopFace.index()] = world.getChunk(this.x, this.y + 1, this.z).getMetadata(x, 0, z);
+			} 
+
+			if(z == size - 1) {
+				if(this.z == maxPos.getZ())	metadata[Side.FrontFace.index()] = -1;
+				else metadata[Side.FrontFace.index()] = world.getChunk(this.x, this.y, this.z + 1).getMetadata(x, y, 0);
+			} 
+		}
+		
+		if(metadata[Side.LeftFace.index()] == -2) 	metadata[Side.LeftFace.index()]   = getMetadata(x - 1, y, z); // 0 -x			1				z         
+		if(metadata[Side.FrontFace.index()] == -2) 	metadata[Side.FrontFace.index()]  = getMetadata(x, y, z + 1); // 1 +z		0	C	2		-x	c	x     
+		if(metadata[Side.RightFace.index()] == -2) 	metadata[Side.RightFace.index()]  = getMetadata(x + 1, y, z); // 2 +x			3			   -z         
+		if(metadata[Side.BackFace.index()] == -2)	metadata[Side.BackFace.index()]   = getMetadata(x, y, z - 1); // 3 -z					4				+y
+		if(metadata[Side.TopFace.index()] == -2) 	metadata[Side.TopFace.index()]	  = getMetadata(x, y + 1, z); // 4 +y					C				 c
+		if(metadata[Side.BottomFace.index()] == -2) metadata[Side.BottomFace.index()] = getMetadata(x, y - 1, z); // 5 -y					5				-y
+		
+		return metadata;	
 	}
 	
 	public void save(String fileLoc) {
@@ -438,16 +480,16 @@ public class Chunk {
 		return hasCubes;
 	}
 
-	public ChunkRender getRender() {
+	public Render getRender() {
 		return render;
+	}
+	
+	public TextureMap getTextureMap() {
+		return render.getTextureMap();
 	}
 	
 	public int getSize() {
 		return size;
-	}
-	
-	public boolean doesSetContainCube(Cube cube) {
-		return typesOfCubes.add(cube);
 	}
 	
 	public boolean doesChunkContainCube(int cube) {
@@ -460,12 +502,8 @@ public class Chunk {
 		return false;
 	}
 	
-	public CubeTextureMap getTextureMap() {
-		return render.getTextureMap();
-	}
-	
-	public void forceVBOUpdate() {
-		render.forceVBOUpdate();
+	public void requestRenderRebuild() {
+		render.requestRenderRebuild();
 	}
 	
 	public void setIsLoaded(boolean isLoaded) {
@@ -484,8 +522,8 @@ public class Chunk {
 		return loadedNeighbors;
 	}
 	
-	public void loadNeighbor(int side, boolean state) {
-		loadedNeighbors[side] = state;
+	public void loadNeighbor(Side side, boolean state) {
+		loadedNeighbors[side.index()] = state;
 
 		for(boolean bool : loadedNeighbors) {
 			if(!bool) {
@@ -503,5 +541,13 @@ public class Chunk {
 
 	public int getCubeCount() {
 		return cubeCount;
+	}
+	
+	public String toString() {
+		return "Chunk <" + x + ", " + y + ", " + z + ">" + "[worldId=" + worldId + "]";
+	}
+	
+	public void cleanUp() {
+		getRender().cleanUp();
 	}
 }

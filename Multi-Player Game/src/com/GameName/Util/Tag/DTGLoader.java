@@ -12,9 +12,11 @@ import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import com.GameName.Util.Time;
 import com.GameName.Util.Vectors.Vector3f;
 
 public class DTGLoader {	
+	public static final int MAX_BYTES = (int) Math.pow(2, 20);//4096; // 2^12	
 	
 	public static OutputStream getOutputStream(File f) throws IOException {
 		if(!f.getAbsolutePath().endsWith(".dtg")) throw new IOException("DTG files must end with \".dtg\"");
@@ -36,14 +38,16 @@ public class DTGLoader {
 	 */
 	
 	public static ArrayList<TagGroup> readAll(InputStream read) throws IOException {
+		long startTime = Time.getSystemTime();
 		ArrayList<TagGroup> groups = new ArrayList<>();
 		
 		byte in = -1; int index = 0;
-		byte[] bytes = new byte[2048];
+		byte[] bytes = new byte[MAX_BYTES];
 		String tagName = null, unprossesedInfo;
 		
 		Tag groupIdTag = null; boolean readingId = false;
 		ArrayList<Tag> tags = new ArrayList<>();
+		int tagCount = 0;
 		
 		while((in = (byte) read.read()) != 6) {
 			switch(in) {
@@ -54,14 +58,13 @@ public class DTGLoader {
 				case 4: groups.add(new TagGroup(groupIdTag, tags.toArray(new Tag[tags.size()]))); break;
 			
 				//Tag
-				case 2: bytes = new byte[2048]; break;
-				case 0: tagName = new String(bytes).trim(); bytes = new byte[2048]; break;
-				case 3: unprossesedInfo = new String(bytes).trim(); 
+				case 2: bytes = new byte[MAX_BYTES]; break;
+				case 0: tagName = new String(bytes).trim(); bytes = new byte[MAX_BYTES]; break;
+				case 3: unprossesedInfo = new String(bytes).trim(); tagCount ++;
 					Tag tag = new Tag(tagName, processInfo(unprossesedInfo));
-//					System.out.println(tagName);
 					
 					if(readingId) {
-						groupIdTag = tag;
+						groupIdTag = tag.clone();
 						readingId = false;
 					} else {
 						tags.add(tag);
@@ -72,6 +75,11 @@ public class DTGLoader {
 			}	
 		} 
 		
+		read.close();
+		
+		System.out.println((Time.getSystemTime() - startTime) + " -> " + 
+				tagCount + " / " + ((double)(Time.getSystemTime() - startTime) / (double)Time.SECONDS) + " = " + 
+				((double)tagCount) / ((double)(Time.getSystemTime() - startTime) / (double)Time.SECONDS));
 		return groups;
 	} 
 	
@@ -92,6 +100,9 @@ public class DTGLoader {
 		}	
 		
 		write.write((byte) 6);
+		
+		write.flush();
+		write.close();
 	}
 	
 	public static void writeTag(OutputStream write, Tag tag) throws IOException {

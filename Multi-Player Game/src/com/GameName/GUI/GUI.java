@@ -1,9 +1,13 @@
 package com.GameName.GUI;
 
+import java.io.IOException;
+
 import com.GameName.Engine.GameEngine;
 import com.GameName.GUI.Components.GUIComponent;
 import com.GameName.Render.Effects.Texture;
+import com.GameName.Render.Effects.Texture2D;
 import com.GameName.Render.Types.Render2D;
+import com.GameName.Render.Types_2.IRenderable;
 
 public abstract class GUI extends Render2D {
 	private final String GUI_TEXTURE_ROOT_DIR = "res/textures/gui/";
@@ -23,12 +27,12 @@ public abstract class GUI extends Render2D {
 	}	
 
 	public void open() {
-		ENGINE.getRender().add(this);
+		ENGINE.getRender().add((IRenderable) this);
 		isOpen = true;
 	}
 	
 	public void close() {
-		ENGINE.getRender().remove(this);
+		ENGINE.getRender().remove((IRenderable) this);
 		isOpen = false;
 	}
 	
@@ -56,7 +60,11 @@ public abstract class GUI extends Render2D {
 	
 	private void loadTextures(String type) {
 		for(int i = 0; i < textures.length; i ++) {
-			textures[i] = new Texture(GUI_TEXTURE_ROOT_DIR + name, false, type);
+			try {
+				textures[i] = new Texture2D(GUI_TEXTURE_ROOT_DIR + name, false);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

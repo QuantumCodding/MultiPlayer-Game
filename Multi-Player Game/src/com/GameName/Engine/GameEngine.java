@@ -13,7 +13,7 @@ import com.GameName.Physics.PhysicsObject;
 import com.GameName.Physics.Dispatch.AABBCollisionDispacher;
 import com.GameName.Render.GLContextThread;
 import com.GameName.Render.RenderEngine;
-import com.GameName.Render.Types.Renderable;
+import com.GameName.Render.Types_2.IRenderable;
 import com.GameName.World.World;
 
 public class GameEngine {
@@ -61,7 +61,7 @@ public class GameEngine {
 	public void addThread(GameThread thread) {threads.addThread(thread);}
 	
 	public void add(PhysicsObject obj) {physics.add(obj);}
-	public void add(Renderable obj) {render.add(obj);}
+	public void add(IRenderable obj) {render.add(obj);}
 	public void add(SoundEvent obj) {sound.add(obj);}
 
 	public PhysicsEngine getPhysics() {return physics;}	

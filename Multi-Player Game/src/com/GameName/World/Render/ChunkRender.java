@@ -1,72 +1,71 @@
-	package com.GameName.World.Render;
+package com.GameName.World.Render;
 
+//import java.io.File;
+import java.util.ArrayList;
+
+import com.GameName.Cube.Cube;
 import com.GameName.Cube.Render.CubeRenderUtil;
-import com.GameName.Cube.Render.CubeTextureMap;
 import com.GameName.Engine.GameEngine;
-import com.GameName.Render.Types.Render3D;
+import com.GameName.Render.Effects.RenderProperties.RenderPropertiesBuilder;
+import com.GameName.Render.Effects.TextureMap;
+import com.GameName.Render.Types_2.Render3D;
 import com.GameName.World.Chunk;
 
 public class ChunkRender extends Render3D {
 	private Chunk chunk;
 	private boolean hasCubes;
+	private boolean newRenders;
+	private TextureMap textureMap;
 	
-	private CubeTextureMap textureMap;
+	private ArrayList<ChunkRenderSection> sections;
 	
 	public ChunkRender(GameEngine eng, Chunk chunk) {
 		super(eng);
 		this.chunk = chunk;
+		textureMap = new TextureMap(ENGINE, false);
+		
+		sections = new ArrayList<>();
+		setRenderProperties(new RenderPropertiesBuilder(getRenderProperties()).enableTexture3D().build());
 	}
 	
-	public void draw() {
+//	private boolean isSaved = false;
+	public void preformRender() {
 		if(!hasCubes) return;
-			
-//		glTranslatef(0, -((WorldRegistry.getWorld(chunk.getWorldId()).getSizeY() - chunk.getY()) * (World.SCALE * 0.1f)), 0);
-		super.draw();			
+		
+//		if(!isSaved) { //					     frcAluminati
+//			textureMap.getTextureMap().save(new File("C:\\Users\\user\\Desktop\\3D Texture Tests\\Chunks\\" + 
+//					chunk.getX() + "-" + chunk.getY() + "-" + chunk.getZ() + "\\TextureMap")); isSaved = true;
+//		}
+		
+		if(newRenders) {
+			for(ChunkRenderSection section : sections)
+				ENGINE.add(section);
+		
+			newRenders = false;
+		}
 	}
 
-	public void updateVBOs() {		
-		if(vertexVBO == -1) {
-			genVBOids();
+	public void buildRender() {
+		for(ChunkRenderSection section : sections) {
+			section.cleanUp();
 		}
 		
-		textureMap = CubeRenderUtil.generateTexturMap(ENGINE, chunk.getTypesOfCubes());
-		int[] ids = ChunkRenderGenerator.generateChunk(ENGINE, chunk, new int[] {vertexVBO, textureVBO, colorVBO, normalVBO, 0});
-		
-		vertexVBO = ids[0];
-		textureVBO = ids[1];
-		colorVBO = ids[2];
-		normalVBO = ids[3];
-		
-		vertexCount = ids[4];
-
-		vboUpdateNeeded = false;
-	}
-
-	public void genVBOids() {
-		int[] ids = ENGINE.getGLContext().genBufferIds(4);
-
-		this.vertexVBO = ids[0];
-		this.textureVBO = ids[1];
-		this.colorVBO = ids[2];
-		this.normalVBO = ids[3];
-		
-		needsVBOids = false;
-	}
-
-	protected void cleanUp_Render3D() {
-
+		sections = ChunkRenderGenerator.generateChunkSectors(ENGINE, chunk);
+		newRenders = true;
 	}
 	
-	public CubeTextureMap getTextureMap() {
-		return textureMap;
+	public ArrayList<ChunkRenderSection> getSections() {
+		return sections;
 	}
-
-	public void setTextureMap(CubeTextureMap textureMap) {
-		this.textureMap = textureMap;
-		setTexture(textureMap.getTexture());
-	}
-
-	public void setHasCubes(boolean hasCubes) {
-		this.hasCubes = hasCubes;
+	
+	public Chunk getChuck() { return chunk; }
+	public boolean hasCubes() { return hasCubes; }
+	public TextureMap getTextureMap() { return textureMap; }
+	
+	public void addCubes(Cube... cubes) {
+		hasCubes = true;
+		for(Cube cube : cubes) {
+			CubeRenderUtil.addCubeToTextureMap(cube, textureMap);
+		}
 	}
 }

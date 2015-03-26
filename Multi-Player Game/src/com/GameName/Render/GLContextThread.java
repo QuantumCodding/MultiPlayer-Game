@@ -1,5 +1,10 @@
 package com.GameName.Render;
 
+import static org.lwjgl.opengl.GL11.GL_RGBA;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glGetTexImage;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL15.glBufferData;
@@ -8,6 +13,7 @@ import static org.lwjgl.opengl.GL15.glGenBuffers;
 
 import java.awt.image.BufferedImage;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -17,7 +23,11 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 
 import com.GameName.Render.Effects.Texture;
+import com.GameName.Render.Effects.Texture1D;
+import com.GameName.Render.Effects.Texture2D;
+import com.GameName.Render.Effects.Texture3D;
 import com.GameName.Util.QueuedArray;
+import com.GameName.Util.Vectors.Vector3f;
 
 public class GLContextThread {
 
@@ -29,13 +39,16 @@ public class GLContextThread {
 	private QueuedArray<Integer> usages;
 	private QueuedArray<Character> types;
 	
-	private BufferedImage image;
-	private String textureLocation;
-	private String imageType;
-	private Texture texture;
-	private String textureName;
-	private boolean useMipmap;
-	private boolean generatingTexture;
+	private BufferedImage image1D, image2D;
+	private ByteBuffer image3D; private Vector3f size3D;
+	private boolean useMipmap1D, useMipmap2D, useMipmap3D;
+	private boolean generating1D, generating2D, generating3D;
+	private Texture1D texture1D; private Texture2D texture2D;
+	private Texture3D texture3D;
+	
+	private Texture textureToGetData;
+	private ByteBuffer textureDataResult;
+	private boolean gettingTextureData;
 	
 	private boolean generatingBufferIds;
 	private int requestAmount;
@@ -63,7 +76,6 @@ public class GLContextThread {
 		int i = 0;	
 		if(sizeCheck(bufferIds, targets, usages, types, buffers)) {
 			for(Integer bufferId : bufferIds.getElements()) {
-//				Logger.print("Binding Buffer: " + bufferId).setType("VBO").end();
 				
 				int target = targets.get(i).intValue();
 				int usage = usages.get(i).intValue(); 
@@ -93,15 +105,27 @@ public class GLContextThread {
 			generatingBufferIds = false;
 		}
 		
-		if(generatingTexture) {
+		if(generating1D) {
+			texture1D = new Texture1D(image1D, useMipmap1D);			
+			generating1D = false;
+		}
+		
+		if(generating2D) {
+			texture2D = new Texture2D(image2D, useMipmap2D);			
+			generating2D = false;
+		}
+		
+		if(generating3D) {
+			texture3D = new Texture3D(image3D, size3D, useMipmap3D);
+			generating3D = false;
+		}
+		
+		if(gettingTextureData) {
+			glEnable(textureToGetData.getType().glType()); textureToGetData.bind();
+			glGetTexImage(textureToGetData.getType().glType(), 0, GL_RGBA, GL_UNSIGNED_BYTE, textureDataResult);
+			glDisable(textureToGetData.getType().glType());
 			
-			if(image != null) {
-				texture = new Texture(image, textureName, useMipmap);
-			} else {
-				texture = new Texture(textureLocation, useMipmap, imageType);
-			}
-			
-			generatingTexture = false;
+			gettingTextureData = false;
 		}
 		
 		for(Integer buffer : buffersToDelete.getElements()) {
@@ -169,45 +193,92 @@ public class GLContextThread {
 		return generatedBufferIds;
 	}
 	
-	public synchronized Texture genTexture(BufferedImage image, String textureName, boolean useMipmap) {
+	public synchronized Texture1D genTexture1D(BufferedImage image, boolean useMipmap) {
 		try {
 			if(Display.isCurrent()) {
-				return new Texture(image, textureName, useMipmap);
+				return new Texture1D(image, useMipmap);
 			}
 		} catch (LWJGLException e) {}
 		
-		while(generatingTexture) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
+		while(generating1D) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
 		while(prossessing) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
 		
-		this.image = image; this.textureName = textureName; 
-		this.textureLocation = null; this.imageType = null;
-		this.useMipmap = useMipmap; generatingTexture = true;
+		this.image1D = image; 
+		this.useMipmap1D = useMipmap; 
+		this.generating1D = true;
 		
-		while(generatingTexture) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
-		return texture;
+		while(generating1D) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
+		return texture1D;
 	}
 	
-	public synchronized Texture genTexture(String textureLocation, String imageType, boolean useMipmap) {
+	public synchronized Texture2D genTexture2D(BufferedImage image, boolean useMipmap) {
 		try {
 			if(Display.isCurrent()) {
-				return new Texture(textureLocation, useMipmap, imageType);
+				return new Texture2D(image, useMipmap);
 			}
 		} catch (LWJGLException e) {}
 		
-		while(generatingTexture) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
+		while(generating2D) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
 		while(prossessing) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
 		
-		this.image = null; this.textureName = null;  
-		this.textureLocation = textureLocation; this.imageType = imageType;
-		this.useMipmap = useMipmap; generatingTexture = true;
+		this.image2D = image; 
+		this.useMipmap2D = useMipmap; 
+		this.generating2D = true;
 		
-		while(generatingTexture) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
-		return texture;
+		while(generating2D) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
+		return texture2D;
+	}
+	
+	public synchronized Texture3D genTexture3D(ByteBuffer image, Vector3f size, boolean useMipmap) {
+		try {
+			if(Display.isCurrent()) {
+				return new Texture3D(image, size, useMipmap);
+			}
+		} catch (LWJGLException e) {}
+		
+		while(generating3D) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
+		while(prossessing) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
+		
+		this.image3D = image; 
+		this.size3D = size;
+		this.useMipmap3D = useMipmap; 
+		this.generating3D = true;
+		
+		while(generating3D) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
+		return texture3D;
+	}
+	
+	public synchronized ByteBuffer getTextureData(Texture texture) {
+		try {
+			if(Display.isCurrent()) {
+				ByteBuffer textureDataResult = BufferUtils.createByteBuffer(
+						texture.getWidth() * texture.getHeight() * texture.getDepth() * 4);
+				
+				glEnable(texture.getType().glType()); texture.bind();
+				glGetTexImage(texture.getType().glType(), 0, GL_RGBA, GL_UNSIGNED_BYTE, textureDataResult);
+				glDisable(texture.getType().glType());
+				
+				return textureDataResult;
+			}
+		} catch (LWJGLException e) {}
+		
+		while(gettingTextureData) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
+		while(prossessing) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
+		
+		textureDataResult = BufferUtils.createByteBuffer(
+				texture.getWidth() * texture.getHeight() * texture.getDepth() * 4);
+		
+		this.textureToGetData = texture;
+		this.gettingTextureData = true;
+		
+		while(gettingTextureData) {try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}}
+		return textureDataResult;
 	}
 
 	public synchronized void addBufferBind(Buffer buffer, int target, int bufferId, int usage, char type) {
 		try {
 			if(Display.isCurrent()) {
+				
 				glBindBuffer(target, bufferId);
 				
 				if(type == 'f') {

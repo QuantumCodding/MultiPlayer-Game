@@ -52,6 +52,10 @@ public class Tag {
 		return true;
 	}
 
+	public Tag clone() {
+		return new Tag(name, info);
+	}
+	
 	public String getName() {
 		return name;
 	}

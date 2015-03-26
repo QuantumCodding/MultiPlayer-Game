@@ -2,7 +2,9 @@ package com.GameName.Cube.Render;
 
 import java.util.ArrayList;
 
+import com.GameName.Render.Effects.TextureMap;
 import com.GameName.Util.Vectors.Vector3f;
+import com.GameName.World.Chunk;
 
 public interface ICubeRender {
 	public static final Vector3f[] DEFAULT_CUBE = new Vector3f[] {
@@ -15,9 +17,10 @@ public interface ICubeRender {
 	};
 	
 	public ArrayList<Float> getVertices(float x, float y, float z, boolean[] visableFaces);	
-	public ArrayList<Float> getTextureCoords(int cubeId, int metadata, CubeTextureMap textureMap, boolean[] visableFaces);
+	public ArrayList<Float> getTextureCoords(int cubeId, int metadata, TextureMap textureMap, boolean[] visableFaces);
 	public ArrayList<Float> getColors(int cubeId, int metadata, boolean[] visableFaces);
 	public ArrayList<Float> getNormals(int cubeId, int metadata, boolean[] visableFaces);
 	
+	public boolean[] getVisableFaces(int x, int y, int z, Chunk c);
 	public int getVerticeCount(boolean[] visableFaces);
 }
